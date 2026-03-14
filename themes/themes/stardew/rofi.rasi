@@ -1,21 +1,33 @@
-/* Stardew rofi — sharp, pixelated */
+/* Stardew — Gruvbox Dark, sharp, pixelated */
 * {
-    bg: rgba(27, 29, 46, 0.96);
-    fg: #edf2f4;
-    accent: #52b788;
-    muted: #4a4e69;
+    bg: rgba(29, 32, 33, 0.96);
+    fg: #ebdbb2;
+    accent: #d79921;
+    muted: #a89984;
 }
 
 window {
     border-radius: 0;
-    border: 2px solid rgba(82, 183, 136, 0.3);
+    border: 2px solid rgba(215, 153, 33, 0.3);
 }
 
 element {
     border-radius: 0;
 }
 
+element selected {
+    background-color: rgba(215, 153, 33, 0.15);
+}
+
+element-text selected {
+    color: #d79921;
+}
+
 inputbar {
     border: 0 0 2px 0;
-    border-color: rgba(82, 183, 136, 0.2);
+    border-color: rgba(215, 153, 33, 0.2);
+}
+
+prompt {
+    color: #b8bb26;
 }

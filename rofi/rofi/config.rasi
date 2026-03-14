@@ -5,87 +5,76 @@ configuration {
     display-run: "";
     display-window: "";
     drun-display-format: "{name}";
-    font: "JetBrains Mono 12";
+    font: "JetBrains Mono 13";
     modi: "drun,run,window";
 }
 
+/* Override any system theme */
+@theme "/dev/null"
+
 * {
-    bg: rgba(26, 27, 38, 0.95);
-    fg: #c8d3f5;
-    accent: #82aaff;
-    muted: #565f89;
-    urgent: #f38ba8;
+    background-color: transparent;
+    text-color: #c0caf5;
 }
 
 window {
-    width: 500px;
-    background-color: @bg;
-    border: 1px solid rgba(130, 170, 255, 0.2);
-    border-radius: 12px;
-    padding: 12px;
+    width: 680px;
+    background-color: #1a1b26dd;
+    border: 1px solid;
+    border-color: #bb9af733;
+    border-radius: 14px;
+    padding: 16px;
+    location: center;
+    anchor: center;
+}
+
+mainbox {
+    spacing: 12px;
 }
 
 inputbar {
     children: [prompt, entry];
-    background-color: transparent;
-    padding: 8px;
-    margin: 0 0 8px 0;
+    padding: 12px 14px;
     border: 0 0 1px 0;
-    border-color: rgba(130, 170, 255, 0.15);
+    border-color: #bb9af726;
 }
 
 prompt {
-    color: @accent;
-    margin: 0 8px 0 0;
+    text-color: #bb9af7;
+    margin: 0 10px 0 0;
 }
 
 entry {
-    color: @fg;
+    text-color: #c0caf5;
     placeholder: "Search...";
-    placeholder-color: @muted;
-}
-
-listbox {
-    background-color: transparent;
-}
-
-mainbox {
-    background-color: transparent;
-}
-
-message {
-    background-color: transparent;
+    placeholder-color: #565f89;
 }
 
 listview {
     columns: 1;
-    lines: 8;
+    lines: 10;
     fixed-height: false;
-    background-color: transparent;
     spacing: 4px;
 }
 
 element {
-    padding: 8px 12px;
-    border-radius: 8px;
-    background-color: transparent;
+    padding: 10px 14px;
+    border-radius: 10px;
 }
 
 element selected {
-    background-color: rgba(130, 170, 255, 0.12);
+    background-color: #bb9af71a;
 }
 
 element-text {
-    color: @fg;
-    background-color: transparent;
+    text-color: #c0caf5;
 }
 
 element-text selected {
-    color: @accent;
+    text-color: #ffc777;
 }
 
 element-icon {
-    size: 22px;
-    margin: 0 8px 0 0;
-    background-color: transparent;
+    size: 24px;
+    margin: 0 10px 0 0;
 }

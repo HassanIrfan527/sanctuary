@@ -1,19 +1,20 @@
-/* Cyberpunk — neon glow, sharp, hacker aesthetic */
+/* Cyberpunk — Dracula+Neon, sharp, glowing, hacker aesthetic */
 window#waybar {
-    background: rgba(10, 10, 15, 0.9);
-    border-bottom: 1px solid rgba(255, 32, 121, 0.4);
-    font-family: "Geist Mono", "JetBrains Mono", monospace;
+    background: rgba(13, 13, 13, 0.9);
+    border-bottom: 1px solid rgba(255, 121, 198, 0.4);
+    font-family: "Rajdhani", "Geist Mono", "Share Tech Mono", monospace;
 }
 
 #workspaces button {
     border-radius: 2px;
     margin: 2px 1px;
+    color: #6272a4;
 }
 
 #workspaces button.active {
-    background: rgba(255, 32, 121, 0.2);
-    color: #00ff9c;
-    box-shadow: 0 0 4px rgba(255, 32, 121, 0.3);
+    background: rgba(255, 121, 198, 0.2);
+    color: #50fa7b;
+    box-shadow: 0 0 4px rgba(255, 121, 198, 0.3);
 }
 
 #clock,
@@ -24,25 +25,26 @@ window#waybar {
 #custom-notification,
 #tray {
     border-radius: 2px;
+    color: #f8f8f2;
 }
 
 #clock {
-    color: #00ff9c;
-    text-shadow: 0 0 6px rgba(0, 255, 156, 0.3);
+    color: #50fa7b;
+    text-shadow: 0 0 6px rgba(80, 250, 123, 0.3);
 }
 
 #custom-weather {
-    color: #00e5ff;
+    color: #8be9fd;
 }
 
 #custom-calendar {
-    color: #7b61ff;
+    color: #bd93f9;
 }
 
 #pulseaudio {
-    color: #ff2079;
+    color: #ff79c6;
 }
 
 #network {
-    color: #00e5ff;
+    color: #8be9fd;
 }

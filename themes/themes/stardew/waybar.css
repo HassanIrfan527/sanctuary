@@ -1,20 +1,21 @@
-/* Stardew Valley — pixelated, blocky, no rounding */
+/* Stardew Valley — Gruvbox Dark, pixelated, blocky, no rounding */
 window#waybar {
-    background: rgba(27, 29, 46, 0.92);
-    border-bottom: 2px solid rgba(82, 183, 136, 0.3);
-    font-family: "Cozette", "JetBrains Mono", monospace;
+    background: rgba(29, 32, 33, 0.92);
+    border-bottom: 2px solid rgba(215, 153, 33, 0.3);
+    font-family: "Cozette", "Terminess Nerd Font", monospace;
 }
 
 #workspaces button {
     border-radius: 0;
-    border: 1px solid rgba(82, 183, 136, 0.15);
+    border: 1px solid rgba(168, 153, 132, 0.15);
     margin: 2px 1px;
+    color: #a89984;
 }
 
 #workspaces button.active {
-    background: rgba(82, 183, 136, 0.25);
-    color: #52b788;
-    border-color: rgba(82, 183, 136, 0.5);
+    background: rgba(215, 153, 33, 0.25);
+    color: #d79921;
+    border-color: rgba(215, 153, 33, 0.5);
 }
 
 #clock,
@@ -25,17 +26,26 @@ window#waybar {
 #custom-notification,
 #tray {
     border-radius: 0;
-    border: 1px solid rgba(82, 183, 136, 0.1);
+    border: 1px solid rgba(168, 153, 132, 0.1);
+    color: #ebdbb2;
 }
 
 #clock {
-    color: #e9c46a;
+    color: #d79921;
 }
 
 #custom-weather {
-    color: #76c8ae;
+    color: #8ec07c;
 }
 
 #custom-calendar {
-    color: #52b788;
+    color: #b8bb26;
+}
+
+#pulseaudio {
+    color: #83a598;
+}
+
+#network {
+    color: #458588;
 }

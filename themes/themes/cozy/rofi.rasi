@@ -1,7 +1,19 @@
-/* Cozy rofi overrides */
+/* Cozy — Tokyo Night, soft rounded */
 * {
     bg: rgba(26, 27, 38, 0.95);
-    fg: #c8d3f5;
-    accent: #82aaff;
+    fg: #c0caf5;
+    accent: #bb9af7;
     muted: #565f89;
+}
+
+element selected {
+    background-color: rgba(187, 154, 247, 0.12);
+}
+
+element-text selected {
+    color: #ffc777;
+}
+
+prompt {
+    color: #bb9af7;
 }

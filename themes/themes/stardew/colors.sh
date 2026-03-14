@@ -1,10 +1,11 @@
 #!/bin/bash
-# Stardew Valley — dark navy, farm green, warm red, pixelated feel
-export BG="#1b1d2e"
-export FG="#edf2f4"
-export ACCENT="#52b788"
-export HIGHLIGHT="#ef233c"
-export SECONDARY="#8d99ae"
-export MUTED="#4a4e69"
-export URGENT="#ef233c"
+# Stardew Valley — Gruvbox Dark base, earthy, warm, pixel farm at night
+export BG="#1d2021"
+export BG_ALT="#282828"
+export FG="#ebdbb2"
+export FG_MUTED="#a89984"
+export ACCENT="#b8bb26"
+export HIGHLIGHT="#d79921"
+export SECONDARY="#458588"
+export URGENT="#cc241d"
 export GTK_THEME="Graphite-teal-Dark-nord"

@@ -1,10 +1,11 @@
 #!/bin/bash
-# Cyberpunk — near black, matrix green, neon pink, electric purple
-export BG="#0a0a0f"
-export FG="#00ff9c"
-export ACCENT="#ff2079"
-export HIGHLIGHT="#7b61ff"
-export SECONDARY="#00e5ff"
-export MUTED="#1a1a2e"
-export URGENT="#ff2079"
+# Cyberpunk — Dracula+Neon hybrid, near black, neon accents, readable white fg
+export BG="#0d0d0d"
+export BG_ALT="#1a1a2e"
+export FG="#f8f8f2"
+export FG_MUTED="#6272a4"
+export ACCENT="#ff79c6"
+export HIGHLIGHT="#8be9fd"
+export SECONDARY="#50fa7b"
+export URGENT="#ff5555"
 export GTK_THEME="Graphite-teal-Dark-nord"

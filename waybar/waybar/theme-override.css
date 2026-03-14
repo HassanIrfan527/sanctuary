@@ -1,2 +1,35 @@
-/* Default theme override — replaced by switch-theme.sh */
-/* Cozy / Nature defaults */
+/* Cozy — Tokyo Night, warm, rounded, spacious */
+window#waybar {
+    background: rgba(26, 27, 38, 0.82);
+    border-bottom: 1px solid rgba(187, 154, 247, 0.08);
+    font-family: "Comfortaa", "Nunito", "JetBrains Mono", sans-serif;
+}
+
+#workspaces button {
+    color: #565f89;
+}
+
+#workspaces button.active {
+    background: rgba(187, 154, 247, 0.18);
+    color: #ffc777;
+}
+
+#clock {
+    color: #ffc777;
+}
+
+#custom-weather {
+    color: #9ece6a;
+}
+
+#custom-calendar {
+    color: #bb9af7;
+}
+
+#pulseaudio {
+    color: #7aa2f7;
+}
+
+#network {
+    color: #7dcfff;
+}

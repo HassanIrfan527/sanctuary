@@ -1,21 +1,25 @@
-/* Stardew — sharp corners, pixel borders */
+/* Stardew — Gruvbox Dark, sharp corners, earthy */
 .notification {
-    background: rgba(27, 29, 46, 0.94);
-    border: 2px solid rgba(82, 183, 136, 0.2);
+    background: rgba(29, 32, 33, 0.94);
+    border: 2px solid rgba(215, 153, 33, 0.2);
     border-radius: 0;
 }
 
 .summary {
-    color: #e9c46a;
+    color: #d79921;
     font-family: "Cozette", "JetBrains Mono", sans-serif;
 }
 
 .body {
-    color: #edf2f4;
+    color: #ebdbb2;
 }
 
 .control-center {
-    background: rgba(27, 29, 46, 0.96);
-    border: 2px solid rgba(82, 183, 136, 0.2);
+    background: rgba(29, 32, 33, 0.96);
+    border: 2px solid rgba(215, 153, 33, 0.2);
     border-radius: 0;
+}
+
+.widget-dnd > switch:checked {
+    background: rgba(184, 187, 38, 0.4);
 }

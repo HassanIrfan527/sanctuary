@@ -12,12 +12,16 @@
     "relative-timestamps": true,
     "hide-on-clear": true,
     "hide-on-action": true,
-    "widgets": ["title", "dnd", "notifications"],
+    "widgets": ["title", "mpris", "dnd", "notifications"],
     "widget-config": {
         "title": {
             "text": "Notifications",
             "clear-all-button": true,
             "button-text": "Clear"
+        },
+        "mpris": {
+            "image-size": 64,
+            "image-radius": 8
         },
         "dnd": {
             "text": "Do Not Disturb"

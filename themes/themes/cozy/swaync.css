@@ -1,7 +1,7 @@
-/* Cozy notification overrides */
+/* Cozy — Tokyo Night, soft rounded notifications */
 .notification {
     background: rgba(26, 27, 38, 0.92);
-    border-color: rgba(130, 170, 255, 0.12);
+    border-color: rgba(187, 154, 247, 0.12);
     border-radius: 12px;
 }
 
@@ -9,8 +9,16 @@
     color: #ffc777;
 }
 
+.body {
+    color: #c0caf5;
+}
+
 .control-center {
     background: rgba(26, 27, 38, 0.95);
-    border-color: rgba(130, 170, 255, 0.12);
+    border-color: rgba(187, 154, 247, 0.12);
     border-radius: 14px;
+}
+
+.widget-dnd > switch:checked {
+    background: rgba(187, 154, 247, 0.4);
 }
