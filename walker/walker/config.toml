@@ -1,0 +1,17 @@
+[search]
+placeholder = "Search..."
+delay = 150
+
+[list]
+max_entries = 8
+
+[activation_mode]
+disabled = false
+use_alt = true
+
+[builtins.applications]
+weight = 5
+
+[builtins.websearch]
+prefix = "?"
+entries = [{name = "Google", url = "https://www.google.com/search?q=%s"}]

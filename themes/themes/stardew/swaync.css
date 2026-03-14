@@ -1,0 +1,21 @@
+/* Stardew — sharp corners, pixel borders */
+.notification {
+    background: rgba(27, 29, 46, 0.94);
+    border: 2px solid rgba(82, 183, 136, 0.2);
+    border-radius: 0;
+}
+
+.summary {
+    color: #e9c46a;
+    font-family: "Cozette", "JetBrains Mono", sans-serif;
+}
+
+.body {
+    color: #edf2f4;
+}
+
+.control-center {
+    background: rgba(27, 29, 46, 0.96);
+    border: 2px solid rgba(82, 183, 136, 0.2);
+    border-radius: 0;
+}

@@ -1,0 +1,48 @@
+/* Cyberpunk — neon glow, sharp, hacker aesthetic */
+window#waybar {
+    background: rgba(10, 10, 15, 0.9);
+    border-bottom: 1px solid rgba(255, 32, 121, 0.4);
+    font-family: "Geist Mono", "JetBrains Mono", monospace;
+}
+
+#workspaces button {
+    border-radius: 2px;
+    margin: 2px 1px;
+}
+
+#workspaces button.active {
+    background: rgba(255, 32, 121, 0.2);
+    color: #00ff9c;
+    box-shadow: 0 0 4px rgba(255, 32, 121, 0.3);
+}
+
+#clock,
+#custom-weather,
+#custom-calendar,
+#pulseaudio,
+#network,
+#custom-notification,
+#tray {
+    border-radius: 2px;
+}
+
+#clock {
+    color: #00ff9c;
+    text-shadow: 0 0 6px rgba(0, 255, 156, 0.3);
+}
+
+#custom-weather {
+    color: #00e5ff;
+}
+
+#custom-calendar {
+    color: #7b61ff;
+}
+
+#pulseaudio {
+    color: #ff2079;
+}
+
+#network {
+    color: #00e5ff;
+}

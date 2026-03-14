@@ -1,0 +1,5 @@
+--target=~/.config
+--ignore=.stowrc
+--ignore=.git
+--ignore=.gitignore
+--ignore=README.md

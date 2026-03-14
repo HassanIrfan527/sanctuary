@@ -1,0 +1,91 @@
+configuration {
+    show-icons: true;
+    icon-theme: "Tela-dark";
+    display-drun: "";
+    display-run: "";
+    display-window: "";
+    drun-display-format: "{name}";
+    font: "JetBrains Mono 12";
+    modi: "drun,run,window";
+}
+
+* {
+    bg: rgba(26, 27, 38, 0.95);
+    fg: #c8d3f5;
+    accent: #82aaff;
+    muted: #565f89;
+    urgent: #f38ba8;
+}
+
+window {
+    width: 500px;
+    background-color: @bg;
+    border: 1px solid rgba(130, 170, 255, 0.2);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+inputbar {
+    children: [prompt, entry];
+    background-color: transparent;
+    padding: 8px;
+    margin: 0 0 8px 0;
+    border: 0 0 1px 0;
+    border-color: rgba(130, 170, 255, 0.15);
+}
+
+prompt {
+    color: @accent;
+    margin: 0 8px 0 0;
+}
+
+entry {
+    color: @fg;
+    placeholder: "Search...";
+    placeholder-color: @muted;
+}
+
+listbox {
+    background-color: transparent;
+}
+
+mainbox {
+    background-color: transparent;
+}
+
+message {
+    background-color: transparent;
+}
+
+listview {
+    columns: 1;
+    lines: 8;
+    fixed-height: false;
+    background-color: transparent;
+    spacing: 4px;
+}
+
+element {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background-color: transparent;
+}
+
+element selected {
+    background-color: rgba(130, 170, 255, 0.12);
+}
+
+element-text {
+    color: @fg;
+    background-color: transparent;
+}
+
+element-text selected {
+    color: @accent;
+}
+
+element-icon {
+    size: 22px;
+    margin: 0 8px 0 0;
+    background-color: transparent;
+}

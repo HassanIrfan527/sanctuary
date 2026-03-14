@@ -1,0 +1,10 @@
+[manager]
+layout = [1, 4, 3]
+sort_by = "natural"
+sort_dir_first = true
+show_hidden = false
+show_symlink = true
+
+[opener]
+edit = [{ exec = 'nvim "$@"', block = true }]
+open = [{ exec = 'xdg-open "$@"', orphan = true }]

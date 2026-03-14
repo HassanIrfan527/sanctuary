@@ -1,0 +1,25 @@
+/* Cyberpunk — neon borders, dark glass */
+.notification {
+    background: rgba(10, 10, 15, 0.94);
+    border: 1px solid rgba(255, 32, 121, 0.3);
+    border-radius: 4px;
+}
+
+.summary {
+    color: #00ff9c;
+    text-shadow: 0 0 4px rgba(0, 255, 156, 0.2);
+}
+
+.body {
+    color: #b0b0b0;
+}
+
+.control-center {
+    background: rgba(10, 10, 15, 0.96);
+    border: 1px solid rgba(255, 32, 121, 0.3);
+    border-radius: 4px;
+}
+
+.widget-dnd > switch:checked {
+    background: rgba(255, 32, 121, 0.4);
+}

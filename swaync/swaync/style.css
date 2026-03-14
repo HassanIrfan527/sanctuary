@@ -1,0 +1,85 @@
+/* Base swaync style — theme colors imported from theme-override.css */
+@import "theme-override.css";
+
+* {
+    font-family: "JetBrains Mono", sans-serif;
+    font-size: 13px;
+}
+
+.notification-row {
+    outline: none;
+}
+
+.notification {
+    background: rgba(26, 27, 38, 0.92);
+    border: 1px solid rgba(130, 170, 255, 0.15);
+    border-radius: 10px;
+    margin: 6px;
+    padding: 0;
+}
+
+.notification-content {
+    padding: 8px 12px;
+}
+
+.summary {
+    color: #c8d3f5;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.body {
+    color: #a9b1d6;
+    font-size: 12px;
+}
+
+.close-button {
+    background: transparent;
+    color: #565f89;
+    border: none;
+    border-radius: 50%;
+    padding: 2px;
+    margin: 4px;
+}
+
+.close-button:hover {
+    color: #f38ba8;
+}
+
+.control-center {
+    background: rgba(26, 27, 38, 0.95);
+    border: 1px solid rgba(130, 170, 255, 0.15);
+    border-radius: 12px;
+    margin: 8px;
+    padding: 8px;
+}
+
+.control-center .notification {
+    border-radius: 8px;
+}
+
+widget.label > label {
+    color: #c8d3f5;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.widget-title {
+    margin: 4px 8px;
+}
+
+.widget-dnd {
+    margin: 4px 8px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    background: rgba(130, 170, 255, 0.1);
+}
+
+.widget-dnd > switch {
+    border-radius: 10px;
+    background: rgba(86, 95, 137, 0.4);
+}
+
+.widget-dnd > switch:checked {
+    background: rgba(130, 170, 255, 0.4);
+}

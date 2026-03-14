@@ -1,0 +1,41 @@
+/* Stardew Valley — pixelated, blocky, no rounding */
+window#waybar {
+    background: rgba(27, 29, 46, 0.92);
+    border-bottom: 2px solid rgba(82, 183, 136, 0.3);
+    font-family: "Cozette", "JetBrains Mono", monospace;
+}
+
+#workspaces button {
+    border-radius: 0;
+    border: 1px solid rgba(82, 183, 136, 0.15);
+    margin: 2px 1px;
+}
+
+#workspaces button.active {
+    background: rgba(82, 183, 136, 0.25);
+    color: #52b788;
+    border-color: rgba(82, 183, 136, 0.5);
+}
+
+#clock,
+#custom-weather,
+#custom-calendar,
+#pulseaudio,
+#network,
+#custom-notification,
+#tray {
+    border-radius: 0;
+    border: 1px solid rgba(82, 183, 136, 0.1);
+}
+
+#clock {
+    color: #e9c46a;
+}
+
+#custom-weather {
+    color: #76c8ae;
+}
+
+#custom-calendar {
+    color: #52b788;
+}

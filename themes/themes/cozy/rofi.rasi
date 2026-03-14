@@ -1,0 +1,7 @@
+/* Cozy rofi overrides */
+* {
+    bg: rgba(26, 27, 38, 0.95);
+    fg: #c8d3f5;
+    accent: #82aaff;
+    muted: #565f89;
+}

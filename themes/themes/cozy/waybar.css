@@ -1,0 +1,22 @@
+/* Cozy — warm, rounded, spacious */
+window#waybar {
+    background: rgba(26, 27, 38, 0.82);
+    border-bottom: 1px solid rgba(130, 170, 255, 0.08);
+}
+
+#workspaces button.active {
+    background: rgba(130, 170, 255, 0.18);
+    color: #ffc777;
+}
+
+#clock {
+    color: #ffc777;
+}
+
+#custom-weather {
+    color: #c3e88d;
+}
+
+#custom-calendar {
+    color: #82aaff;
+}

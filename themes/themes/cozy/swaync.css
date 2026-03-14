@@ -1,0 +1,16 @@
+/* Cozy notification overrides */
+.notification {
+    background: rgba(26, 27, 38, 0.92);
+    border-color: rgba(130, 170, 255, 0.12);
+    border-radius: 12px;
+}
+
+.summary {
+    color: #ffc777;
+}
+
+.control-center {
+    background: rgba(26, 27, 38, 0.95);
+    border-color: rgba(130, 170, 255, 0.12);
+    border-radius: 14px;
+}
