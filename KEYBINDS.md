@@ -51,6 +51,7 @@ Super + .            → Toggle notifications
 Super + C            → Clipboard history
 Super + Shift + T    → Theme switcher (stardew/cozy/cyberpunk)
 Super + Shift + W    → Wallpaper picker (browse ~/Pictures/wallpapers)
+Super + Alt + F      → Font picker (system/terminal/waybar)
 
 ## Night Light
 Super + Shift + =    → Warmer (3500K)
