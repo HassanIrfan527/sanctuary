@@ -1,0 +1,9 @@
+[Plymouth Theme]
+Name=Thunder HUD
+Description=Military HUD targeting system boot animation — War Thunder inspired
+Comment=Custom theme by HassanIrfan527
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/thunder-hud
+ScriptFile=/usr/share/plymouth/themes/thunder-hud/thunder-hud.script

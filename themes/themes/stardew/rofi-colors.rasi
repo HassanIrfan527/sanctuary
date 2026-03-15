@@ -1,0 +1,12 @@
+/* Stardew — Gruvbox Dark, pixelated, thick borders */
+* {
+    bg: #1d2021ee;
+    fg: #ebdbb2;
+    accent: #d79921;
+    muted: #a89984;
+    selected-bg: #d7992133;
+    selected-fg: #b8bb26;
+    border-color: #8b6914cc;
+    border-width: 3px;
+    radius: 0px;
+}

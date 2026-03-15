@@ -1,0 +1,12 @@
+/* Cyberpunk — Dracula+Neon, sharp neon borders */
+* {
+    bg: #0d0d0dee;
+    fg: #f8f8f2;
+    accent: #ff79c6;
+    muted: #6272a4;
+    selected-bg: #ff79c61a;
+    selected-fg: #50fa7b;
+    border-color: #ff79c666;
+    border-width: 1px;
+    radius: 4px;
+}

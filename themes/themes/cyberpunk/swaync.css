@@ -1,8 +1,9 @@
-/* Cyberpunk — Dracula+Neon, neon borders, dark glass */
+/* Cyberpunk — Dracula+Neon, glowing neon borders */
 .notification {
     background: rgba(13, 13, 13, 0.94);
-    border: 1px solid rgba(255, 121, 198, 0.3);
+    border: 1px solid rgba(255, 121, 198, 0.4);
     border-radius: 4px;
+    box-shadow: 0 0 8px rgba(255, 121, 198, 0.1);
 }
 
 .summary {
@@ -14,9 +15,27 @@
     color: #f8f8f2;
 }
 
+.close-button {
+    color: #6272a4;
+}
+
+.close-button:hover {
+    color: #ff5555;
+}
+
 .control-center {
     background: rgba(13, 13, 13, 0.96);
-    border: 1px solid rgba(255, 121, 198, 0.3);
+    border: 1px solid rgba(255, 121, 198, 0.4);
+    border-radius: 4px;
+    box-shadow: 0 0 12px rgba(255, 121, 198, 0.1);
+}
+
+widget.label > label {
+    color: #f8f8f2;
+}
+
+.widget-dnd {
+    background: rgba(255, 121, 198, 0.08);
     border-radius: 4px;
 }
 

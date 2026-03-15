@@ -5,52 +5,53 @@ configuration {
     display-run: "";
     display-window: "";
     drun-display-format: "{name}";
-    font: "JetBrains Mono 13";
+    font: "FantasqueSansM Nerd Font 13";
     modi: "drun,run,window";
 }
 
-/* Override any system theme */
+/* Override any system theme, then import dynamic colors */
 @theme "/dev/null"
-
-* {
-    background-color: transparent;
-    text-color: #c0caf5;
-}
+@import "theme-colors.rasi"
 
 window {
     width: 680px;
-    background-color: #1a1b26dd;
-    border: 1px solid;
-    border-color: #bb9af733;
-    border-radius: 14px;
+    background-color: @bg;
+    border: @border-width;
+    border-color: @border-color;
+    border-radius: @radius;
     padding: 16px;
     location: center;
     anchor: center;
 }
 
 mainbox {
+    background-color: transparent;
     spacing: 12px;
 }
 
 inputbar {
     children: [prompt, entry];
+    background-color: transparent;
     padding: 12px 14px;
     border: 0 0 1px 0;
-    border-color: #bb9af726;
+    border-color: @border-color;
 }
 
 prompt {
-    text-color: #bb9af7;
+    background-color: transparent;
+    text-color: @accent;
     margin: 0 10px 0 0;
 }
 
 entry {
-    text-color: #c0caf5;
+    background-color: transparent;
+    text-color: @fg;
     placeholder: "Search...";
-    placeholder-color: #565f89;
+    placeholder-color: @muted;
 }
 
 listview {
+    background-color: transparent;
     columns: 1;
     lines: 10;
     fixed-height: false;
@@ -58,23 +59,27 @@ listview {
 }
 
 element {
+    background-color: transparent;
     padding: 10px 14px;
-    border-radius: 10px;
+    border-radius: @radius;
 }
 
 element selected {
-    background-color: #bb9af71a;
+    background-color: @selected-bg;
 }
 
 element-text {
-    text-color: #c0caf5;
+    background-color: transparent;
+    text-color: @fg;
 }
 
 element-text selected {
-    text-color: #ffc777;
+    background-color: transparent;
+    text-color: @selected-fg;
 }
 
 element-icon {
+    background-color: transparent;
     size: 24px;
     margin: 0 10px 0 0;
 }

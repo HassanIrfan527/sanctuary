@@ -22,3 +22,23 @@ button:focus, button:active, button:hover {
     border-color: rgba(130, 170, 255, 0.4);
     outline: none;
 }
+
+#lock {
+    background-image: image(url("/usr/share/wlogout/assets/lock.svg"));
+}
+
+#logout {
+    background-image: image(url("/usr/share/wlogout/assets/logout.svg"));
+}
+
+#suspend {
+    background-image: image(url("/usr/share/wlogout/assets/suspend.svg"));
+}
+
+#reboot {
+    background-image: image(url("/usr/share/wlogout/assets/reboot.svg"));
+}
+
+#shutdown {
+    background-image: image(url("/usr/share/wlogout/assets/shutdown.svg"));
+}

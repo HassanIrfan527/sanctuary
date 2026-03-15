@@ -1,17 +1,20 @@
-/* Cozy — Tokyo Night, warm, rounded, spacious */
+/* Cozy — Tokyo Night, warm, rounded, glassy */
 window#waybar {
-    background: rgba(26, 27, 38, 0.82);
+    background: rgba(26, 27, 38, 0.55);
     border-bottom: 1px solid rgba(187, 154, 247, 0.08);
-    font-family: "Comfortaa", "Nunito", "JetBrains Mono", sans-serif;
+    font-family: "FantasqueSansM Nerd Font", monospace;
+    font-size: 13px;
 }
 
 #workspaces button {
     color: #565f89;
+    border-radius: 8px;
 }
 
 #workspaces button.active {
     background: rgba(187, 154, 247, 0.18);
     color: #ffc777;
+    border-radius: 8px;
 }
 
 #clock {

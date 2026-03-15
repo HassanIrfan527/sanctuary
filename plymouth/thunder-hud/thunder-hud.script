@@ -1,0 +1,495 @@
+# ═══════════════════════════════════════════════════════════════
+# THUNDER HUD — Military HUD Boot Animation
+# War Thunder inspired combat system initialization
+# ═══════════════════════════════════════════════════════════════
+
+# ── Screen Setup ──
+Window.SetBackgroundTopColor(0, 0, 0);
+Window.SetBackgroundBottomColor(0, 0, 0);
+
+screen_w = Window.GetWidth();
+screen_h = Window.GetHeight();
+center_x = screen_w / 2;
+center_y = screen_h / 2;
+
+# ── Load All Assets ──
+bg_img = Image("background.png");
+scanline_img = Image("scanline.png");
+hud_border_img = Image("hud-border.png");
+crosshair_img = Image("crosshair.png");
+crosshair_ring_img = Image("crosshair-ring.png");
+crosshair_brackets_img = Image("crosshair-brackets.png");
+air_icon_img = Image("air-icon.png");
+land_icon_img = Image("land-icon.png");
+sea_icon_img = Image("sea-icon.png");
+compass_img = Image("compass.png");
+progress_bg_img = Image("progress-bar-bg.png");
+progress_fill_img = Image("progress-bar-fill.png");
+panel_frame_img = Image("panel-frame.png");
+
+# ── Scale factor for different resolutions ──
+scale_x = screen_w / 1920;
+scale_y = screen_h / 1080;
+
+# ── Create All Sprites ──
+
+# Background
+bg_sprite = Sprite(bg_img);
+bg_sprite.SetPosition(0, 0, 0);
+
+# Scanline (sweeps vertically)
+scanline_sprite = Sprite(scanline_img);
+scanline_sprite.SetPosition(0, 0, 1);
+scanline_sprite.SetOpacity(0);
+
+# HUD Border
+hud_border_sprite = Sprite(hud_border_img);
+hud_border_sprite.SetPosition(0, 0, 2);
+hud_border_sprite.SetOpacity(0);
+
+# Compass
+compass_sprite = Sprite(compass_img);
+compass_sprite.SetPosition(center_x - 400, 55, 3);
+compass_sprite.SetOpacity(0);
+
+# Vehicle diagnostic panels (3x)
+panel1_sprite = Sprite(panel_frame_img);
+panel1_sprite.SetPosition(center_x - 340, center_y - 80, 4);
+panel1_sprite.SetOpacity(0);
+
+panel2_sprite = Sprite(panel_frame_img);
+panel2_sprite.SetPosition(center_x - 100, center_y - 80, 4);
+panel2_sprite.SetOpacity(0);
+
+panel3_sprite = Sprite(panel_frame_img);
+panel3_sprite.SetPosition(center_x + 140, center_y - 80, 4);
+panel3_sprite.SetOpacity(0);
+
+# Vehicle icons inside panels
+air_sprite = Sprite(air_icon_img);
+air_sprite.SetPosition(center_x - 340, center_y - 55, 5);
+air_sprite.SetOpacity(0);
+
+land_sprite = Sprite(land_icon_img);
+land_sprite.SetPosition(center_x - 100, center_y - 55, 5);
+land_sprite.SetOpacity(0);
+
+sea_sprite = Sprite(sea_icon_img);
+sea_sprite.SetPosition(center_x + 140, center_y - 55, 5);
+sea_sprite.SetOpacity(0);
+
+# Crosshair
+crosshair_sprite = Sprite(crosshair_img);
+crosshair_sprite.SetPosition(center_x - 200, center_y - 200, 6);
+crosshair_sprite.SetOpacity(0);
+
+# Rotating ring
+ring_sprite = Sprite(crosshair_ring_img);
+ring_sprite.SetPosition(center_x - 210, center_y - 210, 7);
+ring_sprite.SetOpacity(0);
+
+# Pulsing brackets
+brackets_sprite = Sprite(crosshair_brackets_img);
+brackets_sprite.SetPosition(center_x - 150, center_y - 150, 8);
+brackets_sprite.SetOpacity(0);
+
+# Target vehicle icon (cycles in center)
+target_sprite = Sprite(air_icon_img);
+target_sprite.SetPosition(center_x - 100, center_y - 50, 9);
+target_sprite.SetOpacity(0);
+
+# Progress bar background
+progress_bg_sprite = Sprite(progress_bg_img);
+progress_bg_sprite.SetPosition(center_x - 300, center_y + 230, 10);
+progress_bg_sprite.SetOpacity(0);
+
+# Progress bar fill
+progress_fill_sprite = Sprite(progress_fill_img);
+progress_fill_sprite.SetPosition(center_x - 300, center_y + 230, 11);
+progress_fill_sprite.SetOpacity(0);
+
+# ── Text Sprites ──
+
+# Title (top-left)
+title_text = Image.Text("COMBAT SYSTEMS v4.7.1", 0, 1, 0.25, 1);
+title_sprite = Sprite(title_text);
+title_sprite.SetPosition(80, 50, 12);
+title_sprite.SetOpacity(0);
+
+# OS info (bottom-right)
+os_text = Image.Text("FEDORA 43 // HYPRLAND", 0, 1, 0.25, 1);
+os_sprite = Sprite(os_text);
+os_sprite.SetPosition(screen_w - 300, screen_h - 70, 12);
+os_sprite.SetOpacity(0);
+
+# Threat level (top-right)
+threat_text = Image.Text("THREAT LEVEL: NONE", 0, 1, 0.25, 1);
+threat_sprite = Sprite(threat_text);
+threat_sprite.SetPosition(screen_w - 300, 50, 12);
+threat_sprite.SetOpacity(0);
+
+# Progress percentage text
+progress_pct_sprite = Sprite();
+progress_pct_sprite.SetPosition(center_x - 60, center_y + 255, 12);
+progress_pct_sprite.SetOpacity(0);
+
+# Panel labels
+air_label = Image.Text("AIR", 0, 1, 0.25, 1);
+air_label_sprite = Sprite(air_label);
+air_label_sprite.SetPosition(center_x - 310, center_y - 75, 12);
+air_label_sprite.SetOpacity(0);
+
+land_label = Image.Text("LAND", 0, 1, 0.25, 1);
+land_label_sprite = Sprite(land_label);
+land_label_sprite.SetPosition(center_x - 70, center_y - 75, 12);
+land_label_sprite.SetOpacity(0);
+
+sea_label = Image.Text("SEA", 0, 1, 0.25, 1);
+sea_label_sprite = Sprite(sea_label);
+sea_label_sprite.SetPosition(center_x + 172, center_y - 75, 12);
+sea_label_sprite.SetOpacity(0);
+
+# Panel status text
+air_status_sprite = Sprite();
+air_status_sprite.SetPosition(center_x - 330, center_y + 40, 12);
+air_status_sprite.SetOpacity(0);
+
+land_status_sprite = Sprite();
+land_status_sprite.SetPosition(center_x - 90, center_y + 40, 12);
+land_status_sprite.SetOpacity(0);
+
+sea_status_sprite = Sprite();
+sea_status_sprite.SetPosition(center_x + 150, center_y + 40, 12);
+sea_status_sprite.SetOpacity(0);
+
+# Target info text (right of crosshair)
+target_info_sprite = Sprite();
+target_info_sprite.SetPosition(center_x + 220, center_y - 30, 12);
+target_info_sprite.SetOpacity(0);
+
+# System ready text
+ready_sprite = Sprite();
+ready_sprite.SetPosition(center_x - 80, center_y + 230, 13);
+ready_sprite.SetOpacity(0);
+
+# ── Boot Log Text (bottom-left, scrolling military init) ──
+boot_log_messages[0] = "> INIT combat_kernel v4.7.1";
+boot_log_messages[1] = "> BIOS handshake............. OK";
+boot_log_messages[2] = "> RADAR subsystem............ ONLINE";
+boot_log_messages[3] = "> WEAPONS array.............. ARMED";
+boot_log_messages[4] = "> COMMS encryption........... AES-256";
+boot_log_messages[5] = "> THREAT detection........... ACTIVE";
+boot_log_messages[6] = "> INFRARED sensors........... CALIBRATED";
+boot_log_messages[7] = "> GPS lock................... ACQUIRED";
+boot_log_messages[8] = "> IFF transponder............ ENABLED";
+boot_log_messages[9] = "> COUNTERMEASURES............ STANDBY";
+boot_log_messages[10] = "> NAV systems................ LOCKED";
+boot_log_messages[11] = "> FUEL systems............... NOMINAL";
+boot_log_messages[12] = "> HYDRAULICS................. PRESSURIZED";
+boot_log_messages[13] = "> FIRE CONTROL............... READY";
+boot_log_messages[14] = "> DATALINK................... SYNCED";
+boot_log_messages[15] = "> ALL SYSTEMS NOMINAL";
+
+num_log_lines = 16;
+
+# Create log line sprites (show last 8 lines)
+for (i = 0; i < 8; i++) {
+    log_sprites[i] = Sprite();
+    log_sprites[i].SetPosition(80, screen_h - 200 + (i * 18), 12);
+    log_sprites[i].SetOpacity(0);
+}
+
+# ── Animation State ──
+frame = 0;
+boot_progress = 0;
+current_log_line = 0;
+log_timer = 0;
+target_cycle = 0;
+target_timer = 0;
+scanline_done = 0;
+phase2_started = 0;
+phase3_started = 0;
+phase4_started = 0;
+locked_on = 0;
+
+# ═══════════════════════════════════════════════════════════════
+# REFRESH CALLBACK — Main animation loop (~30fps)
+# ═══════════════════════════════════════════════════════════════
+
+fun refresh_callback() {
+    frame++;
+
+    # ── Phase 1: Scanline sweep + HUD border fade-in ──
+    if (frame < 30 && scanline_done == 0) {
+        # Scanline sweeps from top to bottom
+        scanline_y = (frame / 30) * screen_h;
+        scanline_sprite.SetPosition(0, scanline_y, 1);
+        scanline_sprite.SetOpacity(0.8);
+    }
+
+    if (frame == 30) {
+        scanline_sprite.SetOpacity(0);
+        scanline_done = 1;
+    }
+
+    # HUD border fades in after scanline
+    if (frame > 20 && frame < 50) {
+        opacity = (frame - 20) / 30;
+        hud_border_sprite.SetOpacity(opacity);
+        title_sprite.SetOpacity(opacity);
+        os_sprite.SetOpacity(opacity);
+        compass_sprite.SetOpacity(opacity);
+    }
+
+    if (frame >= 50) {
+        hud_border_sprite.SetOpacity(1);
+        title_sprite.SetOpacity(1);
+        os_sprite.SetOpacity(1);
+        compass_sprite.SetOpacity(1);
+    }
+
+    # ── Boot log text scrolling ──
+    log_timer++;
+    if (log_timer > 8 && current_log_line < num_log_lines) {
+        log_timer = 0;
+
+        # Shift existing lines up
+        for (i = 0; i < 7; i++) {
+            log_sprites[i].SetImage(log_sprites[i + 1].GetImage());
+        }
+
+        # Add new line at bottom
+        new_line = Image.Text(boot_log_messages[current_log_line], 0, 1, 0.25, 0.9);
+        log_sprites[7].SetImage(new_line);
+        log_sprites[7].SetOpacity(1);
+
+        # Make all visible lines show
+        for (i = 0; i < 8; i++) {
+            log_sprites[i].SetOpacity(0.7);
+        }
+        log_sprites[7].SetOpacity(1);
+
+        current_log_line++;
+    }
+
+    # ── Phase 2: Vehicle diagnostic panels ──
+    if (boot_progress > 0.15 && phase2_started == 0) {
+        phase2_started = 1;
+    }
+
+    if (phase2_started == 1) {
+        # Panel 1 (AIR) — appears first
+        if (boot_progress > 0.15) {
+            p1_opacity = Math.Clamp((boot_progress - 0.15) * 10, 0, 1);
+            panel1_sprite.SetOpacity(p1_opacity);
+            air_sprite.SetOpacity(p1_opacity);
+            air_label_sprite.SetOpacity(p1_opacity);
+
+            if (boot_progress > 0.22) {
+                status_img = Image.Text("ONLINE", 0, 1, 0.25, 1);
+                air_status_sprite.SetImage(status_img);
+                air_status_sprite.SetOpacity(1);
+            } else {
+                status_img = Image.Text("SCANNING...", 0, 0.6, 0.15, 1);
+                air_status_sprite.SetImage(status_img);
+                air_status_sprite.SetOpacity(1);
+            }
+        }
+
+        # Panel 2 (LAND) — appears second
+        if (boot_progress > 0.25) {
+            p2_opacity = Math.Clamp((boot_progress - 0.25) * 10, 0, 1);
+            panel2_sprite.SetOpacity(p2_opacity);
+            land_sprite.SetOpacity(p2_opacity);
+            land_label_sprite.SetOpacity(p2_opacity);
+
+            if (boot_progress > 0.32) {
+                status_img = Image.Text("ONLINE", 0, 1, 0.25, 1);
+                land_status_sprite.SetImage(status_img);
+                land_status_sprite.SetOpacity(1);
+            } else {
+                status_img = Image.Text("SCANNING...", 0, 0.6, 0.15, 1);
+                land_status_sprite.SetImage(status_img);
+                land_status_sprite.SetOpacity(1);
+            }
+        }
+
+        # Panel 3 (SEA) — appears third
+        if (boot_progress > 0.35) {
+            p3_opacity = Math.Clamp((boot_progress - 0.35) * 10, 0, 1);
+            panel3_sprite.SetOpacity(p3_opacity);
+            sea_sprite.SetOpacity(p3_opacity);
+            sea_label_sprite.SetOpacity(p3_opacity);
+
+            if (boot_progress > 0.40) {
+                status_img = Image.Text("ONLINE", 0, 1, 0.25, 1);
+                sea_status_sprite.SetImage(status_img);
+                sea_status_sprite.SetOpacity(1);
+            } else {
+                status_img = Image.Text("SCANNING...", 0, 0.6, 0.15, 1);
+                sea_status_sprite.SetImage(status_img);
+                sea_status_sprite.SetOpacity(1);
+            }
+        }
+    }
+
+    # ── Phase 3: Crosshair + target cycling ──
+    if (boot_progress > 0.40 && phase3_started == 0) {
+        phase3_started = 1;
+        # Fade out panels
+    }
+
+    if (phase3_started == 1 && locked_on == 0) {
+        # Fade in crosshair
+        ch_opacity = Math.Clamp((boot_progress - 0.40) * 8, 0, 1);
+        crosshair_sprite.SetOpacity(ch_opacity);
+        ring_sprite.SetOpacity(ch_opacity * 0.6);
+        threat_sprite.SetOpacity(ch_opacity);
+
+        # Pulsing brackets
+        pulse = (Math.Sin(frame / 8) + 1) / 2;
+        brackets_sprite.SetOpacity(0.3 + pulse * 0.7);
+
+        # Fade out diagnostic panels
+        if (boot_progress > 0.50) {
+            fade = Math.Clamp(1 - (boot_progress - 0.50) * 5, 0, 1);
+            panel1_sprite.SetOpacity(fade);
+            panel2_sprite.SetOpacity(fade);
+            panel3_sprite.SetOpacity(fade);
+            air_sprite.SetOpacity(fade);
+            land_sprite.SetOpacity(fade);
+            sea_sprite.SetOpacity(fade);
+            air_label_sprite.SetOpacity(fade);
+            land_label_sprite.SetOpacity(fade);
+            sea_label_sprite.SetOpacity(fade);
+            air_status_sprite.SetOpacity(fade);
+            land_status_sprite.SetOpacity(fade);
+            sea_status_sprite.SetOpacity(fade);
+        }
+
+        # Cycle target vehicle in crosshair center
+        target_timer++;
+        if (target_timer > 60) {
+            target_timer = 0;
+            target_cycle++;
+            if (target_cycle > 2) target_cycle = 0;
+        }
+
+        if (boot_progress > 0.45) {
+            target_sprite.SetOpacity(1);
+            target_info_sprite.SetOpacity(1);
+
+            if (target_cycle == 0) {
+                target_sprite.SetImage(air_icon_img);
+                info = Image.Text("TGT: AIRCRAFT  RNG: 4.2km", 0, 1, 0.25, 1);
+                target_info_sprite.SetImage(info);
+            }
+            if (target_cycle == 1) {
+                target_sprite.SetImage(land_icon_img);
+                info = Image.Text("TGT: GROUND    RNG: 1.8km", 0, 1, 0.25, 1);
+                target_info_sprite.SetImage(info);
+            }
+            if (target_cycle == 2) {
+                target_sprite.SetImage(sea_icon_img);
+                info = Image.Text("TGT: NAVAL     RNG: 12.4km", 0, 1, 0.25, 1);
+                target_info_sprite.SetImage(info);
+            }
+        }
+
+        # Threat level blinks amber periodically
+        if (Math.Int(frame / 30) % 4 == 0) {
+            threat_text_amber = Image.Text("THREAT LEVEL: SCANNING", 1, 0.55, 0, 1);
+            threat_sprite.SetImage(threat_text_amber);
+        } else {
+            threat_text_green = Image.Text("THREAT LEVEL: NONE", 0, 1, 0.25, 1);
+            threat_sprite.SetImage(threat_text_green);
+        }
+    }
+
+    # ── Phase 4: Progress bar + final lock-on ──
+    if (boot_progress > 0.50 && phase4_started == 0) {
+        phase4_started = 1;
+    }
+
+    if (phase4_started == 1) {
+        progress_bg_sprite.SetOpacity(1);
+        progress_fill_sprite.SetOpacity(1);
+        progress_pct_sprite.SetOpacity(1);
+
+        # Scale the fill image based on progress (crop from left)
+        fill_width = Math.Int((boot_progress - 0.10) * 666);
+        if (fill_width < 1) fill_width = 1;
+        if (fill_width > 600) fill_width = 600;
+
+        cropped = progress_fill_img.Scale(fill_width, 20);
+        progress_fill_sprite.SetImage(cropped);
+
+        # Progress percentage text
+        pct = Math.Int(boot_progress * 100);
+        pct_text = Image.Text("SYSTEMS LOADING... " + pct + "%", 0, 1, 0.25, 1);
+        progress_pct_sprite.SetImage(pct_text);
+    }
+
+    # ── Final Lock-On at 100% ──
+    if (boot_progress >= 0.98 && locked_on == 0) {
+        locked_on = 1;
+
+        # Hide cycling targets
+        target_sprite.SetOpacity(0);
+        target_info_sprite.SetOpacity(0);
+
+        # Show TARGET LOCKED
+        locked_text = Image.Text("TARGET LOCKED", 0, 1, 0.25, 1);
+        ready_sprite.SetImage(locked_text);
+        ready_sprite.SetPosition(center_x - 80, center_y - 20, 13);
+        ready_sprite.SetOpacity(1);
+
+        # Snap brackets tight
+        brackets_sprite.SetOpacity(1);
+        brackets_sprite.SetPosition(center_x - 100, center_y - 100, 8);
+
+        # Update progress to SYSTEM READY
+        ready_text = Image.Text("SYSTEM READY", 0, 1, 0.25, 1);
+        progress_pct_sprite.SetImage(ready_text);
+
+        # Threat cleared
+        clear_text = Image.Text("THREAT LEVEL: CLEAR", 0, 1, 0.25, 1);
+        threat_sprite.SetImage(clear_text);
+    }
+}
+
+Plymouth.SetRefreshFunction(refresh_callback);
+
+# ═══════════════════════════════════════════════════════════════
+# BOOT PROGRESS CALLBACK
+# ═══════════════════════════════════════════════════════════════
+
+fun boot_progress_callback(duration, progress) {
+    boot_progress = progress;
+}
+
+Plymouth.SetBootProgressFunction(boot_progress_callback);
+
+# ═══════════════════════════════════════════════════════════════
+# PASSWORD PROMPT (for encrypted disks)
+# ═══════════════════════════════════════════════════════════════
+
+fun display_password_callback(prompt, bullets) {
+    bullet_str = "";
+    for (i = 0; i < bullets; i++) {
+        bullet_str += "* ";
+    }
+
+    pw_prompt = Image.Text(prompt, 0, 1, 0.25, 1);
+    pw_bullets = Image.Text(bullet_str, 0, 1, 0.25, 1);
+
+    pw_prompt_sprite = Sprite(pw_prompt);
+    pw_prompt_sprite.SetPosition(center_x - 150, center_y + 280, 15);
+    pw_prompt_sprite.SetOpacity(1);
+
+    pw_bullets_sprite = Sprite(pw_bullets);
+    pw_bullets_sprite.SetPosition(center_x - 100, center_y + 310, 15);
+    pw_bullets_sprite.SetOpacity(1);
+}
+
+Plymouth.SetDisplayPasswordFunction(display_password_callback);
