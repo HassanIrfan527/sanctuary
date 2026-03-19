@@ -1,0 +1,63 @@
+{
+    "margin-top": 0,
+    "margin-left": 120,
+    "margin-bottom": 0,
+    "margin-right": 120,
+    "height": 60,
+    "layer": "top",
+    "position": "top",
+    "spacing": 15,
+    "modules-left": ["custom/launcher", "clock", "clock#date"],
+    "modules-center": ["hyprland/workspaces"],
+    "modules-right": ["pulseaudio", "network", "tray", "custom/powermenu"],
+
+    "hyprland/workspaces": {
+        "format": "{id}",
+        "on-click": "activate",
+        "sort-by-number": true
+    },
+
+    "custom/launcher": {
+        "interval": "once",
+        "format": "󰣇",
+        "on-click": "pkill wofi || wofi --show drun --term=kitty --width=20% --height=50% --columns 1 -I -s ~/.config/wofi/themes/everforest-light.css",
+        "tooltip": false
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "婢 muted",
+        "format-icons": {
+            "headphone": "",
+            "default": ["", "", ""]
+        },
+        "on-click-right": "pavucontrol",
+        "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
+    },
+
+    "network": {
+        "format-wifi": " {signalStrength}%",
+        "format-ethernet": "",
+        "format-disconnected": "󰤭",
+        "tooltip-format": "{ifname}: {ipaddr}"
+    },
+
+    "clock": {
+        "format": " {:%I:%M %p}"
+    },
+
+    "clock#date": {
+        "format": " {:%A, %B %d, %Y}"
+    },
+
+    "tray": {
+        "spacing": 10,
+        "icon-size": 16
+    },
+
+    "custom/powermenu": {
+        "format": "",
+        "on-click": "wlogout",
+        "tooltip": false
+    }
+}

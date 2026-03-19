@@ -5,6 +5,7 @@ Super + Enter        → Kitty terminal
 Super + E            → Nautilus (files)
 Super + Y            → Yazi (terminal file manager)
 Super + B            → Chrome
+Super + C            → VS Code
 
 ## Quickshell Panels
 Super + Space        → Search / app launcher
@@ -17,7 +18,8 @@ Super + Shift + V    → Clipboard history
 Super + Shift + W    → Wallpaper selector
 Super + Ctrl + M     → Media controls
 Ctrl + Alt + Delete  → Session menu (logout/reboot/shutdown)
-Ctrl + Super + R     → Restart Quickshell
+Ctrl + Super + R     → Restart Quickshell/Waybar
+Super + Shift + T    → Theme switcher (default / cozy-night / cozy-day)
 
 ## Windows (vim-style)
 Super + H/J/K/L      → Focus left/down/up/right
