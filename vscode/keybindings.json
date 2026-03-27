@@ -1,0 +1,26 @@
+[
+  {
+    "key": "shift+enter",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+      "text": "\u001b[200~\n\u001b[201~"
+    },
+    "when": "terminalFocus && terminalProcessSupported"
+  },
+  {
+    "key": "ctrl+enter",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+      "text": "\u001b[200~\n\u001b[201~"
+    },
+    "when": "terminalFocus && terminalProcessSupported"
+  },
+  {
+    "key": "alt+enter",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+      "text": "\u001b[200~\n\u001b[201~"
+    },
+    "when": "terminalFocus && terminalProcessSupported"
+  }
+]

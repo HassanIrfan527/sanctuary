@@ -1,0 +1,88 @@
+/* VSCode transparency - works with Hyprland opacity window rules */
+
+/* ── Base transparency ── */
+body {
+  background-color: transparent !important;
+}
+
+.monaco-workbench {
+  background-color: transparent !important;
+}
+
+/* ── Title bar ── */
+.titlebar-container {
+  background-color: rgba(0, 0, 0, 0.25) !important;
+}
+
+/* ── Sidebar ── */
+.sidebar,
+.composite.title,
+.split-view-view .visible {
+  background-color: transparent !important;
+}
+
+.pane-body {
+  background-color: transparent !important;
+}
+
+/* ── Activity bar ── */
+.activitybar {
+  background-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ── Editor area ── */
+.editor-container,
+.overflow-guard {
+  background-color: transparent !important;
+}
+
+.monaco-editor,
+.monaco-editor .margin,
+.monaco-editor-background {
+  background-color: transparent !important;
+}
+
+.monaco-editor .inputarea.ime-input {
+  background-color: transparent !important;
+}
+
+/* ── Editor tabs ── */
+.tabs-container {
+  background-color: transparent !important;
+}
+
+.tab {
+  background-color: transparent !important;
+}
+
+.tab.active {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* ── Panel (terminal) ── */
+.panel {
+  background-color: transparent !important;
+}
+
+.terminal-wrapper {
+  background-color: transparent !important;
+}
+
+/* ── Status bar ── */
+.statusbar {
+  background-color: rgba(0, 0, 0, 0.25) !important;
+}
+
+/* ── Scrollbar ── */
+.monaco-scrollable-element > .scrollbar > .slider {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.monaco-scrollable-element > .scrollbar > .slider:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* ── Minimap ── */
+.minimap {
+  opacity: 0.6;
+}

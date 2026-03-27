@@ -209,9 +209,19 @@ def get_binds_recursive(current_content, scope):
 
 def parse_keys(path: str) -> Dict[str, List[KeyBinding]]:
     global content_lines
+    global Variables
     content_lines = read_content(path).splitlines()
     if content_lines[0] == "error":
         return "error"
+    # Resolve variable declarations (e.g. $mod = SUPER)
+    for line in content_lines:
+        stripped = line.strip()
+        if stripped.startswith('$') and '=' in stripped and not stripped.startswith('#'):
+            var_name, var_value = stripped.split('=', 1)
+            Variables[var_name.strip()] = var_value.strip()
+    # Substitute variables in all lines
+    for var_name, var_value in Variables.items():
+        content_lines = [l.replace(var_name, var_value) for l in content_lines]
     return get_binds_recursive(Section([], [], ""), 0)
 
 

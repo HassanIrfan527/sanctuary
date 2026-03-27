@@ -24,7 +24,7 @@ My Hyprland desktop configuration for Fedora 43 — dual UI stack with Quickshel
 | Shell (default) | Quickshell (illogical-impulse) |
 | Shell (cozy) | Waybar + Wofi + Swaync |
 | Terminal | Kitty (cursor trails, blur, transparency) |
-| Shell | Zsh + Starship + zsh-autocomplete + zsh-syntax-highlighting |
+| Shell | Zsh + Powerlevel10k / Starship + zsh-autocomplete + zsh-syntax-highlighting |
 | File Manager | Nautilus (GUI) + Yazi (terminal, vim keybinds) |
 | Editor | VS Code + Neovim |
 | Browser | Google Chrome + Zen Browser |
@@ -45,6 +45,15 @@ My Hyprland desktop configuration for Fedora 43 — dual UI stack with Quickshel
 | Recording | Asciinema (terminal) + wf-recorder (screen) |
 | Cat Replacement | Bat (syntax highlighted cat) |
 | Smart cd | Zoxide (frecency-based directory jumping) |
+
+## Useful Packages
+
+| Package | What it does |
+|---------|-------------|
+| asciinema | Record terminal sessions |
+| bat | Syntax-highlighted cat replacement |
+| tldr | Simplified man pages with examples |
+| zoxide | Smart cd that learns your frequent directories |
 
 ## Keyboard Setup
 
@@ -155,7 +164,7 @@ sudo dnf install -y hyprland xdg-desktop-portal-hyprland hyprlock hypridle \
 
 # UI
 sudo dnf install -y waybar wofi rofi fuzzel SwayNotificationCenter \
-  nwg-dock-hyprland nwg-look wlogout cliphist
+  nwg-dock-hyprland nwg-look wlogout cliphist walker
 
 # Terminal and tools
 sudo dnf install -y kitty zsh zsh-syntax-highlighting tmux bat zoxide \
@@ -181,7 +190,12 @@ flatpak install flathub io.github.sxyazi.yazi
 ```bash
 git clone https://github.com/HassanIrfan527/triland ~/.dotfiles
 cd ~/.dotfiles
-stow hypr kitty quickshell matugen fuzzel wlogout yazi themes fastfetch kotofetch illogical-impulse starship
+
+# Stow configs into ~/.config/
+stow hypr hypridle hyprlock kitty quickshell matugen fuzzel rofi swaync waybar walker wlogout yazi themes fastfetch kotofetch illogical-impulse starship nvim vscode
+
+# Stow zsh configs into ~/ (zshrc and p10k live in home dir)
+stow -t ~ zsh
 ```
 
 ### 3. Keyd setup
@@ -216,15 +230,24 @@ EOF
 ```
 ~/.dotfiles/
 ├── hypr/hypr/                 # Hyprland configs
+├── hypridle/                  # Idle daemon config
+├── hyprlock/                  # Lock screen config
 ├── kitty/kitty/               # Kitty terminal
 ├── quickshell/quickshell/ii/  # Quickshell shell
 ├── matugen/matugen/           # Color generation templates
 ├── fuzzel/fuzzel/             # Fuzzel launcher
+├── rofi/                      # Rofi launcher
+├── swaync/                    # SwayNotificationCenter
+├── waybar/                    # Waybar (cozy mode)
+├── walker/                    # Walker launcher
 ├── wlogout/wlogout/           # Logout menu
 ├── yazi/yazi/                 # Terminal file manager
+├── nvim/                      # Neovim config
+├── vscode/                    # VS Code settings
 ├── fastfetch/fastfetch/       # System fetch
 ├── kotofetch/kotofetch/       # Quote fetch
 ├── starship/                  # Prompt theme
+├── zsh/                       # Zsh + Powerlevel10k config
 ├── illogical-impulse/         # Quickshell user config
 ├── keyd/                      # Keyd config (backup)
 ├── tmux.conf                  # Tmux config (backup)

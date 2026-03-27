@@ -9,10 +9,9 @@ Super + C            → VS Code
 
 ## Quickshell Panels
 Super + Space        → Search / app launcher
-Super + Tab          → Workspace overview
 Super + A            → Left sidebar
 Super + .            → Right sidebar (notifications)
-Super + G            → Overlay
+Super + O            → Overlay
 Super + /            → Keybind cheatsheet
 Super + Shift + V    → Clipboard history
 Super + Shift + W    → Wallpaper selector
@@ -30,7 +29,18 @@ Super + W            → Close window
 Super + F            → Maximize toggle
 Super + Shift + F    → Fullscreen
 Super + V            → Toggle floating
+Super + P            → Pin floating window (visible on all workspaces)
 Super + S            → Toggle split direction
+Super + Shift + C    → Center floating window
+Super + G            → Toggle tabbed group
+Super + Tab          → Next tab in group
+Super + Shift + Tab  → Previous tab in group
+Super + Ctrl + HJKL  → Swap window left/down/up/right
+Super + R            → Enter resize mode (HJKL to resize, Esc to exit)
+
+## Scratchpad
+Super + Shift + D    → Launch kitty scratchpad
+Super + D            → Toggle scratchpad
 
 ## Workspaces
 Super + Numpad 1-9   → Switch to workspace (GNOME-style)
