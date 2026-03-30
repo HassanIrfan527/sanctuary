@@ -11,7 +11,7 @@ return {
 		local cmp = require("cmp")
 		local luasnip = require("luasnip")
 
-		local enabled = true
+		local enabled = false
 
 		cmp.setup({
 			enabled = function()
