@@ -3,6 +3,8 @@
 -- Transparency, clean UI, smooth experience
 -- ══════════════════════════════════════
 
+--  ── Initializing lazy.nvim and its plugins  ──
+require("config.lazy")
 -- ── Line numbers ──
 vim.opt.number = true
 vim.opt.relativenumber = true
@@ -104,3 +106,14 @@ vim.opt.undofile = true
 -- ── Disable netrw banner ──
 vim.g.netrw_banner = 0
 vim.g.netrw_liststyle = 3
+
+-- ── Diagnostics ──
+vim.diagnostic.config({
+    virtual_text = true,
+    float = { border = "rounded" },
+})
+vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic" })
+
+-- ── Window navigation ──
+vim.keymap.set("n", "<Tab>", "<C-w>w", { desc = "Cycle windows" })
+vim.keymap.set("n", "<S-Tab>", "<C-w>W", { desc = "Cycle windows reverse" })

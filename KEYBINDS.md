@@ -6,7 +6,7 @@ Super + E            → Nautilus (files)
 Super + Y            → Yazi (terminal file manager)
 Super + B            → Chrome
 Super + C            → VS Code
-
+Super + Z            → Zen Browser
 ## Quickshell Panels
 Super + Space        → Search / app launcher
 Super + A            → Left sidebar
