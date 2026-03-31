@@ -65,7 +65,12 @@ vim.api.nvim_create_autocmd("ColorScheme", {
             "StatusLine", "StatusLineNC",
             "TabLine", "TabLineFill",
             "WinSeparator", "VertSplit",
-            "Pmenu",
+            "Pmenu", "PmenuThumb",
+            "TelescopeNormal", "TelescopeBorder",
+            "TelescopePromptNormal", "TelescopePromptBorder",
+            "TelescopeResultsNormal", "TelescopeResultsBorder",
+            "TelescopePreviewNormal", "TelescopePreviewBorder",
+            "CmpPmenu", "CmpDoc",
         }
         for _, group in ipairs(groups) do
             vim.api.nvim_set_hl(0, group, { bg = "NONE" })
@@ -114,6 +119,15 @@ vim.diagnostic.config({
 })
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic" })
 
+-- ── Clear search highlight ──
+vim.keymap.set("n", "<Esc>", ":nohlsearch<CR>", { silent = true })
+
 -- ── Window navigation ──
 vim.keymap.set("n", "<Tab>", "<C-w>w", { desc = "Cycle windows" })
 vim.keymap.set("n", "<S-Tab>", "<C-w>W", { desc = "Cycle windows reverse" })
+
+-- ── Move lines ──
+vim.keymap.set("n", "<leader>j", ":m .+1<CR>==", { desc = "Move line down" })
+vim.keymap.set("n", "<leader>k", ":m .-2<CR>==", { desc = "Move line up" })
+vim.keymap.set("v", "<leader>j", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
+vim.keymap.set("v", "<leader>k", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })

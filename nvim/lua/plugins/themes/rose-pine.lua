@@ -57,8 +57,7 @@ return {
 
 			highlight_groups = {},
 
-			before_highlight = function(group, highlight, palette)
-			end,
+			before_highlight = function(group, highlight, palette) end,
 		})
 
 		vim.cmd("colorscheme rose-pine")

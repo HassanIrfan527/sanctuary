@@ -54,6 +54,8 @@ eval "$(starship init zsh)"
 # Zoxide Initialization
 eval "$(zoxide init zsh)"
 
+# Direnv Initialization
+eval "$(direnv hook zsh)"
 
 # Toggle for zsh-autocomplete
 
