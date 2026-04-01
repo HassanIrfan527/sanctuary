@@ -131,3 +131,12 @@ vim.keymap.set("n", "<leader>j", ":m .+1<CR>==", { desc = "Move line down" })
 vim.keymap.set("n", "<leader>k", ":m .-2<CR>==", { desc = "Move line up" })
 vim.keymap.set("v", "<leader>j", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
 vim.keymap.set("v", "<leader>k", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
+
+-- ── LSP keymaps ──
+vim.keymap.set("n", "gr", function() require("telescope.builtin").lsp_references() end, { desc = "Go to references (telescope)" })
+vim.keymap.set("n", "gd", function() require("telescope.builtin").lsp_definitions() end, { desc = "Go to definition (telescope)" })
+
+-- ── Splits ──
+vim.keymap.set("n", "<leader>sv", ":vsplit<CR>", { desc = "Split vertical" })
+vim.keymap.set("n", "<leader>sh", ":split<CR>", { desc = "Split horizontal" })
+vim.keymap.set("n", "<leader>sc", ":close<CR>", { desc = "Close split" })

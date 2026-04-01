@@ -29,5 +29,7 @@ return {
 		vim.keymap.set("n", "<leader>fc", builtin.colorscheme, { desc = "Switch colorscheme" })
 		vim.keymap.set("n", "<leader>fk", builtin.keymaps, { desc = "Keymaps" })
 		vim.keymap.set("n", "<leader>gc", builtin.git_commits, { desc = "Git commits" })
+		vim.keymap.set("n", "<leader>fs", builtin.lsp_document_symbols, { desc = "File symbols" })
+		vim.keymap.set("n", "<leader>fw", builtin.lsp_workspace_symbols, { desc = "Workspace symbols" })
 	end,
 }
