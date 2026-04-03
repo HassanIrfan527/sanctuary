@@ -24,7 +24,7 @@ My Hyprland desktop configuration for Fedora 43 — dual UI stack with Quickshel
 | Shell (default) | Quickshell (illogical-impulse) |
 | Shell (cozy) | Waybar + Wofi + Swaync |
 | Terminal | Kitty (cursor trails, blur, transparency) |
-| Shell | Zsh + Powerlevel10k / Starship + zsh-autocomplete + zsh-syntax-highlighting |
+| Shell | Zsh + Starship + zsh-autocomplete + zsh-syntax-highlighting |
 | File Manager | Nautilus (GUI) + Yazi (terminal, vim keybinds) |
 | Editor | VS Code + Neovim |
 | Browser | Google Chrome + Zen Browser |
@@ -41,19 +41,23 @@ My Hyprland desktop configuration for Fedora 43 — dual UI stack with Quickshel
 | Clipboard | Cliphist |
 | Screenshots | Grimblast + Hyprshot |
 | Fetch | Fastfetch + Kotofetch |
+| Fuzzy Finder | Television (Rust-based, 30+ channels) |
 | Multiplexer | Tmux (Ctrl+A prefix, Catppuccin theme) |
 | Recording | Asciinema (terminal) + wf-recorder (screen) |
 | Cat Replacement | Bat (syntax highlighted cat) |
 | Smart cd | Zoxide (frecency-based directory jumping) |
 
-## Useful Packages
+## CLI & TUI Tools
 
 | Package | What it does |
 |---------|-------------|
+| television | Rust-based fuzzy finder with 30+ channels (files, text, git, docker, env) |
 | asciinema | Record terminal sessions |
 | bat | Syntax-highlighted cat replacement |
 | tldr | Simplified man pages with examples |
 | zoxide | Smart cd that learns your frequent directories |
+| podman-tui | TUI for managing Podman containers, images, volumes |
+| direnv | Auto-loads .envrc per directory (venv activation, env vars) |
 
 ## Keyboard Setup
 
