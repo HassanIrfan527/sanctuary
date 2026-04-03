@@ -1,20 +1,33 @@
 return {
 	"folke/persistence.nvim",
-	event = "BufReadPre",
+	lazy = false,
 	config = function()
 		require("persistence").setup({
 			need = 2,
+			autostart = false,
 		})
 
 		vim.api.nvim_create_autocmd("VimEnter", {
+			nested = true,
 			callback = function()
 				local args = vim.fn.argv()
-				for _, arg in ipairs(args) do
-					if arg:match("COMMIT_EDITMSG") or arg:match("MERGE_MSG") or arg:match("git%-rebase%-todo") then
-						require("persistence").stop()
-						return
+				if #args > 0 then
+					for _, arg in ipairs(args) do
+						if arg:match("COMMIT_EDITMSG") or arg:match("MERGE_MSG") or arg:match("git%-rebase%-todo") then
+							require("persistence").stop()
+							return
+						end
 					end
+					return
 				end
+				require("persistence").load()
+			end,
+		})
+
+		vim.api.nvim_create_autocmd("BufReadPre", {
+			once = true,
+			callback = function()
+				require("persistence").start()
 			end,
 		})
 		vim.keymap.set("n", "<leader>qs", function() require("persistence").load() end, { desc = "Restore session" })

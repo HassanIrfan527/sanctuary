@@ -11,15 +11,24 @@ return {
 		local telescope = require("telescope")
 		local builtin = require("telescope.builtin")
 
-		telescope.setup({})
+		telescope.setup({
+			defaults = {
+				file_ignore_patterns = {
+					"node_modules/",
+					"%.git/",
+					"vendor/",
+					"%.cache/",
+				},
+			},
+		})
 		telescope.load_extension("fzf")
 
 		vim.keymap.set("n", "<leader>ff", function()
-			builtin.find_files({ hidden = true })
-		end, { desc = "Find files (hidden)" })
-		vim.keymap.set("n", "<leader>fF", function()
 			builtin.find_files({ hidden = false })
-		end, { desc = "Find files (no hidden)" })
+		end, { desc = "Find files" })
+		vim.keymap.set("n", "<leader>fF", function()
+			builtin.find_files({ hidden = true, no_ignore = true })
+		end, { desc = "Find ALL files (hidden + ignored)" })
 		vim.keymap.set("n", "<leader>fg", function()
 			builtin.live_grep({ additional_args = { "--hidden" } })
 		end, { desc = "Grep across files" })

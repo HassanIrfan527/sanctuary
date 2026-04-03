@@ -14,6 +14,7 @@ return {
 				markdown = { "prettier" },
 				yaml = { "prettier" },
 				php = { "php_cs_fixer" },
+				blade = { "blade-formatter" },
 				lua = { "stylua" },
 				toml = { "taplo" },
 				c = { "clang_format" },
@@ -24,7 +25,7 @@ return {
 				zsh = { "shfmt" },
 			},
 			format_on_save = {
-				timeout_ms = 500,
+				timeout_ms = 2000,
 				lsp_format = "fallback",
 			},
 		})

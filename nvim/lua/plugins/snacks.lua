@@ -65,6 +65,11 @@ return {
 			input = {
 				enabled = true,
 			},
+			lazygit = {
+				enabled = true,
+			},
 		})
+
+		vim.keymap.set("n", "<leader>lg", function() Snacks.lazygit() end, { desc = "Lazygit" })
 	end,
 }
