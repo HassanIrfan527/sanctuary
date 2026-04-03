@@ -24,11 +24,28 @@ return {
 		telescope.load_extension("fzf")
 
 		vim.keymap.set("n", "<leader>ff", function()
-			builtin.find_files({ hidden = false })
-		end, { desc = "Find files" })
+			builtin.find_files({ hidden = true })
+		end, { desc = "Find files (respects gitignore)" })
+		vim.keymap.set("n", "<leader>fa", function()
+			builtin.find_files({
+				hidden = true,
+				no_ignore = true,
+				file_ignore_patterns = {
+					"node_modules/",
+					"%.git/",
+					"vendor/",
+					"%.cache/",
+					"__pycache__/",
+					"%.venv/",
+					"venv/",
+					"dist/",
+					"build/",
+				},
+			})
+		end, { desc = "Find all files (shows .env, docs)" })
 		vim.keymap.set("n", "<leader>fF", function()
 			builtin.find_files({ hidden = true, no_ignore = true })
-		end, { desc = "Find ALL files (hidden + ignored)" })
+		end, { desc = "Find ALL files (no filter)" })
 		vim.keymap.set("n", "<leader>fg", function()
 			builtin.live_grep({ additional_args = { "--hidden" } })
 		end, { desc = "Grep across files" })

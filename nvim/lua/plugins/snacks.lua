@@ -68,8 +68,20 @@ return {
 			lazygit = {
 				enabled = true,
 			},
+			bigfile = {
+				enabled = true,
+				size = 1.5 * 1024 * 1024,
+			},
+			scope = {
+				enabled = true,
+			},
+			terminal = {
+				enabled = true,
+			},
 		})
 
 		vim.keymap.set("n", "<leader>lg", function() Snacks.lazygit() end, { desc = "Lazygit" })
+		vim.keymap.set({ "n", "t" }, "<leader>t", function() Snacks.terminal.toggle() end, { desc = "Toggle terminal 1" })
+		vim.keymap.set({ "n", "t" }, "<leader>T", function() Snacks.terminal.toggle("zsh") end, { desc = "Toggle terminal 2" })
 	end,
 }
