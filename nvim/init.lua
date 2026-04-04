@@ -18,6 +18,11 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.signcolumn = "yes"
 
+-- ── Folding ──
+vim.opt.foldmethod = "indent"
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 99
+
 -- ── Cursor ──
 vim.opt.cursorline = true
 vim.opt.guicursor = "n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50"
@@ -143,6 +148,7 @@ vim.keymap.set("v", "<leader>k", ":m '<-2<CR>gv=gv", { desc = "Move selection up
 -- ── LSP keymaps ──
 vim.keymap.set("n", "gr", function() require("telescope.builtin").lsp_references() end, { desc = "Go to references (telescope)" })
 vim.keymap.set("n", "gd", function() require("telescope.builtin").lsp_definitions() end, { desc = "Go to definition (telescope)" })
+vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code actions" })
 
 -- ── Splits ──
 vim.keymap.set("n", "<leader>sv", ":vsplit<CR>", { desc = "Split vertical" })

@@ -14,7 +14,7 @@ return {
 ╚██╗ ██╔╝██║   ██║██║██║  ██║
  ╚████╔╝ ╚██████╔╝██║██████╔╝
   ╚═══╝   ╚═════╝ ╚═╝╚═════╝
-      ⟡  n o  e s c a p e  ⟡]],
+    ⟡  n o  e s c a p e  ⟡]],
 					keys = {
 						{ icon = " ", key = "f", desc = "Find File", action = ":Telescope find_files" },
 						{ icon = " ", key = "g", desc = "Find Text", action = ":Telescope live_grep" },
@@ -80,8 +80,14 @@ return {
 			},
 		})
 
-		vim.keymap.set("n", "<leader>lg", function() Snacks.lazygit() end, { desc = "Lazygit" })
-		vim.keymap.set({ "n", "t" }, "<leader>t", function() Snacks.terminal.toggle() end, { desc = "Toggle terminal 1" })
-		vim.keymap.set({ "n", "t" }, "<leader>T", function() Snacks.terminal.toggle("zsh") end, { desc = "Toggle terminal 2" })
+		vim.keymap.set("n", "<leader>lg", function()
+			Snacks.lazygit()
+		end, { desc = "Lazygit" })
+		vim.keymap.set({ "n", "t" }, "<leader>t", function()
+			Snacks.terminal.toggle()
+		end, { desc = "Toggle terminal 1" })
+		vim.keymap.set({ "n", "t" }, "<leader>T", function()
+			Snacks.terminal.toggle("zsh")
+		end, { desc = "Toggle terminal 2" })
 	end,
 }
