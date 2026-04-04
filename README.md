@@ -128,6 +128,8 @@ CapsLock is remapped via keyd (`/etc/keyd/default.conf`):
 | `Shift+Print` | Screenshot full screen |
 | `Super+Shift+=` | Night light warmer |
 | `Super+Shift+-` | Night light cooler |
+| `Super+Shift+B` | Toggle key sounds on/off |
+| `Super+Alt+B` | Switch key sound theme |
 
 ### Tmux (Prefix: Ctrl+A)
 | Key | Action |
@@ -185,6 +187,16 @@ sudo dnf install -y jetbrains-mono-nerd-fonts google-rubik-vf-fonts \
 
 # Cargo
 cargo install matugen
+
+# Key sounds (bucklespring with libinput+mouse/scroll patch)
+# See keysounds/README.md for build instructions
+sudo dnf install -y openal-soft-devel alure-devel libinput-devel systemd-devel
+cd /tmp && git clone https://github.com/zevv/bucklespring.git
+# Apply the libinput mouse/scroll patch from keysounds/scan-libinput.c
+cp ~/.dotfiles/keysounds/scan-libinput.c /tmp/bucklespring/
+cd /tmp/bucklespring && make clean && make libinput=1
+cp buckle ~/.local/bin/buckle
+sudo usermod -aG input $USER  # required for key event access
 
 # Flatpak
 flatpak install flathub io.github.sxyazi.yazi
