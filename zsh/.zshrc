@@ -86,3 +86,4 @@ export EDITOR=nvim
 export VISUAL=nvim
 
 export PATH="$HOME/go/bin:$PATH"
+export GI_TYPELIB_PATH="/usr/local/lib64/girepository-1.0:$GI_TYPELIB_PATH"
