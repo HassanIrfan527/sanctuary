@@ -27,7 +27,7 @@ My Hyprland desktop configuration for Fedora 43 — dual UI stack with Quickshel
 | Shell | Zsh + Starship + zsh-autocomplete + zsh-syntax-highlighting |
 | File Manager | Nautilus (GUI) + Yazi (terminal, vim keybinds) |
 | Editor | VS Code + Neovim |
-| Browser | Google Chrome + Zen Browser |
+| Browser | Google Chrome + Zen Browser + Qutebrowser (keyboard-driven) |
 | Launcher (default) | Quickshell search / Fuzzel fallback |
 | Launcher (cozy) | Wofi |
 | Notifications (default) | Quickshell built-in |
@@ -52,9 +52,14 @@ My Hyprland desktop configuration for Fedora 43 — dual UI stack with Quickshel
 | Package | What it does |
 |---------|-------------|
 | television | Rust-based fuzzy finder with 30+ channels (files, text, git, docker, env) |
+| fzf | Classic fuzzy finder — Ctrl+R history, Ctrl+T files, Alt+C cd (via `/usr/share/fzf/shell/key-bindings.zsh`) |
 | asciinema | Record terminal sessions |
 | bat | Syntax-highlighted cat replacement |
+| glow | Terminal markdown renderer (pretty-prints README/docs) |
+| sheets | Terminal spreadsheet (CSV viewer/editor) |
 | tldr | Simplified man pages with examples |
+| thefuck | Corrects the previous shell command — type `fuck` to fix typos |
+| weathr | ASCII terminal weather app (animated conditions, auto-location) |
 | zoxide | Smart cd that learns your frequent directories |
 | podman-tui | TUI for managing Podman containers, images, volumes |
 | direnv | Auto-loads .envrc per directory (venv activation, env vars) |
@@ -174,7 +179,14 @@ sudo dnf install -y waybar wofi rofi fuzzel SwayNotificationCenter \
 
 # Terminal and tools
 sudo dnf install -y kitty zsh zsh-syntax-highlighting tmux bat zoxide \
-  starship fastfetch asciinema
+  starship fastfetch asciinema fzf tldr thefuck qutebrowser
+
+# Markdown/spreadsheet TUIs (Go-based — installed via `go install`)
+go install github.com/charmbracelet/glow@latest
+go install github.com/maaslalani/sheets@latest
+
+# Rust-based CLI tools
+cargo install television weathr
 
 # Utils
 sudo dnf install -y brightnessctl playerctl pamixer gammastep \
@@ -208,10 +220,13 @@ git clone https://github.com/HassanIrfan527/triland ~/.dotfiles
 cd ~/.dotfiles
 
 # Stow configs into ~/.config/
-stow hypr hypridle hyprlock kitty quickshell matugen fuzzel rofi swaync waybar walker wlogout yazi themes fastfetch kotofetch illogical-impulse starship nvim vscode
+stow hypr hypridle hyprlock kitty quickshell matugen fuzzel rofi swaync waybar walker wlogout yazi themes fastfetch kotofetch illogical-impulse starship nvim vscode qutebrowser television glow ags
 
 # Stow zsh configs into ~/ (zshrc and p10k live in home dir)
 stow -t ~ zsh
+
+# Stow git config into ~/
+stow -t ~ git
 ```
 
 ### 3. Keyd setup
@@ -258,17 +273,24 @@ EOF
 ├── walker/                    # Walker launcher
 ├── wlogout/wlogout/           # Logout menu
 ├── yazi/yazi/                 # Terminal file manager
+├── qutebrowser/qutebrowser/   # Qutebrowser (keyboard-driven browser)
 ├── nvim/                      # Neovim config
 ├── vscode/                    # VS Code settings
 ├── fastfetch/fastfetch/       # System fetch
 ├── kotofetch/kotofetch/       # Quote fetch
 ├── starship/                  # Prompt theme
 ├── zsh/                       # Zsh + Powerlevel10k config
+├── git/                       # Gitconfig + work profile + hooks
 ├── illogical-impulse/         # Quickshell user config
+├── ags/ags/                   # AGS/Astal shell (WIP replacement for Quickshell)
+├── television/television/     # Television fuzzy finder config + cable channels
+├── glow/glow/                 # Glow markdown renderer config
 ├── keyd/                      # Keyd config (backup)
+├── keysounds/                 # Bucklespring + MechSim keysound configs
+├── scripts/                   # Helper scripts (ags-run, ags-reload, etc.)
 ├── tmux.conf                  # Tmux config (backup)
 ├── themes/themes/             # Theme/UI stack switcher
-├── cozy/                      # Cozy theme (Everforest)
+├── qylock/                    # Qylock lock screen
 └── plymouth/thunder-hud/      # Boot animation
 ```
 

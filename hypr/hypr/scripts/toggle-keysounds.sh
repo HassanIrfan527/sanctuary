@@ -1,14 +1,16 @@
 #!/bin/bash
 
-BUCKLE="/home/anonymous/.local/bin/buckle"
-SOUNDS_DIR="/home/anonymous/.local/share/bucklespring-sounds"
-THEME_FILE="/home/anonymous/.config/bucklespring/theme"
-THEME=$(cat "$THEME_FILE" 2>/dev/null || echo "ibm-model-m")
+CONFIG="$HOME/.config/keysounds/config"
+source "$CONFIG" 2>/dev/null || ENGINE="bucklespring"
 
-if pgrep -x buckle > /dev/null; then
-    pkill -x buckle
+if pgrep -x buckle > /dev/null || pgrep -f keyboard_sound_player > /dev/null; then
+    pkill -x buckle 2>/dev/null
+    pkill -f keyboard_sound_player 2>/dev/null
+    sudo -n pkill -f get_key_presses 2>/dev/null
     notify-send "Key Sounds" "Turned off"
 else
-    setsid "$BUCKLE" -f -p "${SOUNDS_DIR}/${THEME}" &>/dev/null &
-    notify-send "Key Sounds" "Turned on (${THEME})"
+    ~/.config/hypr/scripts/keysounds-daemon.sh
+    THEME="$BUCKLESPRING_THEME"
+    [ "$ENGINE" = "mechsim" ] && THEME="$MECHSIM_THEME"
+    notify-send "Key Sounds" "Turned on (${ENGINE}: ${THEME})"
 fi
