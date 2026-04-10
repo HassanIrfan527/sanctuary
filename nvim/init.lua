@@ -13,6 +13,14 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
+-- ── SCSS/SASS line-comment override ──
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = { "scss", "sass" },
+	callback = function()
+		vim.bo.commentstring = "// %s"
+	end,
+})
+
 -- ── Line numbers ──
 vim.opt.number = true
 vim.opt.relativenumber = true
