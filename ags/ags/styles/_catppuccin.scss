@@ -1,0 +1,63 @@
+// Catppuccin Mocha — https://catppuccin.com/palette
+
+// Base
+$rosewater: #f5e0dc;
+$flamingo: #f2cdcd;
+$pink: #f5c2e7;
+$mauve: #cba6f7;
+$red: #f38ba8;
+$maroon: #eba0ac;
+$peach: #fab387;
+$yellow: #f9e2af;
+$green: #a6e3a1;
+$teal: #94e2d5;
+$sky: #89dceb;
+$sapphire: #74c7ec;
+$blue: #89b4fa;
+$lavender: #b4befe;
+
+// Surfaces (light to dark)
+$text: #cdd6f4;
+$subtext1: #bac2de;
+$subtext0: #a6adc8;
+$overlay2: #9399b2;
+$overlay1: #7f849c;
+$overlay0: #6c7086;
+$surface2: #585b70;
+$surface1: #45475a;
+$surface0: #313244;
+$base: #1e1e2e;
+$mantle: #181825;
+$crust: #11111b;
+
+// Semantic aliases
+$bg: $base;
+$bg-alt: $mantle;
+$bg-deep: $crust;
+$fg: $text;
+$fg-muted: $subtext0;
+$accent: $mauve;
+$border: $surface1;
+
+// Fonts
+$font-main: "Inter", sans-serif;
+$font-display: "Space Grotesk", sans-serif;
+$font-mono: "Maple Mono NF", monospace;
+$font-nerd: "Maple Mono NF", monospace;
+
+// Sizing
+$font-size-sm: 11px;
+$font-size-md: 13px;
+$font-size-lg: 16px;
+$font-size-xl: 20px;
+
+// Spacing
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 12px;
+$spacing-lg: 16px;
+
+// Radii
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 14px;

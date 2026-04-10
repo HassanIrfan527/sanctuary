@@ -1,20 +1,165 @@
-// https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/theme/Adwaita/_colors-public.scss
-$fg-color: #{"@theme_fg_color"};
-$bg-color: #{"@theme_bg_color"};
+@import "./styles/catppuccin";
+
+$radius: 999px;
 
 window.Bar {
   background: transparent;
-  color: $fg-color;
-  font-weight: bold;
+  color: $fg;
+  font-weight: 500;
+  font-family: $font-main;
+  font-size: $font-size-md;
 
-  > centerbox {
-    background: $bg-color;
-    border-radius: 10px;
-    margin: 8px;
+  button,
+  menubutton,
+  menubutton>button {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+    color: $fg;
+    min-height: 0;
+    min-width: 0;
+
+    &:hover,
+    &:active,
+    &:focus {
+      background: transparent;
+      box-shadow: none;
+    }
+  }
+}
+
+.bar-inner {
+  margin: 8px 12px;
+}
+
+window.Bar button.logo {
+  background: transparentize($mantle, 0.05);
+  border: 1px solid transparentize($surface1, 0.4);
+  border-radius: $radius;
+  padding: 6px 10px;
+
+  &:hover {
+    background: transparentize($surface0, 0.1);
+  }
+}
+
+.bar-pill {
+  background: transparentize($mantle, 0.05);
+  border: 1px solid transparentize($surface1, 0.4);
+  border-radius: $radius;
+  padding: 4px 14px;
+}
+
+.workspaces {
+  .ws {
+    min-width: 18px;
+    padding: 2px 6px;
+    border-radius: $radius;
+    color: $overlay0;
+    transition: all 220ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      color: $fg;
+    }
+
+    &.active {
+      min-width: 36px;
+      padding: 2px 14px;
+      background: $mauve;
+      color: $crust;
+      font-weight: 700;
+    }
+  }
+}
+
+.sep {
+  min-width: 1px;
+  background: transparentize($surface1, 0.5);
+  margin: 4px 2px;
+}
+
+.clock {
+  color: $fg;
+  padding: 0 4px;
+  font-weight: 600;
+}
+
+window.Bar button.notif-btn {
+  background: transparentize($mantle, 0.05);
+  border: 1px solid transparentize($surface1, 0.4);
+  border-radius: $radius;
+  padding: 6px 10px;
+  color: $fg;
+  transition: all 180ms ease;
+
+  &:hover {
+    background: transparentize($surface0, 0.1);
   }
 
-  button {
-    border-radius: 8px;
-    margin: 2px;
+  &.dnd {
+    color: $overlay0;
+  }
+
+  .notif-icon {
+    font-family: $font-nerd;
+    font-size: 14px;
+    color: $yellow;
+  }
+
+  &.dnd .notif-icon {
+    color: $overlay0;
+  }
+
+  .notif-count {
+    color: $mauve;
+    font-weight: 700;
+    font-size: $font-size-sm;
+  }
+}
+
+window.NotificationPopups {
+  background: transparent;
+  color: $fg;
+  font-family: $font-main;
+
+  .popups-stack {
+    margin: 12px 16px;
+  }
+}
+
+window.NotificationPopups .notif-card {
+  background: transparentize($mantle, 0.05);
+  border: 1px solid transparentize($surface1, 0.4);
+  border-radius: 12px;
+  padding: 12px 16px;
+  min-width: 320px;
+
+  .notif-card-title {
+    color: $fg;
+    font-weight: 700;
+    font-size: $font-size-md;
+  }
+
+  .notif-card-body {
+    color: $subtext0;
+    font-size: $font-size-sm;
+  }
+}
+
+window.NotificationPopups button.notif-card-close {
+  background: transparent;
+  border: none;
+  color: $overlay0;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: $font-size-md;
+  min-width: 0;
+  min-height: 0;
+
+  &:hover {
+    background: transparentize($surface1, 0.4);
+    color: $red;
   }
 }
