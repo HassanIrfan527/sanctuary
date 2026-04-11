@@ -1,0 +1,21 @@
+shell = "zsh"
+
+[plugins]
+
+[plugins.zsh-vi-mode]
+github = "jeffreytse/zsh-vi-mode"
+
+[plugins.zsh-autopair]
+github = "hlissner/zsh-autopair"
+
+[plugins.zsh-abbr]
+github = "olets/zsh-abbr"
+
+[plugins.fzf-tab]
+github = "Aloxaf/fzf-tab"
+
+# zsh-syntax-highlighting MUST be loaded last
+[plugins.zsh-syntax-highlighting]
+github = "zsh-users/zsh-syntax-highlighting"
+
+[templates]
