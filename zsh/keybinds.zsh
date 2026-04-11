@@ -35,4 +35,23 @@ function zvm_after_init() {
   bindkey -M vicmd ' tt' _tv_text_widget      # Space t t → tv text (grep)
   bindkey -M vicmd ' tg' _tv_gitlog_widget    # Space t g → tv git-log
   bindkey -M vicmd ' tb' _tv_gitbranch_widget # Space t b → tv git-branch
+
+  # Initial mode sync to tmux status bar
+  if [[ -n $TMUX ]]; then
+    tmux set -g @zvm_mode "INSERT"
+    tmux set -g @zvm_mode_color "#80a0ff"
+  fi
+}
+
+# Sync mode changes to tmux status bar (bubbles theme)
+function zvm_after_select_vi_mode() {
+  [[ -z $TMUX ]] && return
+  case $ZVM_MODE in
+    $ZVM_MODE_NORMAL)       tmux set -g @zvm_mode "NORMAL";  tmux set -g @zvm_mode_color "#d183e8" ;;
+    $ZVM_MODE_INSERT)       tmux set -g @zvm_mode "INSERT";  tmux set -g @zvm_mode_color "#80a0ff" ;;
+    $ZVM_MODE_VISUAL)       tmux set -g @zvm_mode "VISUAL";  tmux set -g @zvm_mode_color "#79dac8" ;;
+    $ZVM_MODE_VISUAL_LINE)  tmux set -g @zvm_mode "V-LINE";  tmux set -g @zvm_mode_color "#79dac8" ;;
+    $ZVM_MODE_REPLACE)      tmux set -g @zvm_mode "REPLACE"; tmux set -g @zvm_mode_color "#ff5189" ;;
+  esac
+  tmux refresh-client -S
 }

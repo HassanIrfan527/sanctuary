@@ -162,3 +162,16 @@ vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action
 vim.keymap.set("n", "<leader>sv", ":vsplit<CR>", { desc = "Split vertical" })
 vim.keymap.set("n", "<leader>sh", ":split<CR>", { desc = "Split horizontal" })
 vim.keymap.set("n", "<leader>sc", ":close<CR>", { desc = "Close split" })
+
+-- ── Hide tmux status while in nvim ──
+if vim.env.TMUX then
+    local grp = vim.api.nvim_create_augroup("TmuxStatusToggle", { clear = true })
+    vim.api.nvim_create_autocmd({ "VimEnter", "VimResume" }, {
+        group = grp,
+        callback = function() vim.fn.system("tmux set status off") end,
+    })
+    vim.api.nvim_create_autocmd({ "VimLeave", "VimSuspend" }, {
+        group = grp,
+        callback = function() vim.fn.system("tmux set status on") end,
+    })
+end
