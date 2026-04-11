@@ -11,6 +11,9 @@ fi
 if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
     PATH="$HOME/bin:${PATH}"
 fi
+if [[ ":$PATH:" != *":$HOME/.cargo/bin:"* ]]; then
+    PATH="$HOME/.cargo/bin:${PATH}"
+fi
 export PATH
 
 # Uncomment if you don’t like systemctl’s auto-paging
@@ -26,30 +29,22 @@ if [ -d ~/.zshrc.d ]; then
 fi
 unset rc
 
-# Custom Aliases
-alias CODE="cd $HOME/Documents/Coding/"
-alias app-aie="cd $HOME/Documents/Coding/app-aie"
-alias sail="./vendor/bin/sail"
-alias manage="cd $HOME/Documents/Coding/Manage"
+# Aliases
+source ~/.dotfiles/zsh/aliases.zsh
 
-# Requires kotofetch to be installed and custom quote to be written in the ~/.config/kotofetch/quotes/quotes.toml file
-alias quote="kotofetch --modes quotes.toml --source true --translation romaji"
-alias keybinds="less ~/.dotfiles/KEYBINDS.md"
-alias keybinds-tmux="less ~/.dotfiles/KEYBINDS-TMUX.md"
+# SE 101 bug capture (bug / bugstats)
+source ~/.dotfiles/zsh/bugs.zsh
 
-# source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+# Completion system (required before fzf-tab)
+autoload -Uz compinit && compinit
 
-# zsh-autocomplete must be loaded before other plugins
-zstyle ':autocomplete:*' min-input 2
-zstyle ':autocomplete:list-choices:*' max-list-choices 0
-zstyle ':autocomplete:*' list-lines 8
-source $HOME/zsh-autocomplete/zsh-autocomplete.plugin.zsh
-
-source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# fzf-tab styling
+zstyle ':completion:*' menu no
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath 2>/dev/null || ls -1 $realpath'
+zstyle ':fzf-tab:*' switch-group '<' '>'
 
 # Starship Initialization
 eval "$(starship init zsh)"
-
 
 # Zoxide Initialization
 eval "$(zoxide init zsh)"
@@ -59,15 +54,38 @@ eval "$(direnv hook zsh)"
 
 # Toggle for zsh-autocomplete
 
+# History
+HISTFILE=~/.zsh_history
+HISTSIZE=50000
+SAVEHIST=50000
+setopt HIST_IGNORE_DUPS HIST_IGNORE_ALL_DUPS HIST_FIND_NO_DUPS
+setopt HIST_IGNORE_SPACE HIST_REDUCE_BLANKS
+setopt SHARE_HISTORY INC_APPEND_HISTORY
 
+# Skip secrets from history
+zshaddhistory() {
+  emulate -L zsh
+  if [[ $1 == *(TOKEN|SECRET|PASSWORD|API_KEY|PRIVATE_KEY|BEARER|Authorization)* ]]; then
+    return 1
+  fi
+  return 0
+}
 
+# Navigation
+setopt AUTO_CD AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT
+setopt INTERACTIVE_COMMENTS
 
-# Keybinds
-bindkey '^[[1;5C' forward-word
-bindkey '^[[1;5D' backward-word
-bindkey '^[[H' beginning-of-line
-bindkey '^[[F' end-of-line
-bindkey '^[[3~' delete-char
+# thefuck — corrects the previous command (`fuck`)
+eval "$(thefuck --alias)"
+
+# Keybinds (defines widgets + zvm_after_init hook — must precede sheldon)
+source ~/.dotfiles/zsh/keybinds.zsh
+
+# zsh-vi-mode: init at source time (prevents recursion with starship prompt)
+ZVM_INIT_MODE=sourcing
+
+# Plugins via sheldon (loads zsh-vi-mode, zsh-abbr, zsh-autopair, autocomplete, syntax-highlighting)
+eval "$(sheldon source)"
 
 # End of ~/.zshrc
 

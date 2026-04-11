@@ -27,6 +27,7 @@ $pixi\
 [](fg:color_bg3 bg:color_bg1)\
 $time\
 [ ](fg:color_bg1)\
+${custom.bugs}\
 $line_break$status$character"""
 
 palette = 'gruvbox_dark'
@@ -175,6 +176,14 @@ disabled = false
 disabled = false
 symbol = '✗ '
 format = '[$symbol$status ](bold fg:color_red)'
+
+[custom.bugs]
+description = "SE 101 bugs captured in last 7d (shift hours only)"
+command = "find '/mnt/PERSONAL/Obsidian/SE 101/Bugs' -maxdepth 1 -type f -name '*.md' ! -name 'README.md' -mtime -7 2>/dev/null | wc -l"
+when = "test $(date +%H) -ge 18 -o $(date +%H) -le 3"
+shell = ["sh", "-c"]
+format = '[🐛 $output ]($style)'
+style = 'fg:color_yellow'
 
 [character]
 disabled = false
