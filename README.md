@@ -11,6 +11,13 @@ So you can call me "weird" or a linux nerd. I like these labels btw.
 
 So just know that this configuration works for me and it may not work for you.
 
+Fun fact: I did use claude code (vibe-coded), to adjust the hyprland configuration, cause I literally didn't know what to do.
+
+## about AGS
+
+I cloned someone else's hyprland config and used it. And its working for me though, but I wanted to create my own config. And I'm slowly building my own AGS config. Here's a screenshot of it:
+![AGS Screenshot](./screenshots/ags-ss.png)
+
 ## UI Modes
 
 ### Default — Quickshell (illogical-impulse)
@@ -64,6 +71,7 @@ So just know that this configuration works for me and it may not work for you.
 | weathr     | ASCII terminal weather app (animated conditions, auto-location)                                             |
 | zoxide     | Smart cd that learns your frequent directories                                                              |
 | podman-tui | TUI for managing Podman containers, images, volumes                                                         |
+| harlequin  | SQL IDE TUI — Postgres/MySQL/SQLite/DuckDB with autocomplete, query history, result grid                    |
 | direnv     | Auto-loads .envrc per directory (venv activation, env vars)                                                 |
 
 ## Additional Desktop Apps
@@ -326,3 +334,25 @@ Runs alongside GNOME 49 — select either at GDM login. XDG portal isolation, GT
 
 - [end-4/dots-hyprland](https://github.com/end-4/dots-hyprland) — Quickshell illogical-impulse
 - [Darkkal44/qylock](https://github.com/Darkkal44/qylock?tab=readme-ov-file#gallery) - sddm themes
+
+## Screenshots
+
+### AGS Shell
+
+![AGS](screenshots/ags-ss.png)
+
+### Kitty
+
+![Kitty](screenshots/kitty.png)
+
+### Neovim
+
+![Neovim](screenshots/nvim.png)
+
+### Qutebrowser
+
+![Qutebrowser](screenshots/qutebrowser.png)
+
+### Tmux
+
+![Tmux](screenshots/tmux.png)
