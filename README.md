@@ -2,6 +2,15 @@
 
 My Hyprland desktop configuration for Fedora 43 — dual UI stack with Quickshell (default) and AGS (zen), vim-first keybinds, Material You theming via matugen.
 
+## FYI
+
+I want a config which feels like home, which feels like a sanctuary, not something I have to do like its a task. This is kinda my hobby now. And you know ricing has no limits or end, where we can say: "Now I have reached my perfect system config, and I don't need anymore tweaks", perfect doesn't exist. So enough yapping, and my main motive is just one line:
+"Everything should be controlled by keyboard, and the whole OS is vim" - yeah im obsessed with vim.
+And you can imagine my obsession with this idea of mine that I'll add a system-wide vim-like navigation structure, where everything would be controlled by vim shortcuts. I thought a lot about it, but it didn't work out in hyprland. But I will find a way.
+So you can call me "weird" or a linux nerd. I like these labels btw.
+
+So just know that this configuration works for me and it may not work for you.
+
 ## UI Modes
 
 ### Default — Quickshell (illogical-impulse)
