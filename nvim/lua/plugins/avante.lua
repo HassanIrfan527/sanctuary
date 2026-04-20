@@ -5,7 +5,6 @@ return {
 	build = "make",
 	dependencies = {
 		"nvim-treesitter/nvim-treesitter",
-		"stevearc/dressing.nvim",
 		"nvim-lua/plenary.nvim",
 		"MunifTanjim/nui.nvim",
 		"nvim-tree/nvim-web-devicons",
@@ -15,6 +14,7 @@ return {
 		{ "<leader>aa", "<cmd>AvanteToggle<CR>", desc = "Toggle Avante sidebar" },
 		{ "<leader>ac", "<cmd>AvanteChat<CR>", desc = "Avante chat" },
 		{ "<leader>ae", "<cmd>AvanteEdit<CR>", desc = "Avante edit", mode = { "n", "v" } },
+		{ "<leader>af", "<cmd>AvanteToggleFocus<CR>", desc = "Focus Avante / Editor" },
 	},
 	config = function()
 		require("avante").setup({
@@ -24,11 +24,21 @@ return {
 				auto_set_keymaps = true,
 			},
 			windows = {
-				width = 35,
+				width = 40,
 				sidebar_header = {
 					rounded = true,
 				},
+				input = {
+					prefix = "❯ ",
+					height = 8,
+				},
+				ask = {
+					floating = false,
+					border = "rounded",
+					start_insert = true,
+				},
 			},
+			hints = { enabled = true },
 		})
 	end,
 }
