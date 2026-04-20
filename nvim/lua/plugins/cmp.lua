@@ -26,8 +26,30 @@ return {
 				end,
 			},
 			window = {
-				completion = cmp.config.window.bordered(),
-				documentation = cmp.config.window.bordered(),
+				completion = cmp.config.window.bordered({
+					border = "rounded",
+					winhighlight = "Normal:NormalFloat,CursorLine:PmenuSel,Search:None",
+				}),
+				documentation = cmp.config.window.bordered({
+					border = "rounded",
+					winhighlight = "Normal:NormalFloat",
+				}),
+			},
+			formatting = {
+				fields = { "abbr", "kind", "menu" },
+				format = function(_, vim_item)
+					local icons = {
+						Text = "󰉿", Method = "󰆧", Function = "󰊕", Constructor = "",
+						Field = "󰜢", Variable = "󰀫", Class = "󰠱", Interface = "",
+						Module = "", Property = "󰜢", Unit = "󰑭", Value = "󰎠",
+						Enum = "", Keyword = "󰌋", Snippet = "", Color = "󰏘",
+						File = "󰈙", Reference = "󰈇", Folder = "󰉋", EnumMember = "",
+						Constant = "󰏿", Struct = "󰙅", Event = "", Operator = "󰆕",
+						TypeParameter = "",
+					}
+					vim_item.kind = string.format("%s %s", icons[vim_item.kind] or "", vim_item.kind)
+					return vim_item
+				end,
 			},
 			mapping = cmp.mapping.preset.insert({
 				["<Tab>"] = cmp.mapping.select_next_item(),

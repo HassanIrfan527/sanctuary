@@ -61,7 +61,16 @@ vim.opt.showmode = false
 vim.opt.showcmd = false
 vim.opt.cmdheight = 1
 vim.opt.laststatus = 3
-vim.opt.fillchars = { eob = " ", vert = "│", horiz = "─", horizup = "┴", horizdown = "┬", vertleft = "┤", vertright = "├", verthoriz = "┼" }
+vim.opt.fillchars = {
+	eob = " ",
+	vert = "│",
+	horiz = "─",
+	horizup = "┴",
+	horizdown = "┬",
+	vertleft = "┤",
+	vertright = "├",
+	verthoriz = "┼",
+}
 vim.opt.list = true
 vim.opt.listchars = { tab = "  ", trail = "·", nbsp = "␣" }
 
@@ -77,44 +86,70 @@ vim.opt.termguicolors = true
 -- ── Transparent background ──
 -- Makes nvim background transparent so kitty/terminal blur shows through
 vim.api.nvim_create_autocmd("ColorScheme", {
-    pattern = "*",
-    callback = function()
-        local groups = {
-            "Normal", "NormalNC", "NormalFloat",
-            "SignColumn", "EndOfBuffer",
-            "CursorLineNr", "LineNr",
-            "StatusLine", "StatusLineNC",
-            "TabLine", "TabLineFill",
-            "WinSeparator", "VertSplit",
-            "Pmenu", "PmenuThumb",
-            "TelescopeNormal", "TelescopeBorder",
-            "TelescopePromptNormal", "TelescopePromptBorder",
-            "TelescopeResultsNormal", "TelescopeResultsBorder",
-            "TelescopePreviewNormal", "TelescopePreviewBorder",
-            "CmpPmenu", "CmpDoc",
-        }
-        for _, group in ipairs(groups) do
-            vim.api.nvim_set_hl(0, group, { bg = "NONE" })
-        end
-        vim.api.nvim_set_hl(0, "CursorLine", { bg = "#1a1a2e" })
-        vim.api.nvim_set_hl(0, "Visual", { bg = "#2a2a4e" })
-        vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#2a2a4e", fg = "#c0caf5" })
-        vim.api.nvim_set_hl(0, "FloatBorder", { bg = "NONE", fg = "#565f89" })
-        vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE" })
-        vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#2a2a3e" })
-    end,
+	pattern = "*",
+	callback = function()
+		local groups = {
+			"Normal",
+			"NormalNC",
+			"NormalFloat",
+			"SignColumn",
+			"EndOfBuffer",
+			"CursorLineNr",
+			"LineNr",
+			"StatusLine",
+			"StatusLineNC",
+			"TabLine",
+			"TabLineFill",
+			"WinSeparator",
+			"VertSplit",
+			"Pmenu",
+			"PmenuThumb",
+			"TelescopeNormal",
+			"TelescopeBorder",
+			"TelescopePromptNormal",
+			"TelescopePromptBorder",
+			"TelescopeResultsNormal",
+			"TelescopeResultsBorder",
+			"TelescopePreviewNormal",
+			"TelescopePreviewBorder",
+			"CmpPmenu",
+			"CmpDoc",
+		}
+		for _, group in ipairs(groups) do
+			vim.api.nvim_set_hl(0, group, { bg = "NONE" })
+		end
+		vim.api.nvim_set_hl(0, "CursorLine", { bg = "#1a1a2e" })
+		vim.api.nvim_set_hl(0, "Visual", { bg = "#2a2a4e" })
+		vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#2a2a4e", fg = "#c0caf5" })
+		vim.api.nvim_set_hl(0, "FloatBorder", { bg = "#1a1b26", fg = "#565f89" })
+		vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#1a1b26" })
+		vim.api.nvim_set_hl(0, "WinSeparator", { fg = "#2a2a3e" })
+	end,
 })
 
 -- Apply transparency on startup
 vim.api.nvim_create_autocmd("VimEnter", {
-    callback = function()
-        vim.cmd("doautocmd ColorScheme")
-    end,
+	callback = function()
+		vim.cmd("doautocmd ColorScheme")
+	end,
 })
 
 -- ── Floating window defaults ──
 vim.o.winblend = 15
 vim.o.pumblend = 15
+
+-- ── LSP floating windows (hover, signature) ──
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
+	border = "rounded",
+	winblend = 0,
+})
+vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
+	border = "rounded",
+	winblend = 0,
+})
+vim.diagnostic.config({
+	float = { border = "rounded" },
+})
 
 -- ── Window title ──
 vim.opt.title = true
@@ -135,8 +170,8 @@ vim.g.netrw_liststyle = 3
 
 -- ── Diagnostics ──
 vim.diagnostic.config({
-    virtual_text = true,
-    float = { border = "rounded" },
+	virtual_text = true,
+	float = { border = "rounded" },
 })
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic" })
 
@@ -154,8 +189,12 @@ vim.keymap.set("v", "<leader>j", ":m '>+1<CR>gv=gv", { desc = "Move selection do
 vim.keymap.set("v", "<leader>k", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
 
 -- ── LSP keymaps ──
-vim.keymap.set("n", "gr", function() require("telescope.builtin").lsp_references() end, { desc = "Go to references (telescope)" })
-vim.keymap.set("n", "gd", function() require("telescope.builtin").lsp_definitions() end, { desc = "Go to definition (telescope)" })
+vim.keymap.set("n", "gr", function()
+	require("telescope.builtin").lsp_references()
+end, { desc = "Go to references (telescope)" })
+vim.keymap.set("n", "gd", function()
+	require("telescope.builtin").lsp_definitions()
+end, { desc = "Go to definition (telescope)" })
 vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code actions" })
 
 -- ── Splits ──
@@ -163,15 +202,22 @@ vim.keymap.set("n", "<leader>sv", ":vsplit<CR>", { desc = "Split vertical" })
 vim.keymap.set("n", "<leader>sh", ":split<CR>", { desc = "Split horizontal" })
 vim.keymap.set("n", "<leader>sc", ":close<CR>", { desc = "Close split" })
 
+-- ── Custom ──
+vim.keymap.set("i", "{{", "<Esc>A {<CR>}<Esc>O")
+
 -- ── Hide tmux status while in nvim ──
 if vim.env.TMUX then
-    local grp = vim.api.nvim_create_augroup("TmuxStatusToggle", { clear = true })
-    vim.api.nvim_create_autocmd({ "VimEnter", "VimResume" }, {
-        group = grp,
-        callback = function() vim.fn.system("tmux set status off") end,
-    })
-    vim.api.nvim_create_autocmd({ "VimLeave", "VimSuspend" }, {
-        group = grp,
-        callback = function() vim.fn.system("tmux set status on") end,
-    })
+	local grp = vim.api.nvim_create_augroup("TmuxStatusToggle", { clear = true })
+	vim.api.nvim_create_autocmd({ "VimEnter", "VimResume" }, {
+		group = grp,
+		callback = function()
+			vim.fn.system("tmux set status off")
+		end,
+	})
+	vim.api.nvim_create_autocmd({ "VimLeave", "VimSuspend" }, {
+		group = grp,
+		callback = function()
+			vim.fn.system("tmux set status on")
+		end,
+	})
 end
