@@ -1,6 +1,8 @@
 # Fastfetch
 fastfetch -c ~/.config/fastfetch/config.jsonc
 
+# kotofetch --modes quotes.toml --source true --translation romaji
+
 # ~/.zshrc
 
 # User specific environment: update PATH if needed
@@ -32,6 +34,9 @@ unset rc
 # Aliases
 source ~/.dotfiles/zsh/aliases.zsh
 
+# Utils
+source ~/.dotfiles/zsh/utils.zsh
+
 # SE 101 bug capture (bug / bugstats)
 source ~/.dotfiles/zsh/bugs.zsh
 
@@ -44,7 +49,16 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath 2>/
 zstyle ':fzf-tab:*' switch-group '<' '>'
 
 # Starship Initialization
+export STARSHIP_CONFIG="$HOME/.config/starship.toml"
 eval "$(starship init zsh)"
+
+starship-theme() {
+    local themes_dir="$HOME/.dotfiles/starship/themes"
+    local theme=$(ls "$themes_dir"/*.toml | xargs -n1 basename -s .toml | fuzzel --dmenu -p "starship theme: ")
+    [[ -z "$theme" ]] && return
+    ln -sf "$themes_dir/${theme}.toml" "$HOME/.config/starship.toml"
+    echo "switched to: $theme"
+}
 
 # Zoxide Initialization
 eval "$(zoxide init zsh)"
@@ -64,11 +78,11 @@ setopt SHARE_HISTORY INC_APPEND_HISTORY
 
 # Skip secrets from history
 zshaddhistory() {
-  emulate -L zsh
-  if [[ $1 == *(TOKEN|SECRET|PASSWORD|API_KEY|PRIVATE_KEY|BEARER|Authorization)* ]]; then
-    return 1
-  fi
-  return 0
+    emulate -L zsh
+    if [[ $1 == *(TOKEN|SECRET|PASSWORD|API_KEY|PRIVATE_KEY|BEARER|Authorization)* ]]; then
+        return 1
+    fi
+    return 0
 }
 
 # Navigation

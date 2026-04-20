@@ -4,6 +4,7 @@ import Logo from "./Logo"
 import Clock from "./Clock"
 import Workspaces from "./Workspaces"
 import Notifications from "./Notifications"
+import MusicPlayer from "../../MusicPlayer"
 
 const { TOP, LEFT, RIGHT } = Astal.WindowAnchor
 
@@ -20,8 +21,9 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
       application={app}
     >
       <centerbox cssClasses={["bar-inner"]}>
-        <box $type="start">
+        <box $type="start" spacing={10}>
           <Logo />
+          <MusicPlayer />
         </box>
         <box $type="center" cssClasses={["bar-pill"]} spacing={12}>
           <Clock />

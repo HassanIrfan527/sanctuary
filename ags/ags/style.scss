@@ -119,6 +119,151 @@ window.Bar button.notif-btn {
   }
 }
 
+window.Bar menubutton.player-pill {
+  background: transparentize($mantle, 0.05);
+  border: 1px solid transparentize($surface1, 0.4);
+  border-radius: $radius;
+  padding: 4px 12px;
+  transition: all 180ms ease;
+
+  &:hover {
+    background: transparentize($surface0, 0.1);
+  }
+
+  > box {
+    color: $mauve;
+    font-family: $font-nerd;
+
+    label:first-child {
+      margin-top: 2px;
+      font-size: 14px;
+    }
+
+    label:last-child {
+      color: $fg;
+      font-family: $font-main;
+      font-weight: 600;
+      margin-left: 8px;
+      margin-top: 0;
+    }
+  }
+}
+
+popover.player-popover {
+  background: transparent;
+
+  > arrow,
+  > contents {
+    background: transparentize($mantle, 0.35);
+    border: 1px solid transparentize($surface1, 0.5);
+    border-radius: $radius-lg;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    color: $fg;
+  }
+
+  > contents {
+    padding: $spacing-md;
+  }
+
+  .player-content {
+    min-width: 360px;
+  }
+
+  .player-art {
+    border-radius: $radius-md;
+    min-width: 110px;
+    min-height: 110px;
+  }
+
+  .player-info {
+    padding: 2px 0;
+  }
+
+  .player-title {
+    color: $fg;
+    font-weight: 700;
+    font-size: $font-size-md;
+  }
+
+  .player-artist {
+    color: $fg-muted;
+    font-size: $font-size-sm;
+    margin-bottom: $spacing-sm;
+  }
+
+  .player-time-row {
+    margin-top: auto;
+    margin-bottom: 4px;
+  }
+
+  .player-time {
+    color: $fg-muted;
+    font-size: $font-size-sm;
+    font-family: $font-mono;
+  }
+
+  button.player-play {
+    background: transparentize($mauve, 0.8);
+    color: $mauve;
+    border-radius: $radius;
+    padding: 4px 14px;
+    font-family: $font-nerd;
+    font-size: $font-size-md;
+    transition: all 160ms ease;
+
+    &:hover {
+      background: $mauve;
+      color: $crust;
+    }
+  }
+
+  .player-progress-row {
+    margin-top: 2px;
+  }
+
+  button.player-skip {
+    background: transparent;
+    color: $fg-muted;
+    font-family: $font-nerd;
+    font-size: $font-size-md;
+    padding: 2px 6px;
+    border-radius: $radius-sm;
+    transition: color 160ms ease;
+
+    &:hover {
+      color: $mauve;
+      background: transparent;
+    }
+  }
+
+  scale.player-progress {
+    margin: 0 4px;
+    min-height: 14px;
+
+    trough {
+      background: transparentize($surface1, 0.3);
+      border-radius: $radius;
+      min-height: 3px;
+    }
+
+    highlight {
+      background: $mauve;
+      border-radius: $radius;
+      min-height: 3px;
+    }
+
+    slider {
+      background: $mauve;
+      border: 2px solid $mantle;
+      border-radius: 999px;
+      min-width: 12px;
+      min-height: 12px;
+      margin: -6px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+    }
+  }
+}
+
 window.NotificationPopups {
   background: transparent;
   color: $fg;

@@ -1,4 +1,4 @@
-# My plan for AGS rice.
+# My Plan for AGS Rice.
 
 Here are some ideas/logics for this config:
 
@@ -14,6 +14,8 @@ In my config, preset is a set of themes, color palettes and design layouts:
 3. Cyberpunk (Future plan)
 
 Note: In version 1, I'm not gonna add more presets which I had planned earlier like the pixel and cyberpunk one. and including a theme switcher. Its a good idea, but for now, I'll keep it simple.
+
+**Idea: Colonists preset** — A rice theme inspired by The Colonists game. Earthy warm palette (soft greens, warm browns, muted orange), workspace names like "Workshop/Farm/Harbor", bar styled as a resource tracker. The cozy "building from nothing" vibe.
 
 ### Themes
 
@@ -45,3 +47,6 @@ The following themes would be included in the **Cozy** preset:
 - Islands: show only rounded pillboxes/islands
 - Full/Maximized: Show a full top bar, but the components of the bar would be separated by a slight rounded pillbox.
 - Minimal: Centered, show only a rounded centered bar showing the time, workspaces and the music player. Just simple and minimal.
+
+11. Bottom bar design:
+    Lualine-style bottom bar, showing the current music and some other utilities...

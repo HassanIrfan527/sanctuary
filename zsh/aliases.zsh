@@ -16,3 +16,20 @@ alias tva='tv alias'
 
 # fun aliases
 alias void='sudo dnf'
+
+# harlequin db connection aliases
+htdb() {
+    if [ -z "$POSTGRES_TEST_CONNECTION_STRING" ]; then
+        echo "Error: Connection string not found."
+        return 1
+    fi
+    harlequin -a postgres "$POSTGRES_TEST_CONNECTION_STRING" "$@"
+}
+
+hpdb() {
+    if [ -z "$POSTGRES_PROD_CONNECTION_STRING" ]; then
+        echo "Error: Connection string not found."
+        return 1
+    fi
+    harlequin -a postgres "$POSTGRES_PROD_CONNECTION_STRING" "$@"
+}
