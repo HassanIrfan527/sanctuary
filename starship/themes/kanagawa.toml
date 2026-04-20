@@ -1,0 +1,199 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """
+$os\
+$username\
+$directory\
+$git_branch\
+$git_status\
+${custom.bugs}\
+$fill\
+$c\
+$cpp\
+$rust\
+$golang\
+$nodejs\
+$php\
+$java\
+$kotlin\
+$haskell\
+$python\
+$docker_context\
+$conda\
+$pixi\
+$time
+$status$character"""
+
+palette = 'kanagawa'
+
+[palettes.kanagawa]
+sumiInk0 = '#16161D'
+sumiInk1 = '#1F1F28'
+sumiInk3 = '#363646'
+sumiInk4 = '#54546D'
+fujiWhite = '#DCD7BA'
+oldWhite = '#C8C093'
+crystalBlue = '#7E9CD8'
+springGreen = '#98BB6C'
+carpYellow = '#E6C384'
+surimiOrange = '#FFA066'
+sakuraPink = '#D27E99'
+oniViolet = '#957FB8'
+waveAqua2 = '#7AA89F'
+peachRed = '#FF5D62'
+boatYellow2 = '#C0A36E'
+
+[os]
+disabled = false
+style = "bg:oniViolet fg:sumiInk0"
+format = "[](fg:oniViolet)[ $os ](bg:oniViolet fg:sumiInk0)[](fg:oniViolet) "
+
+[os.symbols]
+Windows = "󰍲"
+Ubuntu = "󰕈"
+SUSE = ""
+Raspbian = "󰐿"
+Mint = "󰣭"
+Macos = "󰀵"
+Manjaro = ""
+Linux = "󰌽"
+Gentoo = "󰣨"
+Fedora = "󰣛"
+Alpine = ""
+Amazon = ""
+Android = ""
+AOSC = ""
+Arch = "󰣇"
+Artix = "󰣇"
+EndeavourOS = ""
+CentOS = ""
+Debian = "󰣚"
+Redhat = "󱄛"
+RedHatEnterprise = "󱄛"
+Pop = ""
+
+[username]
+show_always = true
+style_user = "bg:oniViolet fg:sumiInk0"
+style_root = "bg:oniViolet fg:sumiInk0"
+format = "[](fg:oniViolet)[ $user ](bg:oniViolet fg:sumiInk0)[](fg:oniViolet) "
+
+[directory]
+style = "bg:crystalBlue fg:sumiInk0"
+format = "[](fg:crystalBlue)[ $path ](bg:crystalBlue fg:sumiInk0)[](fg:crystalBlue) "
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = "󰝚 "
+"Pictures" = " "
+"Developer" = "󰲋 "
+
+[git_branch]
+symbol = ""
+style = "bg:springGreen fg:sumiInk0"
+format = "[](fg:springGreen)[ $symbol $branch ](bg:springGreen fg:sumiInk0)[](fg:springGreen) "
+
+[git_status]
+style = "bg:springGreen fg:sumiInk0"
+format = "[](fg:springGreen)[($all_status$ahead_behind )](bg:springGreen fg:sumiInk0)[](fg:springGreen) "
+
+[fill]
+style = "fg:sumiInk3"
+symbol = " "
+
+[c]
+symbol = " "
+style = "bg:sumiInk3 fg:carpYellow"
+format = " [](fg:sumiInk3)[ $symbol$version ](bg:sumiInk3 fg:carpYellow)[](fg:sumiInk3)"
+
+[cpp]
+symbol = " "
+style = "bg:sumiInk3 fg:carpYellow"
+format = " [](fg:sumiInk3)[ $symbol$version ](bg:sumiInk3 fg:carpYellow)[](fg:sumiInk3)"
+
+[rust]
+symbol = ""
+style = "bg:sumiInk3 fg:carpYellow"
+format = " [](fg:sumiInk3)[ $symbol $version ](bg:sumiInk3 fg:carpYellow)[](fg:sumiInk3)"
+
+[golang]
+symbol = ""
+style = "bg:sumiInk3 fg:carpYellow"
+format = " [](fg:sumiInk3)[ $symbol $version ](bg:sumiInk3 fg:carpYellow)[](fg:sumiInk3)"
+
+[nodejs]
+symbol = ""
+style = "bg:sumiInk3 fg:carpYellow"
+format = " [](fg:sumiInk3)[ $symbol $version ](bg:sumiInk3 fg:carpYellow)[](fg:sumiInk3)"
+
+[php]
+symbol = ""
+style = "bg:sumiInk3 fg:carpYellow"
+format = " [](fg:sumiInk3)[ $symbol $version ](bg:sumiInk3 fg:carpYellow)[](fg:sumiInk3)"
+
+[java]
+symbol = ""
+style = "bg:sumiInk3 fg:carpYellow"
+format = " [](fg:sumiInk3)[ $symbol $version ](bg:sumiInk3 fg:carpYellow)[](fg:sumiInk3)"
+
+[kotlin]
+symbol = ""
+style = "bg:sumiInk3 fg:carpYellow"
+format = " [](fg:sumiInk3)[ $symbol $version ](bg:sumiInk3 fg:carpYellow)[](fg:sumiInk3)"
+
+[haskell]
+symbol = ""
+style = "bg:sumiInk3 fg:carpYellow"
+format = " [](fg:sumiInk3)[ $symbol $version ](bg:sumiInk3 fg:carpYellow)[](fg:sumiInk3)"
+
+[python]
+symbol = ""
+style = "bg:sumiInk3 fg:carpYellow"
+format = " [](fg:sumiInk3)[ $symbol $version ](bg:sumiInk3 fg:carpYellow)[](fg:sumiInk3)"
+
+[docker_context]
+symbol = ""
+style = "bg:sumiInk3 fg:waveAqua2"
+format = " [](fg:sumiInk3)[ $symbol $context ](bg:sumiInk3 fg:waveAqua2)[](fg:sumiInk3)"
+
+[conda]
+style = "bg:sumiInk3 fg:waveAqua2"
+format = " [](fg:sumiInk3)[ $symbol $environment ](bg:sumiInk3 fg:waveAqua2)[](fg:sumiInk3)"
+
+[pixi]
+style = "bg:sumiInk3 fg:waveAqua2"
+format = " [](fg:sumiInk3)[ $symbol $version $environment ](bg:sumiInk3 fg:waveAqua2)[](fg:sumiInk3)"
+
+[time]
+disabled = false
+time_format = "%R"
+style = "bg:sumiInk4 fg:fujiWhite"
+format = " [](fg:sumiInk4)[  $time ](bg:sumiInk4 fg:fujiWhite)[](fg:sumiInk4)"
+
+[line_break]
+disabled = false
+
+[status]
+disabled = false
+symbol = '✗ '
+format = '[$symbol$status ](bold fg:peachRed)'
+
+[custom.bugs]
+description = "SE 101 bugs captured in last 7d (shift hours only)"
+command = "find '/mnt/PERSONAL/Obsidian/SE 101/Bugs' -maxdepth 1 -type f -name '*.md' ! -name 'README.md' -mtime -7 2>/dev/null | wc -l"
+when = "test $(date +%H) -ge 18 -o $(date +%H) -le 3"
+shell = ["sh", "-c"]
+format = '[🐛 $output ]($style)'
+style = 'fg:carpYellow'
+
+[character]
+disabled = false
+success_symbol = '[](bold fg:springGreen)'
+error_symbol = '[](bold fg:peachRed)'
+vimcmd_symbol = '[](bold fg:springGreen)'
+vimcmd_replace_one_symbol = '[](bold fg:oniViolet)'
+vimcmd_replace_symbol = '[](bold fg:oniViolet)'
+vimcmd_visual_symbol = '[](bold fg:carpYellow)'

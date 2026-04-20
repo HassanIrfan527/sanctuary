@@ -1,0 +1,200 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """
+[](magenta)\
+$os\
+$username\
+[](bg:blue fg:magenta)\
+$directory\
+[](fg:blue bg:green)\
+$git_branch\
+$git_status\
+[](fg:green bg:terminal_black)\
+$c\
+$cpp\
+$rust\
+$golang\
+$nodejs\
+$php\
+$java\
+$kotlin\
+$haskell\
+$python\
+[](fg:terminal_black bg:bg_highlight)\
+$docker_context\
+$conda\
+$pixi\
+[](fg:bg_highlight bg:comment)\
+$time\
+[ ](fg:comment)\
+${custom.bugs}\
+$line_break$status$character"""
+
+palette = 'tokyo_night'
+
+[palettes.tokyo_night]
+bg = '#1A1B26'
+bg_dark = '#16161E'
+bg_highlight = '#292E42'
+terminal_black = '#414868'
+fg = '#C0CAF5'
+fg_dark = '#A9B1D6'
+comment = '#565F89'
+blue = '#7AA2F7'
+cyan = '#7DCFFF'
+green = '#9ECE6A'
+magenta = '#BB9AF7'
+red = '#F7768E'
+orange = '#FF9E64'
+yellow = '#E0AF68'
+teal = '#1ABC9C'
+
+[os]
+disabled = false
+style = "bg:magenta fg:bg_dark"
+
+[os.symbols]
+Windows = "󰍲"
+Ubuntu = "󰕈"
+SUSE = ""
+Raspbian = "󰐿"
+Mint = "󰣭"
+Macos = "󰀵"
+Manjaro = ""
+Linux = "󰌽"
+Gentoo = "󰣨"
+Fedora = "󰣛"
+Alpine = ""
+Amazon = ""
+Android = ""
+AOSC = ""
+Arch = "󰣇"
+Artix = "󰣇"
+EndeavourOS = ""
+CentOS = ""
+Debian = "󰣚"
+Redhat = "󱄛"
+RedHatEnterprise = "󱄛"
+Pop = ""
+
+[username]
+show_always = true
+style_user = "bg:magenta fg:bg_dark"
+style_root = "bg:magenta fg:bg_dark"
+format = '[ $user ]($style)'
+
+[directory]
+style = "fg:bg_dark bg:blue"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = "󰝚 "
+"Pictures" = " "
+"Developer" = "󰲋 "
+
+[git_branch]
+symbol = ""
+style = "bg:green"
+format = '[[ $symbol $branch ](fg:bg_dark bg:green)]($style)'
+
+[git_status]
+style = "bg:green"
+format = '[[($all_status$ahead_behind )](fg:bg_dark bg:green)]($style)'
+
+[nodejs]
+symbol = ""
+style = "bg:terminal_black"
+format = '[[ $symbol( $version) ](fg:cyan bg:terminal_black)]($style)'
+
+[c]
+symbol = " "
+style = "bg:terminal_black"
+format = '[[ $symbol( $version) ](fg:cyan bg:terminal_black)]($style)'
+
+[cpp]
+symbol = " "
+style = "bg:terminal_black"
+format = '[[ $symbol( $version) ](fg:cyan bg:terminal_black)]($style)'
+
+[rust]
+symbol = ""
+style = "bg:terminal_black"
+format = '[[ $symbol( $version) ](fg:cyan bg:terminal_black)]($style)'
+
+[golang]
+symbol = ""
+style = "bg:terminal_black"
+format = '[[ $symbol( $version) ](fg:cyan bg:terminal_black)]($style)'
+
+[php]
+symbol = ""
+style = "bg:terminal_black"
+format = '[[ $symbol( $version) ](fg:cyan bg:terminal_black)]($style)'
+
+[java]
+symbol = ""
+style = "bg:terminal_black"
+format = '[[ $symbol( $version) ](fg:cyan bg:terminal_black)]($style)'
+
+[kotlin]
+symbol = ""
+style = "bg:terminal_black"
+format = '[[ $symbol( $version) ](fg:cyan bg:terminal_black)]($style)'
+
+[haskell]
+symbol = ""
+style = "bg:terminal_black"
+format = '[[ $symbol( $version) ](fg:cyan bg:terminal_black)]($style)'
+
+[python]
+symbol = ""
+style = "bg:terminal_black"
+format = '[[ $symbol( $version) ](fg:cyan bg:terminal_black)]($style)'
+
+[docker_context]
+symbol = ""
+style = "bg:bg_highlight"
+format = '[[ $symbol( $context) ](fg:teal bg:bg_highlight)]($style)'
+
+[conda]
+style = "bg:bg_highlight"
+format = '[[ $symbol( $environment) ](fg:teal bg:bg_highlight)]($style)'
+
+[pixi]
+style = "bg:bg_highlight"
+format = '[[ $symbol( $version)( $environment) ](fg:teal bg:bg_highlight)]($style)'
+
+[time]
+disabled = false
+time_format = "%R"
+style = "bg:comment"
+format = '[[  $time ](fg:fg bg:comment)]($style)'
+
+[line_break]
+disabled = false
+
+[status]
+disabled = false
+symbol = '✗ '
+format = '[$symbol$status ](bold fg:red)'
+
+[custom.bugs]
+description = "SE 101 bugs captured in last 7d (shift hours only)"
+command = "find '/mnt/PERSONAL/Obsidian/SE 101/Bugs' -maxdepth 1 -type f -name '*.md' ! -name 'README.md' -mtime -7 2>/dev/null | wc -l"
+when = "test $(date +%H) -ge 18 -o $(date +%H) -le 3"
+shell = ["sh", "-c"]
+format = '[🐛 $output ]($style)'
+style = 'fg:yellow'
+
+[character]
+disabled = false
+success_symbol = '[](bold fg:green)'
+error_symbol = '[](bold fg:red)'
+vimcmd_symbol = '[](bold fg:green)'
+vimcmd_replace_one_symbol = '[](bold fg:magenta)'
+vimcmd_replace_symbol = '[](bold fg:magenta)'
+vimcmd_visual_symbol = '[](bold fg:yellow)'

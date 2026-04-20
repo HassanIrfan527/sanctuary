@@ -1,0 +1,97 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """
+$character\
+$directory \
+$fill\
+$git_branch\
+$git_status\
+$c\
+$python\
+$nodejs\
+$rust\
+$golang\
+$time"""
+
+palette = 'zen'
+
+[palettes.zen]
+fg = '#C5C8C6'
+dim = '#5C6370'
+accent = '#7FBBB3'
+warn = '#D19A66'
+subtle = '#3E4451'
+
+[character]
+disabled = false
+success_symbol = '[›](fg:dim)'
+error_symbol = '[›](bold fg:warn)'
+vimcmd_symbol = '[‹](fg:accent)'
+vimcmd_replace_one_symbol = '[‹](fg:warn)'
+vimcmd_replace_symbol = '[‹](fg:warn)'
+vimcmd_visual_symbol = '[‹](fg:dim)'
+
+[directory]
+style = "fg:accent"
+format = "[$path]($style)"
+truncation_length = 2
+truncation_symbol = "…/"
+
+[fill]
+style = "fg:subtle"
+symbol = " "
+
+[git_branch]
+symbol = ""
+style = "fg:dim"
+format = "[$symbol $branch ]($style)"
+
+[git_status]
+disabled = false
+style = "fg:warn"
+format = '[$all_status$ahead_behind]($style) '
+ahead = '[↑${count}](fg:accent) '
+behind = '[↓${count}](fg:dim) '
+diverged = '[↑${ahead_count}↓${behind_count}](fg:warn) '
+modified = '[~${count}](fg:warn) '
+untracked = '[?${count}](fg:dim) '
+staged = '[+${count}](fg:accent) '
+deleted = '[x${count}](fg:warn) '
+renamed = '[»${count}](fg:dim) '
+stashed = '[$${count}](fg:dim) '
+up_to_date = ''
+
+[c]
+symbol = ""
+style = "fg:dim"
+format = "[$symbol ]($style)"
+detect_files = ['Makefile', 'CMakeLists.txt']
+
+[python]
+symbol = ""
+style = "fg:dim"
+format = "[$symbol ]($style)"
+
+[nodejs]
+symbol = ""
+style = "fg:dim"
+format = "[$symbol ]($style)"
+
+[rust]
+symbol = ""
+style = "fg:dim"
+format = "[$symbol ]($style)"
+
+[golang]
+symbol = ""
+style = "fg:dim"
+format = "[$symbol ]($style)"
+
+[time]
+disabled = false
+time_format = "%R"
+style = "fg:dim"
+format = "[$time]($style)"
+
+[line_break]
+disabled = true
