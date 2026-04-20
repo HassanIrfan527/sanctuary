@@ -14,8 +14,12 @@ github = "olets/zsh-abbr"
 [plugins.fzf-tab]
 github = "Aloxaf/fzf-tab"
 
-# zsh-syntax-highlighting MUST be loaded last
+# zsh-syntax-highlighting
 [plugins.zsh-syntax-highlighting]
 github = "zsh-users/zsh-syntax-highlighting"
+
+[plugins.extract]
+github = "ohmyzsh/ohmyzsh"
+dir = "plugins/extract"
 
 [templates]
