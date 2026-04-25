@@ -33,9 +33,3 @@ hpdb() {
     fi
     harlequin -a postgres "$POSTGRES_PROD_CONNECTION_STRING" "$@"
 }
-
-# git aliases
-
-alias gs = 'git status'
-alias gd = 'git diff'
-alias gds = 'git diff --staged'
