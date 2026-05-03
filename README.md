@@ -73,6 +73,8 @@ I cloned someone else's hyprland config and used it. And its working for me thou
 | podman-tui | TUI for managing Podman containers, images, volumes                                                         |
 | harlequin  | SQL IDE TUI — Postgres/MySQL/SQLite/DuckDB with autocomplete, query history, result grid                    |
 | direnv     | Auto-loads .envrc per directory (venv activation, env vars)                                                 |
+| dozzle     | An amazing logger for podman containers                                                                     |
+| lnav       | A TUI package for viewing logs better. its amazing                                                          |
 
 ## Additional Desktop Apps
 

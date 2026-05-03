@@ -4,6 +4,7 @@ return {
 		"nvim-lua/plenary.nvim",
 		"sindrets/diffview.nvim",
 		"nvim-telescope/telescope.nvim",
+		"esmuellert/codediff.nvim",
 	},
 	cmd = "Neogit",
 	keys = {
