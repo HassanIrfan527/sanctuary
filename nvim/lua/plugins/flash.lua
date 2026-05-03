@@ -5,7 +5,10 @@ return {
 	opts = {
 		modes = {
 			search = {
-				enabled = true,
+				enabled = false,
+			},
+			char = {
+				enabled = false,
 			},
 		},
 	},
@@ -20,7 +23,7 @@ return {
 		},
 		{
 			"S",
-			mode = { "n", "x", "o" },
+			mode = { "n", "o" },
 			function()
 				require("flash").treesitter()
 			end,
