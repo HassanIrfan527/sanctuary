@@ -58,23 +58,24 @@ I cloned someone else's hyprland config and used it. And its working for me thou
 
 ## CLI & TUI Tools
 
-| Package    | What it does                                                                                                |
-| ---------- | ----------------------------------------------------------------------------------------------------------- |
-| television | Rust-based fuzzy finder with 30+ channels (files, text, git, docker, env)                                   |
-| fzf        | Classic fuzzy finder — Ctrl+R history, Ctrl+T files, Alt+C cd (via `/usr/share/fzf/shell/key-bindings.zsh`) |
-| asciinema  | Record terminal sessions                                                                                    |
-| bat        | Syntax-highlighted cat replacement                                                                          |
-| glow       | Terminal markdown renderer (pretty-prints README/docs)                                                      |
-| sheets     | Terminal spreadsheet (CSV viewer/editor)                                                                    |
-| tldr       | Simplified man pages with examples                                                                          |
-| thefuck    | Corrects the previous shell command — type `fuck` to fix typos                                              |
-| weathr     | ASCII terminal weather app (animated conditions, auto-location)                                             |
-| zoxide     | Smart cd that learns your frequent directories                                                              |
-| podman-tui | TUI for managing Podman containers, images, volumes                                                         |
-| harlequin  | SQL IDE TUI — Postgres/MySQL/SQLite/DuckDB with autocomplete, query history, result grid                    |
-| direnv     | Auto-loads .envrc per directory (venv activation, env vars)                                                 |
-| dozzle     | An amazing logger for podman containers                                                                     |
-| lnav       | A TUI package for viewing logs better. its amazing                                                          |
+| Package     | What it does                                                                                                |
+| ----------- | ----------------------------------------------------------------------------------------------------------- |
+| television  | Rust-based fuzzy finder with 30+ channels (files, text, git, docker, env)                                   |
+| fzf         | Classic fuzzy finder — Ctrl+R history, Ctrl+T files, Alt+C cd (via `/usr/share/fzf/shell/key-bindings.zsh`) |
+| asciinema   | Record terminal sessions                                                                                    |
+| bat         | Syntax-highlighted cat replacement                                                                          |
+| glow        | Terminal markdown renderer (pretty-prints README/docs)                                                      |
+| sheets      | Terminal spreadsheet (CSV viewer/editor)                                                                    |
+| tldr        | Simplified man pages with examples                                                                          |
+| thefuck     | Corrects the previous shell command — type `fuck` to fix typos                                              |
+| weathr      | ASCII terminal weather app (animated conditions, auto-location)                                             |
+| zoxide      | Smart cd that learns your frequent directories                                                              |
+| podman-tui  | TUI for managing Podman containers, images, volumes                                                         |
+| harlequin   | SQL IDE TUI — Postgres/MySQL/SQLite/DuckDB with autocomplete, query history, result grid                    |
+| direnv      | Auto-loads .envrc per directory (venv activation, env vars)                                                 |
+| dozzle      | An amazing logger for podman containers                                                                     |
+| lnav        | A TUI package for viewing logs better. its amazing                                                          |
+| clickup-cli | A CLI package for clickup. Its great since clickup is slow on the browser and in the app too.               |
 
 ## Additional Desktop Apps
 
