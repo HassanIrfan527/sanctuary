@@ -6,7 +6,7 @@ set -euo pipefail
 
 title=$(: | fuzzel --dmenu --lines=0 --prompt='bug> ' --width=40 || true)
 
-if [[ -z "${title// }" ]]; then
+if [[ -z "${title// /}" ]]; then
     exit 0
 fi
 

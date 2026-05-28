@@ -1,0 +1,29 @@
+@use "sys24-tokens" as *;
+
+.sys24-root frame.sys24-fieldset {
+    border: $border-w solid $accent;
+    border-radius: $radius;
+    background: $mantle;
+    padding: 1px 6px 2px 6px;
+
+    > border {
+        border: none;
+    }
+
+    > label {
+        color: $accent;
+        font-family: $font;
+        font-size: 9px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        padding: 0 2px;
+        background: $mantle;
+        margin: 0 8px 0 8px;
+        text-transform: lowercase;
+    }
+
+    &.status   > label { color: $accent; }
+    &.time     > label { color: $accent; }
+    &.media-fs > label { color: $accent; }
+    &.system   > label { color: $accent; }
+}

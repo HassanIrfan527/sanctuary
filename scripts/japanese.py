@@ -1,5 +1,6 @@
 import csv
 import random
+import subprocess
 
 # we'll use ollama to generate a sentence based on the word we selected.
 # import ollama

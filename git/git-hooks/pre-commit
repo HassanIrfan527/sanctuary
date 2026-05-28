@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+# Global pre-commit hook: enforce correct git email per directory
+
+REPO_DIR="$(git rev-parse --show-toplevel)"
+CURRENT_EMAIL="$(git config user.email)"
+
+WORK_DIRS=(
+  "$HOME/Development/pixiecode"
+  "$HOME/Development/app-aie"
+)
+
+WORK_EMAIL="hassan@closegpt.ai"
+PERSONAL_EMAIL="harryed525@gmail.com"
+
+is_work_repo=false
+for dir in "${WORK_DIRS[@]}"; do
+  if [[ "$REPO_DIR" == "$dir" || "$REPO_DIR" == "$dir/"* ]]; then
+    is_work_repo=true
+    break
+  fi
+done
+
+if $is_work_repo; then
+  if [[ "$CURRENT_EMAIL" != "$WORK_EMAIL" ]]; then
+    echo "ERROR: Wrong git email for work repo!"
+    echo "  Current:  $CURRENT_EMAIL"
+    echo "  Expected: $WORK_EMAIL"
+    echo "  Repo:     $REPO_DIR"
+    echo ""
+    echo "Fix: git config user.email \"$WORK_EMAIL\""
+    exit 1
+  fi
+else
+  if [[ "$CURRENT_EMAIL" != "$PERSONAL_EMAIL" ]]; then
+    echo "ERROR: Wrong git email for personal repo!"
+    echo "  Current:  $CURRENT_EMAIL"
+    echo "  Expected: $PERSONAL_EMAIL"
+    echo "  Repo:     $REPO_DIR"
+    echo ""
+    echo "Fix: git config user.email \"$PERSONAL_EMAIL\""
+    exit 1
+  fi
+fi
+
+# Chain to repo-local pre-commit hook if it exists
+LOCAL_HOOK="$(git rev-parse --git-dir)/hooks/pre-commit"
+if [[ -x "$LOCAL_HOOK" ]]; then
+  exec "$LOCAL_HOOK" "$@"
+fi

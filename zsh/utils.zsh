@@ -1,11 +1,21 @@
 gcm() {
-    local msg=$(git diff --cached | ollama run llama3.2:latest "Write a concise git commit message for this diff, which could clearly explain what's this commit is about. It should be a one-liner commit message, short, concise and to-the-point. But it should really explain the whole purpose of this commit. No explanation. Just the commit message.")
-    echo "Suggested:-\n $msg"
-    echo "Edit? (y/n)"
-    read confirm
-    if [ "$confirm" = "y" ]; then
-        git commit -m "$msg"
+    local diff=$(git diff --cached)
+    if [ -z "$diff" ]; then
+        echo "Nothing staged."
+        return 1
     fi
+
+    # Cap input at ~5KB to keep it fast
+    local truncated=$(echo "$diff" | head -c 5000)
+
+    local msg=$(echo "$truncated" | ollama run llama3.2:1b \
+        "Write a git commit message. ONE subject line under 60 characters, imperative mood. No explanation, no code review.
+   Just the message.")
+
+    echo "Suggested: $msg"
+    echo "Commit? (y/n)"
+    read -r confirm
+    [ "$confirm" = "y" ] && git commit -m "$msg"
 }
 
 # explain() {

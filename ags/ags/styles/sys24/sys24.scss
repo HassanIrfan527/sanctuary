@@ -1,0 +1,12 @@
+@use "sys24-tokens" as *;
+@use "sys24-fieldset";
+@use "sys24-bar";
+@use "sys24-notifications";
+@use "sys24-notifcenter";
+@use "sys24-session";
+
+window,
+.sys24-root,
+.sys24-root * {
+    font-family: $font;
+}

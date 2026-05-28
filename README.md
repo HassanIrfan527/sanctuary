@@ -76,6 +76,8 @@ I cloned someone else's hyprland config and used it. And its working for me thou
 | dozzle      | An amazing logger for podman containers                                                                     |
 | lnav        | A TUI package for viewing logs better. its amazing                                                          |
 | clickup-cli | A CLI package for clickup. Its great since clickup is slow on the browser and in the app too.               |
+| pi          | Alternative to claude code. Simple, extensible and amazing. Check it out at [pi.dev](https://pi.dev)        |
+| opencode    | Currently testing it, if it can be a replacement to claude code.                                            |
 
 ## Additional Desktop Apps
 

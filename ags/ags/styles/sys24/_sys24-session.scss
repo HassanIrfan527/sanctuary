@@ -1,0 +1,47 @@
+@use "sys24-tokens" as *;
+
+.sys24-root.Sys24Session {
+    background: rgba(0, 0, 0, 0.4);
+
+    .session-modal {
+        background: $mantle;
+        border: $border-w solid $accent;
+        border-radius: $radius;
+        padding: 18px 24px;
+        min-width: 360px;
+    }
+
+    .session-label {
+        color: $accent;
+        background: $mantle;
+        font-family: $font;
+        font-size: 10px;
+        padding: 0 6px;
+        margin-left: 12px;
+    }
+
+    .session-button {
+        background: transparent;
+        border: $border-w solid $overlay;
+        border-radius: $radius;
+        color: $text;
+        font-family: $font;
+        font-size: 12px;
+        padding: 6px 14px;
+        margin: 4px;
+        min-width: 0;
+
+        &:hover, &:focus {
+            border-color: $accent;
+            color: $accent;
+            background: $base;
+        }
+    }
+
+    .session-key {
+        color: $overlay;
+        font-family: $font;
+        font-size: 9px;
+        margin-left: 6px;
+    }
+}

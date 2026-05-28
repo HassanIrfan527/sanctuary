@@ -1,0 +1,71 @@
+// Grid preset — Tron-inspired design tokens
+// Self-contained: no catppuccin import. Swap $accent to retheme (Ares red,
+// Clu orange, Athena gold, Aphrodite pink, Poseidon blue).
+
+// ---- palette ----
+$bg:            #0a0a0a;
+$bg-alpha:      rgba(10, 10, 10, 0.92);
+$surface:       #0f1418;
+$surface-hi:    #131a20;
+
+$accent:        #00d4ff;
+$accent-soft:   rgba(0, 212, 255, 0.55);
+$accent-dim:    rgba(0, 212, 255, 0.35);
+$accent-glow:   rgba(0, 212, 255, 0.18);
+$accent-faint:  rgba(0, 212, 255, 0.08);
+
+$text:          #d6f4ff;
+$text-dim:      rgba(214, 244, 255, 0.55);
+$text-faint:    rgba(214, 244, 255, 0.30);
+
+$divider:       rgba(0, 212, 255, 0.12);
+
+// ---- type ----
+$mono:          "Maple Mono NF", "JetBrains Mono", monospace;
+$fz-xxs:         9px;
+$fz-xs:         10px;
+$fz-sm:         11px;
+$fz-md:         13px;
+$fz-lg:         16px;
+
+$track-wide:    0.22em;
+$track-mid:     0.14em;
+
+// ---- radius ----
+// Tron is sharp. radius 0 everywhere; 2px max on micro-pills for anti-alias.
+$r-0:  0;
+$r-1:  1px;
+$r-2:  2px;
+
+// ---- mixins ----
+@mixin glow($c: $accent, $size: 8px) {
+  box-shadow:
+    0 0 2px $c,
+    0 0 $size rgba($c, 0.55),
+    inset 0 0 1px rgba($c, 0.6);
+}
+
+@mixin soft-glow($c: $accent) {
+  box-shadow: 0 0 6px rgba($c, 0.35);
+}
+
+@mixin hud-text {
+  font-family: $mono;
+  text-transform: uppercase;
+  letter-spacing: $track-wide;
+  font-size: $fz-xxs;
+  color: $text-dim;
+}
+
+@mixin pill-border($c: $accent-dim) {
+  border: 1px solid $c;
+  border-radius: $r-2;
+}
+
+@mixin scanlines {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0 2px,
+    rgba(0, 212, 255, 0.025) 2px 3px
+  );
+}

@@ -1,0 +1,19 @@
+[user]
+	name = HassanIrfan527
+	email = harryed525@gmail.com
+
+# Work profile - applies only to specific work directories
+[includeIf "gitdir:~/Development/pixiecode/"]
+	path = ~/.gitconfig-work
+
+[includeIf "gitdir:~/Development/app-aie/"]
+	path = ~/.gitconfig-work
+[core]
+	editor = nvim
+	hooksPath = /home/anonymous/.git-hooks
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential

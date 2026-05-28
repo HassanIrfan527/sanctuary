@@ -110,8 +110,6 @@ export VAPI_INSTALL="$HOME/.vapi"
 export PATH="$VAPI_INSTALL/bin:$PATH"
 export MANPATH=""$HOME/.vapi"/share/man:$MANPATH"
 
-# opencode
-export PATH=/home/anonymous/.opencode/bin:$PATH
 export PATH="$HOME/.npm-global/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 export EDITOR=nvim
@@ -119,3 +117,35 @@ export VISUAL=nvim
 
 export PATH="$HOME/go/bin:$PATH"
 export GI_TYPELIB_PATH="/usr/local/lib64/girepository-1.0:$GI_TYPELIB_PATH"
+
+export NVM_DIR="$HOME/.config/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+
+# pixiecode memory search — semantic lookup across public + private memories
+mem() {
+    local root="${PIXIECODE_ROOT:-$HOME/Development/pixiecode}"
+    local py="$root/venv/.venv/bin/python3"
+    local cli="$root/tools/memory/cli.py"
+    if [[ ! -x "$py" || ! -f "$cli" ]]; then
+        echo "mem: pixiecode CLI not found at $cli" >&2
+        return 1
+    fi
+    if [[ $# -eq 0 ]]; then
+        echo "Usage: mem <query> [--top-k N] [--category preferences|entities|events|cases|patterns|tools|skills]"
+        echo "       mem-reindex                 # rebuild vector DB (add --full to re-embed)"
+        echo "       mem-status                  # show indexed counts + provider"
+        return 0
+    fi
+    "$py" "$cli" search "$@"
+}
+
+mem-reindex() {
+    local root="${PIXIECODE_ROOT:-$HOME/Development/pixiecode}"
+    "$root/venv/.venv/bin/python3" "$root/tools/memory/cli.py" reindex "$@"
+}
+
+mem-status() {
+    local root="${PIXIECODE_ROOT:-$HOME/Development/pixiecode}"
+    "$root/venv/.venv/bin/python3" "$root/tools/memory/cli.py" status
+}
