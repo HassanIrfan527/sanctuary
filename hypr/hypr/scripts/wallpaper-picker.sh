@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# wallpaper-picker.sh — fuzzel + swww
 set -euo pipefail
 
 DIRS=(
@@ -18,8 +19,11 @@ pick=$(list_walls | sed "s|$HOME/||" | sort -u | fuzzel --dmenu --prompt "wallpa
 full="$HOME/$pick"
 [[ -f "$full" ]] || exit 1
 
-hyprctl hyprpaper unload all >/dev/null 2>&1 || true
-hyprctl hyprpaper preload "$full" >/dev/null
-for m in $(hyprctl monitors -j | jq -r '.[].name'); do
-    hyprctl hyprpaper wallpaper "$m,$full" >/dev/null
-done
+# make sure swww-daemon is up
+pgrep -x swww-daemon >/dev/null || { swww-daemon & disown; sleep 0.5; }
+
+swww img "$full" \
+    --transition-type grow \
+    --transition-pos 0.5,0.5 \
+    --transition-duration 0.8 \
+    --transition-fps 60

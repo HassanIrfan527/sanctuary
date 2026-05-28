@@ -20,4 +20,4 @@ SHEET="$HOME/.dotfiles/docs/cheatsheet.txt"
             "super + i             | bug capture" \
             "ctrl + alt + delete   | session menu"
     fi
-) | fuzzel --dmenu --prompt "cheat > " --width 70 --lines 14 >/dev/null || true
+) | fuzzel --dmenu --prompt "cheat > " --width 70 --lines 22 >/dev/null || true

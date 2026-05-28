@@ -1,0 +1,60 @@
+─ apps & windows ─────────────────────────────────────
+super + return         terminal (kitty)
+super + e              file manager (nautilus)
+super + y              terminal yazi
+super + b              brave
+super + z              zen
+super + a              audio output picker
+super + w              close window
+super + f              fullscreen
+super + shift + f      maximize
+super + shift + v      toggle floating
+super + s              toggle split
+super + g              toggle group
+super + d              scratchpad terminal
+
+─ launchers & menus ──────────────────────────────────
+super + space          app launcher
+super + v              clipboard history
+super + slash          this cheatsheet
+super + delete         session menu (lock/logout/reboot)
+super + i              bug capture
+super + shift + i      browse bugs
+super + shift + t      study today
+
+─ focus & layout ─────────────────────────────────────
+super + h j k l        focus window (vim arrows)
+super + shift + h..l   move window
+super + ctrl + h..l    swap window
+super + alt + h..l     resize window
+super + r              enter resize submap (esc to exit)
+
+─ workspaces ─────────────────────────────────────────
+super + 1..9           switch workspace
+super + p / n          prev / next workspace
+super + shift + 1..9   move window to workspace
+super + shift + p / n  move window to prev / next ws
+
+─ screenshots ────────────────────────────────────────
+print                  region: annotate + save + copy
+shift + print          screen: annotate + save + copy
+
+─ media & system ─────────────────────────────────────
+super + escape         lock screen
+super + shift + b      toggle key sounds
+super + alt + b        switch key sound theme
+super + alt + s        toggle study mode
+super + alt + p        pomodoro
+super + shift + m      play/pause
+super + shift + [/]    prev / next track
+super + = / -          volume + / -
+super + 0              mute toggle
+
+─ night light (hyprsunset) ───────────────────────────
+super + shift + =      warm (3500 K)
+super + shift + -      cool (4500 K)
+super + shift + 0      default (3800 K)
+
+─ notifications ──────────────────────────────────────
+click bell capsule     toggle swaync sidebar
+right-click bell       toggle do-not-disturb

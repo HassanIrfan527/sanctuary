@@ -1,57 +1,88 @@
-/* Base waybar style — theme colors imported from theme-override.css */
-@import "theme-override.css";
+/* ── waybar: catppuccin mocha + lavender accent ── */
+
+@define-color base       #1e1e2e;
+@define-color mantle     #181825;
+@define-color crust      #11111b;
+@define-color text       #cdd6f4;
+@define-color subtext0   #a6adc8;
+@define-color overlay0   #6c7086;
+@define-color surface0   #313244;
+@define-color lavender   #b4befe;
 
 * {
+    font-family: "Maple Mono NF", monospace;
     font-size: 13px;
+    font-weight: 500;
+    border: none;
+    border-radius: 0;
     min-height: 0;
 }
 
 window#waybar {
     background: transparent;
-    color: #c8d3f5;
+    color: @text;
 }
 
+/* every module is a pill-shaped capsule */
+#workspaces,
+#clock,
+#tray,
+#custom-notif {
+    background-color: alpha(@base, 0.85);
+    border: 2px solid @lavender;
+    border-radius: 16px;
+    padding: 2px 14px;
+    margin: 0 4px;
+    color: @text;
+}
+
+/* workspaces: dots inside the capsule */
 #workspaces button {
-    padding: 0 6px;
-    color: #565f89;
     background: transparent;
+    color: @overlay0;
+    padding: 0 3px;
     border: none;
-    border-radius: 4px;
-    margin: 3px 2px;
+    border-radius: 0;
 }
 
 #workspaces button.active {
-    color: #c8d3f5;
-    background: rgba(130, 170, 255, 0.2);
+    color: @lavender;
 }
 
 #workspaces button:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-#clock,
-#custom-weather,
-#custom-calendar,
-#pulseaudio,
-#network,
-#custom-notification,
-#tray {
-    padding: 0 8px;
-    margin: 3px 2px;
-    border-radius: 4px;
+    color: @text;
+    background: transparent;
+    box-shadow: none;
+    text-shadow: none;
 }
 
 #clock {
-    font-weight: bold;
+    padding: 2px 18px;
+    letter-spacing: 0.5px;
 }
 
-#custom-notification {
-    padding: 0 6px;
+#tray {
+    padding: 2px 10px;
 }
 
-tooltip {
-    background: rgba(26, 27, 38, 0.95);
-    border: 1px solid rgba(130, 170, 255, 0.3);
-    border-radius: 8px;
-    color: #c8d3f5;
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+    color: @lavender;
+}
+
+#custom-notif {
+    padding: 2px 14px;
+    font-size: 14px;
+    color: @lavender;
+}
+
+#tray.empty {
+    background: transparent;
+    border-color: transparent;
+    padding: 0;
+    margin: 0;
 }

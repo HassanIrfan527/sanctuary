@@ -2,84 +2,49 @@
     "layer": "top",
     "position": "top",
     "height": 32,
-    "spacing": 4,
-    "modules-left": ["hyprland/workspaces", "hyprland/window"],
+    "spacing": 8,
+    "margin-top": 6,
+    "margin-left": 12,
+    "margin-right": 12,
+
+    "modules-left":   ["hyprland/workspaces"],
     "modules-center": ["clock"],
-    "modules-right": [
-        "custom/weather",
-        "custom/calendar",
-        "pulseaudio",
-        "network",
-        "tray",
-        "custom/notification"
-    ],
+    "modules-right":  ["tray", "custom/notif"],
 
     "hyprland/workspaces": {
-        "format": "{id}",
-        "on-click": "activate",
-        "sort-by-number": true
-    },
-
-    "hyprland/window": {
-        "max-length": 40,
-        "separate-outputs": true
+        "format": "{icon}",
+        "format-icons": {
+            "active":  "●",
+            "default": "○",
+            "empty":   "○"
+        },
+        "on-click": "activate"
     },
 
     "clock": {
-        "format": "{:%a %b %d  %I:%M %p}",
-        "tooltip-format": "<tt>{calendar}</tt>",
-        "calendar": {
-            "mode": "month",
-            "weeks-pos": "left",
-            "format": {
-                "today": "<span color='#f38ba8'><b><u>{}</u></b></span>"
-            }
-        }
+        "format": "{:%H:%M · %a %d}",
+        "tooltip-format": "<tt>{calendar}</tt>"
     },
 
-    "custom/weather": {
-        "exec": "~/.config/waybar/scripts/weather.sh",
-        "interval": 900,
-        "format": "{}",
-        "tooltip": false
+    "tray": {
+        "icon-size": 16,
+        "spacing": 8
     },
 
-    "custom/calendar": {
-        "exec": "~/.config/waybar/scripts/calendar.sh",
-        "interval": 300,
-        "format": "  {}",
-        "on-click": "xdg-open https://calendar.google.com"
-    },
-
-    "custom/notification": {
-        "tooltip": false,
+    "custom/notif": {
         "format": "{icon}",
         "format-icons": {
-            "notification": "<span foreground='red'><sup></sup></span>",
-            "none": "",
-            "dnd-notification": "<span foreground='red'><sup></sup></span>",
-            "dnd-none": ""
+            "notification":      "󰂚",
+            "none":               "󰂜",
+            "dnd-notification":   "󰂛",
+            "dnd-none":           "󰪑",
+            "inhibited-notification": "󰂚",
+            "inhibited-none":     "󰂜"
         },
         "return-type": "json",
-        "exec-if": "which swaync-client",
-        "exec": "swaync-client -swb",
-        "on-click": "swaync-client -t -sw",
-        "escape": true
-    },
-
-    "pulseaudio": {
-        "format": "{icon} {volume}%",
-        "format-muted": " muted",
-        "format-icons": { "default": ["", "", ""] },
-        "on-click": "pavucontrol"
-    },
-
-    "network": {
-        "format-wifi": "  {signalStrength}%",
-        "format-ethernet": "",
-        "format-disconnected": "",
-        "tooltip-format": "{ifname}: {ipaddr}"
-    },
-
-    "tray": { "spacing": 10, "icon-size": 16 }
+        "exec":        "swaync-client -swb",
+        "tooltip":     false,
+        "on-click":       "swaync-client -t -sw",
+        "on-click-right": "swaync-client -d -sw"
+    }
 }
