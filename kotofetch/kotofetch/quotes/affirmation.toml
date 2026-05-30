@@ -1,0 +1,134 @@
+# Cozy affirmations — fetched only via `kotofetch --modes affirmation`.
+# Calm, present-focused. Grow this file freely; same schema as quotes.toml.
+
+[[quote]]
+japanese = "大丈夫、すべてうまくいく。"
+translation = "It's alright — everything will work out."
+romaji = "Daijōbu, subete umaku iku."
+source = "affirmation"
+
+[[quote]]
+japanese = "今、ここで十分です。"
+translation = "Here and now is enough."
+romaji = "Ima, koko de jūbun desu."
+source = "affirmation"
+
+[[quote]]
+japanese = "ゆっくり呼吸しよう。"
+translation = "Breathe, slowly."
+romaji = "Yukkuri kokyū shiyō."
+source = "affirmation"
+
+[[quote]]
+japanese = "あなたはあなたのままでいい。"
+translation = "You are fine just as you are."
+romaji = "Anata wa anata no mama de ii."
+source = "affirmation"
+
+[[quote]]
+japanese = "一歩ずつでいい。"
+translation = "One step at a time is enough."
+romaji = "Ippo zutsu de ii."
+source = "affirmation"
+
+[[quote]]
+japanese = "静けさの中に、答えがある。"
+translation = "Within the stillness lies the answer."
+romaji = "Shizukesa no naka ni, kotae ga aru."
+source = "affirmation"
+
+[[quote]]
+japanese = "今日もよく頑張った。"
+translation = "You did well today, too."
+romaji = "Kyō mo yoku ganbatta."
+source = "affirmation"
+
+[[quote]]
+japanese = "休むことも、前に進むこと。"
+translation = "To rest is also to move forward."
+romaji = "Yasumu koto mo, mae ni susumu koto."
+source = "affirmation"
+
+[[quote]]
+japanese = "心を、軽くしよう。"
+translation = "Let your heart grow light."
+romaji = "Kokoro o, karuku shiyō."
+source = "affirmation"
+
+[[quote]]
+japanese = "雨の日も、また良し。"
+translation = "Even rainy days are good."
+romaji = "Ame no hi mo, mata yoshi."
+source = "affirmation"
+
+[[quote]]
+japanese = "焦らなくて、いい。"
+translation = "There is no need to rush."
+romaji = "Aseranakute, ii."
+source = "affirmation"
+
+[[quote]]
+japanese = "自分に、優しく。"
+translation = "Be gentle with yourself."
+romaji = "Jibun ni, yasashiku."
+source = "affirmation"
+
+[[quote]]
+japanese = "すべては移ろいゆく。"
+translation = "All things pass."
+romaji = "Subete wa utsuroiyuku."
+source = "affirmation"
+
+[[quote]]
+japanese = "小さな幸せを、数えよう。"
+translation = "Count the small joys."
+romaji = "Chiisana shiawase o, kazoeyō."
+source = "affirmation"
+
+[[quote]]
+japanese = "今日という日は、二度と来ない。"
+translation = "A day like today will never come again."
+romaji = "Kyō to iu hi wa, nido to konai."
+source = "affirmation"
+
+[[quote]]
+japanese = "心配事の多くは、起こらない。"
+translation = "Most worries never come to pass."
+romaji = "Shinpaigoto no ōku wa, okoranai."
+source = "affirmation"
+
+[[quote]]
+japanese = "肩の力を、抜こう。"
+translation = "Let the tension leave your shoulders."
+romaji = "Kata no chikara o, nukō."
+source = "affirmation"
+
+[[quote]]
+japanese = "君の歩幅で、いい。"
+translation = "Go at your own pace."
+romaji = "Kimi no hohaba de, ii."
+source = "affirmation"
+
+[[quote]]
+japanese = "暗い夜も、必ず明ける。"
+translation = "Even the darkest night breaks into dawn."
+romaji = "Kurai yoru mo, kanarazu akeru."
+source = "affirmation"
+
+[[quote]]
+japanese = "ありのままで、美しい。"
+translation = "Just as it is — beautiful."
+romaji = "Ari no mama de, utsukushii."
+source = "affirmation"
+
+[[quote]]
+japanese = "過去は過ぎた。今を生きよう。"
+translation = "The past has passed; live in the now."
+romaji = "Kako wa sugita. Ima o ikiyō."
+source = "affirmation"
+
+[[quote]]
+japanese = "深く吸って、ゆっくり吐く。"
+translation = "Breathe in deep, and slowly let it go."
+romaji = "Fukaku sutte, yukkuri haku."
+source = "affirmation"
