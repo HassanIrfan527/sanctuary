@@ -4,3 +4,248 @@ translation = "You are not my enemy. I have no enemies."
 romaji = "Anta kata wa ore no teki janai. Ore ni teki nanka inai."
 source = "Thorfinn Karlsefni - Vinland Saga"
 
+[[quote]]
+japanese = "本当の戦士に剣は要らない。"
+translation = "A true warrior needs no sword."
+romaji = "Hontou no senshi ni ken wa iranai."
+source = "Thors - Vinland Saga"
+
+[[quote]]
+japanese = "人は心で生きるんだ。"
+translation = "People live by their hearts."
+romaji = "Hito wa kokoro de ikiru nda."
+source = "Your Name"
+
+[[quote]]
+japanese = "大切な人。忘れたくない人。忘れちゃダメな人！"
+translation = "Someone precious. Someone I don't want to forget. Someone I mustn't forget!"
+romaji = "Taisetsu na hito. Wasuretakunai hito. Wasurecha dame na hito!"
+source = "Mitsuha - Your Name"
+
+[[quote]]
+japanese = "大丈夫。僕たちはきっと、大丈夫だ。"
+translation = "It's okay. We're going to be okay, for sure."
+romaji = "Daijoubu. Bokutachi wa kitto, daijoubu da."
+source = "Hodaka - Weathering With You"
+
+[[quote]]
+japanese = "鳴る神の 少し響みて さし曇り 雨も降らぬか 君を留めむ"
+translation = "A faint clap of thunder, clouded skies — perhaps rain will come. If so, will you stay here with me?"
+romaji = "Naru kami no / sukoshi toyomite / sashi kumori / ame mo furanu ka / kimi wo todomemu"
+source = "The Garden of Words"
+
+[[quote]]
+japanese = "鳴る神の 少し響みて 降らずとも 我は留らむ 妹し留めば"
+translation = "A faint clap of thunder — even if no rain falls, I will stay here, so long as you are with me."
+romaji = "Naru kami no / sukoshi toyomite / furazu tomo / ware wa tomaramu / imo shi todomeba"
+source = "The Garden of Words"
+
+[[quote]]
+japanese = "僕は最強だから。"
+translation = "Because I'm the strongest."
+romaji = "Boku wa saikyou dakara."
+source = "Gojo Satoru - Jujutsu Kaisen"
+
+[[quote]]
+japanese = "人を助けるのに、理由がいるかい？"
+translation = "Do you need a reason to help someone?"
+romaji = "Hito wo tasukeru no ni, riyuu ga iru kai?"
+source = "Itadori Yuji - Jujutsu Kaisen"
+
+[[quote]]
+japanese = "駆逐してやる！この世から一匹残らず！"
+translation = "I'll wipe them out — every last one of them from this world!"
+romaji = "Kuchiku shite yaru! Kono yo kara ippiki nokorazu!"
+source = "Eren Yeager - Attack on Titan"
+
+[[quote]]
+japanese = "心臓を捧げよ！"
+translation = "Dedicate your hearts!"
+romaji = "Shinzou wo sasageyo!"
+source = "Erwin Smith - Attack on Titan"
+
+[[quote]]
+japanese = "後悔しない方を選べ。"
+translation = "Choose the option you'll regret the least."
+romaji = "Koukai shinai hou wo erabe."
+source = "Levi Ackerman - Attack on Titan"
+
+[[quote]]
+japanese = "何かを捨てることができなければ、何も変えることはできない。"
+translation = "Unless you can throw something away, you can never change anything."
+romaji = "Nanika wo suteru koto ga dekinakereba, nanimo kaeru koto wa dekinai."
+source = "Armin Arlert - Attack on Titan"
+
+[[quote]]
+japanese = "人は何かの犠牲なしに何も得ることはできない。"
+translation = "Humankind cannot gain anything without first giving something in return."
+romaji = "Hito wa nanika no gisei nashi ni nanimo eru koto wa dekinai."
+source = "Fullmetal Alchemist: Brotherhood"
+
+[[quote]]
+japanese = "痛みを伴わない教訓には意義がない。"
+translation = "A lesson without pain is meaningless."
+romaji = "Itami wo tomonawanai kyoukun ni wa igi ga nai."
+source = "Edward Elric - Fullmetal Alchemist: Brotherhood"
+
+[[quote]]
+japanese = "立って歩け。前へ進め。あんたには立派な足がついてるじゃないか。"
+translation = "Stand up and walk. Keep moving forward. You've got two good legs, haven't you?"
+romaji = "Tatte aruke. Mae e susume. Anta ni wa rippa na ashi ga tsuiteru janai ka."
+source = "Edward Elric - Fullmetal Alchemist: Brotherhood"
+
+[[quote]]
+japanese = "雨の日は嫌いだ。"
+translation = "I hate the rain."
+romaji = "Ame no hi wa kirai da."
+source = "Roy Mustang - Fullmetal Alchemist: Brotherhood"
+
+[[quote]]
+japanese = "諦めないことが俺の忍道だ！"
+translation = "Never giving up is my ninja way!"
+romaji = "Akiramenai koto ga ore no nindou da!"
+source = "Uzumaki Naruto - Naruto"
+
+[[quote]]
+japanese = "人は、思い込みの中で生きている。"
+translation = "People live within their own assumptions."
+romaji = "Hito wa, omoikomi no naka de ikiteiru."
+source = "Uchiha Itachi - Naruto"
+
+[[quote]]
+japanese = "許せ、サスケ。これで最後だ。"
+translation = "Forgive me, Sasuke. This is the last time."
+romaji = "Yuruse, Sasuke. Kore de saigo da."
+source = "Uchiha Itachi - Naruto"
+
+[[quote]]
+japanese = "海賊王に俺はなる！"
+translation = "I'm going to be King of the Pirates!"
+romaji = "Kaizoku ou ni ore wa naru!"
+source = "Monkey D. Luffy - One Piece"
+
+[[quote]]
+japanese = "頑張れ！人間は誰だって頑張れる。俺が証明してやる！"
+translation = "Keep going! Anyone can give it their all — I'll prove it!"
+romaji = "Ganbare! Ningen wa dare datte ganbareru. Ore ga shoumei shite yaru!"
+source = "Kamado Tanjiro - Demon Slayer"
+
+[[quote]]
+japanese = "生殺与奪の権を他人に握らせるな！"
+translation = "Never leave the power over your life and death in someone else's hands!"
+romaji = "Seisatsu yodatsu no ken wo tanin ni nigiraseru na!"
+source = "Tomioka Giyu - Demon Slayer"
+
+[[quote]]
+japanese = "心を燃やせ。"
+translation = "Set your heart ablaze."
+romaji = "Kokoro wo moyase."
+source = "Rengoku Kyojuro - Demon Slayer"
+
+[[quote]]
+japanese = "撃っていいのは、撃たれる覚悟のある奴だけだ。"
+translation = "The only ones who should shoot are those prepared to be shot."
+romaji = "Utte ii no wa, utareru kakugo no aru yatsu dake da."
+source = "Lelouch Lamperouge - Code Geass"
+
+[[quote]]
+japanese = "計画通り。"
+translation = "Just as planned."
+romaji = "Keikaku doori."
+source = "Yagami Light - Death Note"
+
+[[quote]]
+japanese = "僕は正義だ。"
+translation = "I am justice."
+romaji = "Boku wa seigi da."
+source = "L - Death Note"
+
+[[quote]]
+japanese = "一度あったことは忘れないものさ。思い出せないだけで。"
+translation = "Once you've met someone, you never really forget them. You just can't remember, that's all."
+romaji = "Ichido atta koto wa wasurenai mono sa. Omoidasenai dake de."
+source = "Zeniba - Spirited Away"
+
+[[quote]]
+japanese = "生きろ。"
+translation = "Live."
+romaji = "Ikiro."
+source = "Princess Mononoke"
+
+[[quote]]
+japanese = "逃げちゃダメだ。逃げちゃダメだ。逃げちゃダメだ。"
+translation = "I mustn't run away. I mustn't run away. I mustn't run away."
+romaji = "Nigecha dame da. Nigecha dame da. Nigecha dame da."
+source = "Ikari Shinji - Neon Genesis Evangelion"
+
+[[quote]]
+japanese = "お前が信じる、お前を信じろ！"
+translation = "Believe in the you that believes in yourself!"
+romaji = "Omae ga shinjiru, omae wo shinjiro!"
+source = "Kamina - Tengen Toppa Gurren Lagann"
+
+[[quote]]
+japanese = "本当に欲しいものは、寄り道や回り道の途中にある。"
+translation = "The things you truly want are found along the detours and roundabout paths."
+romaji = "Hontou ni hoshii mono wa, yorimichi ya mawarimichi no tochuu ni aru."
+source = "Ging Freecss - Hunter x Hunter"
+
+[[quote]]
+japanese = "下を向くのは、地面に落ちたものを拾う時だけでいい。"
+translation = "The only time you should look down is when you're picking something up off the ground."
+romaji = "Shita wo muku no wa, jimen ni ochita mono wo hirou toki dake de ii."
+source = "Haikyu!!"
+
+[[quote]]
+japanese = "「愛してる」を知りたいのです。"
+translation = "I want to know what 'I love you' means."
+romaji = "\"Aishiteru\" wo shiritai no desu."
+source = "Violet Evergarden"
+
+[[quote]]
+japanese = "そそるぜ、これは！"
+translation = "Now this gets me excited!"
+romaji = "Sosoru ze, kore wa!"
+source = "Ishigami Senku - Dr. Stone"
+
+[[quote]]
+japanese = "趣味でヒーローをやっている者だ。"
+translation = "I'm just a guy who's a hero for fun."
+romaji = "Shumi de hero wo yatteiru mono da."
+source = "Saitama - One Punch Man"
+
+[[quote]]
+japanese = "君はヒーローになれる。"
+translation = "You can become a hero."
+romaji = "Kimi wa hero ni nareru."
+source = "All Might - My Hero Academia"
+
+[[quote]]
+japanese = "やれやれだぜ。"
+translation = "Good grief."
+romaji = "Yare yare daze."
+source = "Kujo Jotaro - JoJo's Bizarre Adventure"
+
+[[quote]]
+japanese = "ザ・ワールド！時よ止まれ！"
+translation = "The World! Time, stop!"
+romaji = "Za Warudo! Toki yo tomare!"
+source = "Dio Brando - JoJo's Bizarre Adventure"
+
+[[quote]]
+japanese = "見つけてくれて、ありがとう。"
+translation = "Thank you for finding me."
+romaji = "Mitsukete kurete, arigatou."
+source = "Menma - Anohana"
+
+[[quote]]
+japanese = "君に、生きるのを手伝ってほしい。"
+translation = "I want you to help me live."
+romaji = "Kimi ni, ikiru no wo tetsudatte hoshii."
+source = "Ishida Shoya - A Silent Voice"
+
+[[quote]]
+japanese = "エル・プサイ・コングルゥ。"
+translation = "El Psy Kongroo."
+romaji = "Eru Psy Kongruu."
+source = "Okabe Rintaro - Steins;Gate"
