@@ -7,34 +7,37 @@
     "margin-right": 14,
     "spacing": 0,
     "name": "bottom",
-
-    "modules-left":   ["group/left"],
+    "modules-left": [
+        "group/left"
+    ],
     "modules-center": [],
-    "modules-right":  ["group/right"],
-
+    "modules-right": [
+        "group/right"
+    ],
     "group/left": {
         "orientation": "horizontal",
-        "modules": ["custom/mode", "custom/kanji"]
+        "modules": [
+            "custom/mode",
+            "custom/kanji"
+        ]
     },
-
     "group/right": {
         "orientation": "horizontal",
-        "modules": ["hyprland/window"]
+        "modules": [
+            "hyprland/window"
+        ]
     },
-
     "custom/mode": {
         "exec": "~/.config/hypr/scripts/mode-detector.sh",
         "return-type": "json",
         "interval": 1,
         "tooltip": false
     },
-
     "custom/kanji": {
         "exec": "~/.config/hypr/scripts/kanji-quote.sh",
         "return-type": "json",
         "interval": 1800
     },
-
     "hyprland/window": {
         "format": "{title}",
         "max-length": 50,
