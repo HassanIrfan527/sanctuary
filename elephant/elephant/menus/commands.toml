@@ -1,0 +1,52 @@
+name = "commands"
+name_pretty = "Commands"
+icon = "applications-system"
+action = "/home/anonymous/.config/hypr/scripts/cmd.sh %VALUE%"
+
+[[entries]]
+text = "Dismiss all notifications"
+value = "dismiss"
+keywords = ["notifications", "clear", "dismiss", "close"]
+icon = "edit-clear-all-symbolic"
+
+[[entries]]
+text = "Toggle Do Not Disturb"
+value = "dnd"
+keywords = ["dnd", "notifications", "quiet", "silence", "focus"]
+icon = "notifications-disabled-symbolic"
+
+[[entries]]
+text = "Notification center"
+value = "panel"
+keywords = ["notifications", "history", "panel", "center"]
+icon = "preferences-system-notifications-symbolic"
+
+[[entries]]
+text = "Lock screen"
+value = "lock"
+keywords = ["lock", "screen"]
+icon = "system-lock-screen-symbolic"
+
+[[entries]]
+text = "Log out"
+value = "logout"
+keywords = ["logout", "exit", "session", "quit"]
+icon = "system-log-out-symbolic"
+
+[[entries]]
+text = "Suspend"
+value = "suspend"
+keywords = ["suspend", "sleep"]
+icon = "system-suspend-symbolic"
+
+[[entries]]
+text = "Reboot"
+value = "reboot"
+keywords = ["reboot", "restart"]
+icon = "system-reboot-symbolic"
+
+[[entries]]
+text = "Shut down"
+value = "shutdown"
+keywords = ["shutdown", "poweroff", "power", "off"]
+icon = "system-shutdown-symbolic"
