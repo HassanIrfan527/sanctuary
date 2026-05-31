@@ -135,3 +135,10 @@ row:selected .item-text { color: @lavender; }
   color: @crust;
   border-radius: 12px;
 }
+
+/* ── prefix hint bar (bottom-left): @ web · . emoji · / command · ~ clipboard ── */
+.prefix-hints {
+  font-size: 12px;
+  color: @subtext0;
+  opacity: 0.6;
+}

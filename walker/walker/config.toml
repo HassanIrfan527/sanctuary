@@ -14,7 +14,7 @@ anchor_left = true
 anchor_right = true
 
 [placeholders]
-"default" = { input = "search  ·  @ web  ·  . emoji", list = "nothing here" }
+"default" = { input = "search", list = "nothing here" }
 
 [providers]
 default = ["desktopapplications"]
@@ -32,6 +32,10 @@ provider = "unicode"
 [[providers.prefixes]]
 prefix = "~"
 provider = "clipboard"
+
+[[providers.prefixes]]
+prefix = "/"
+provider = "menus:commands"
 
 [providers.clipboard]
 time_format = "relative"

@@ -124,6 +124,17 @@
                   <class name="keybinds"></class>
                 </style>
                 <child>
+                  <object class="GtkLabel" id="PrefixHints">
+                    <style>
+                      <class name="prefix-hints"></class>
+                    </style>
+                    <property name="use-markup">true</property>
+                    <property name="halign">start</property>
+                    <property name="valign">center</property>
+                    <property name="label">&lt;span foreground="#b4befe"&gt;@&lt;/span&gt; web   &lt;span foreground="#b4befe"&gt;.&lt;/span&gt; emoji   &lt;span foreground="#b4befe"&gt;/&lt;/span&gt; command   &lt;span foreground="#b4befe"&gt;~&lt;/span&gt; clipboard</property>
+                  </object>
+                </child>
+                <child>
                   <object class="GtkBox" id="GlobalKeybinds">
                     <property name="spacing">10</property>
                     <style>
