@@ -23,7 +23,7 @@ for theme in $(ls -1 "$MECHSIM_SOUNDS" 2>/dev/null); do
     ITEMS+="mechsim/${theme}${marker}\n"
 done
 
-CHOSEN=$(echo -e "$ITEMS" | sed '/^$/d' | fuzzel --dmenu --prompt "Key sound: " --width 35)
+CHOSEN=$(echo -e "$ITEMS" | sed '/^$/d' | walker --dmenu -p "key sound")
 
 [ -z "$CHOSEN" ] && exit 0
 

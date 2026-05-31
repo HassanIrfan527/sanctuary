@@ -10,13 +10,13 @@ A daily-driver shell at **~80-150MB total RAM** (vs. ~600MB+ for end-4's QS dots
 
 | Component | Tool | Notes |
 |---|---|---|
-| Compositor | Hyprland (v1), niri (v2 port) | Same shell stack works on both |
+| Compositor | Hyprland | |
 | Bar | **waybar** | CSS + JSON; biggest community = best fallback when stuck |
 | Launcher | **fuzzel** | Already in use |
 | Clipboard | **wl-clipboard + cliphist + fuzzel** | `wl-copy`/`wl-paste` are the modern primitives |
 | Notif daemon | **mako** | Wlroots-native, ~5-10MB |
 | Notif "center" | **fuzzel --dmenu** action menu | No GTK center; click bar icon → fuzzel popup with actions |
-| Wallpaper | **swww** | Animations, works on Hyprland + niri |
+| Wallpaper | **swww** | Animations |
 | Wallpaper picker | fuzzel --dmenu script | Defer to v1.1 |
 | Lock | **hyprlock** | Already have it |
 | Idle | **hypridle** | Better dbus inhibit than swayidle |
@@ -75,12 +75,9 @@ Each line dispatches a shell command. No GTK, no widget runtime, ~zero RAM when 
 ## v1.1 / later
 
 - Wallpaper picker (fuzzel + thumbnails via `chafa` previews? or just names)
-- niri port — copy waybar/mako/fuzzel/cliphist configs verbatim; rewrite only the compositor file
-- Optional: river experiment if niri port goes well
 
 ## Open questions
 
-- Scratchpad on niri (no native special workspace) — defer until niri port
 - Font choice: stick with current terminal font or pick a dedicated bar font?
 - Bar position: top (matches sys24) or bottom?
 
