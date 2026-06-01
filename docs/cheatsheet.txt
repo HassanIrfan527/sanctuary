@@ -36,8 +36,9 @@ super + shift + 1..9   move window to workspace
 super + shift + p / n  move window to prev / next ws
 
 ─ screenshots ────────────────────────────────────────
-print                  region: annotate + save + copy
-shift + print          screen: annotate + save + copy
+print                  region → copy to clipboard
+shift + print          region → satty (annotate + save)
+super + print          fullscreen → copy to clipboard
 
 ─ media & system ─────────────────────────────────────
 super + escape         lock screen

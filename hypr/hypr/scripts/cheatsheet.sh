@@ -15,7 +15,9 @@ SHEET="$HOME/.dotfiles/docs/cheatsheet.txt"
             "super + 1..9          | switch workspace" \
             "super + shift + v     | clipboard history" \
             "super + shift + w     | wallpaper picker" \
-            "super + shift + s     | region screenshot" \
+            "print                 | region screenshot → clipboard" \
+            "shift + print         | region screenshot → satty (edit)" \
+            "super + print         | fullscreen screenshot → clipboard" \
             "super + slash         | this cheatsheet" \
             "super + i             | bug capture" \
             "ctrl + alt + delete   | session menu"
