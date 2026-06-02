@@ -90,11 +90,12 @@ Notifications are handled by **swaync**.
 
 ### Keyd (system-level)
 
-CapsLock is remapped via keyd (`/etc/keyd/default.conf`):
+CapsLock is remapped via keyd (`/etc/keyd/default.conf`) with one line — `capslock = overload(meta, esc)`:
 
-- **CapsLock hold** — vim layer (hjkl = arrows, w/b = word nav, y/p = copy/paste, u = undo)
-- **CapsLock tap** — Super key
-- **CapsLock hold + Space** — one-shot numpad layer (uio=789, jkl=456, m,.=123)
+- **CapsLock hold** — acts as the Super (Meta) modifier, so `CapsLock+<key>` == `Super+<key>`
+- **CapsLock tap** — Esc
+
+That's the whole keyd config. All shortcuts live in `keybinds.conf` (single source of truth) — every `Super+…` bind below is reachable from the home row via CapsLock. The OS-wide vim editing layer was dropped on purpose: every surface is already vim (Neovim, tmux, vimium, TUIs), so it was redundant.
 
 ### Hyprland Keybinds
 
@@ -121,7 +122,7 @@ CapsLock is remapped via keyd (`/etc/keyd/default.conf`):
 | `Super+.`       | Japanese recall drawer          |
 | `Super+A`       | Affirmation drawer              |
 | `Super+Alt+A`   | Ambient soundscapes             |
-| `Super+C`       | Color picker (hex to clipboard) |
+| `Super+Shift+C` | Color picker (hex to clipboard) |
 | `Super+Semicolon` | Window jump                   |
 
 #### Windows (vim-style)
@@ -146,8 +147,10 @@ CapsLock is remapped via keyd (`/etc/keyd/default.conf`):
 | `Super+Numpad 1-9`       | Switch workspace              |
 | `Super+1-9`              | Switch workspace (number row) |
 | `Super+Shift+Numpad 1-9` | Move window to workspace      |
-| `CapsLock+N`             | Previous workspace            |
-| `CapsLock+M`             | Next workspace                |
+| `Super+N` / `CapsLock+n` | Next workspace                |
+| `Super+P` / `CapsLock+p` | Previous workspace            |
+| `Super+C` / `CapsLock+c` | New empty workspace           |
+| `Super+'` / `CapsLock+'`  | Last workspace (back-and-forth) |
 
 #### System
 
@@ -183,18 +186,9 @@ CapsLock is remapped via keyd (`/etc/keyd/default.conf`):
 | `Ctrl+A, x`    | Kill pane         |
 | `Ctrl+A, w`    | Kill tab          |
 
-### Vim Layer (CapsLock hold)
+### CapsLock = Super
 
-| Key     | Action                |
-| ------- | --------------------- |
-| `hjkl`  | Arrow keys            |
-| `w/b`   | Word forward/backward |
-| `0/4`   | Home/End              |
-| `y/p`   | Copy/Paste            |
-| `u`     | Undo                  |
-| `x`     | Delete                |
-| `v`     | Select all            |
-| `Space` | One-shot numpad mode  |
+There's no separate vim layer anymore — **hold CapsLock and it _is_ Super**, so every Hyprland keybind above works from the home row (e.g. `CapsLock+h/j/k/l` = move focus, `CapsLock+Shift+h/j/k/l` = move window, `CapsLock+Space` = walker, `CapsLock+n/p` = next/prev workspace). Tap CapsLock for Esc.
 
 ## Installation
 
