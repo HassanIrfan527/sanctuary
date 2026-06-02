@@ -24,7 +24,8 @@
     border-radius: 0;
     min-height: 0;
     box-shadow: none;
-    text-shadow: none;
+    /* faint shadow as insurance — the real legibility comes from the blurred layer */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 window#waybar {
@@ -37,7 +38,8 @@ window#waybar {
 #clock,
 #tray,
 #mpris,
-#custom-notif {
+#pet,
+#image {
     border: none;
     border-radius: 16px;
     padding: 2px 14px;
@@ -46,7 +48,7 @@ window#waybar {
 
 /* workspaces — lavender */
 #workspaces {
-    background-color: alpha(@lavender, 0.16);
+    background-color: alpha(@lavender, 0.22);
 }
 
 #workspaces button {
@@ -77,15 +79,15 @@ window#waybar {
 
 /* clock — blue */
 #clock {
-    background-color: alpha(@blue, 0.16);
-    color: @blue;
+    background-color: alpha(@blue, 0.22);
+    color: @text;
     padding: 2px 18px;
     letter-spacing: 0.5px;
 }
 
 /* music — mauve */
 #mpris {
-    background-color: alpha(@mauve, 0.16);
+    background-color: alpha(@mauve, 0.22);
     color: @mauve;
     padding: 2px 14px;
 }
@@ -96,12 +98,11 @@ window#waybar {
     margin: 0;
 }
 
-/* notifications — red */
-#custom-notif {
-    background-color: alpha(@red, 0.16);
-    color: @red;
-    padding: 2px 14px;
-    font-size: 14px;
+/* the desk pet — pink pill, the blob is the star (twins the toast bubble) */
+#pet,
+#image {
+    background-color: alpha(@pink, 0.18);
+    padding: 1px 11px;
 }
 
 /* tray — neutral surface */

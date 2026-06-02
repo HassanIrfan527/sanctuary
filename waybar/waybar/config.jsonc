@@ -15,7 +15,7 @@
     ],
     "modules-right": [
         "tray",
-        "custom/notif"
+        "image#pet"
     ],
     "hyprland/workspaces": {
         "format": "{icon} {windows}",
@@ -26,7 +26,7 @@
             "empty": "○"
         },
         "window-format": "{icon}",
-        "window-rewrite-default": "",
+        "window-rewrite-default": "󰣆 ",
         "window-rewrite": {
             "class<kitty>": " ",
             "title<.*nvim.*>": "",
@@ -49,6 +49,31 @@
             "class<com.getpostman.Postman>": "󰦔 ",
             "class<scratchterm>": " ",
             "class<beekeeper-studio>": " "
+            ,"class<firefox>": "󰈹 ",
+            "class<librewolf>": "󰈹 ",
+            "class<[Cc]hromium>": "󰊯 ",
+            "class<google-chrome>": "󰊯 ",
+            "class<org.qutebrowser.qutebrowser>": "󰖟 ",
+            "class<obsidian>": "󱓧 ",
+            "class<org.telegram.desktop>": "󰔁 ",
+            "class<[Ss]ignal>": "󰭹 ",
+            "class<[Ss]lack>": "󰒱 ",
+            "class<[Gg]imp.*>": "󰋩 ",
+            "class<imv>": "󰋩 ",
+            "class<org.gnome.eog>": "󰋩 ",
+            "class<org.gnome.Loupe>": "󰋩 ",
+            "class<org.pwmt.zathura>": "󰈦 ",
+            "class<.*[Ee]vince>": "󰈦 ",
+            "class<.*[Pp]avucontrol>": "󰕾 ",
+            "class<org.gnome.Calculator>": "󰃬 ",
+            "class<com.obsproject.Studio>": "󰕧 ",
+            "class<[Tt]hunar>": " ",
+            "class<.*libreoffice.*>": "󰈙 ",
+            "class<.*[Ss]office.*>": "󰈙 ",
+            "class<org.gnome.Settings>": "󰒓 ",
+            "class<foot>": " ",
+            "class<[Aa]lacritty>": " ",
+            "class<org.wezfurlong.wezterm>": " "
         },
         "on-click": "activate",
         "on-scroll-up": "hyprctl dispatch workspace m-1",
@@ -80,20 +105,12 @@
         "icon-size": 16,
         "spacing": 8
     },
-    "custom/notif": {
-        "format": "{icon}",
-        "format-icons": {
-            "notification": "󰂚",
-            "none": "󰂜",
-            "dnd-notification": "󰂛",
-            "dnd-none": "󰪑",
-            "inhibited-notification": "󰂚",
-            "inhibited-none": "󰂜"
-        },
-        "return-type": "json",
-        "exec": "swaync-client -swb",
+    "image#pet": {
+        "exec": "/home/anonymous/.config/waybar/pet/pet.sh",
+        "size": 20,
+        "interval": 2,
         "tooltip": false,
-        "on-click": "swaync-client -t -sw",
+        "on-click": "walker --provider menus:notifications",
         "on-click-right": "swaync-client -d -sw"
     }
 }
