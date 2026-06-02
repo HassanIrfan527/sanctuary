@@ -15,6 +15,7 @@
 @define-color pink       #f5c2e7;
 @define-color yellow     #f9e2af;
 @define-color red        #f38ba8;
+@define-color teal       #94e2d5;
 
 * {
     font-family: "Maple Mono NF Bold", "Maple Mono NF", monospace;
@@ -53,6 +54,7 @@ window#waybar {
 #custom-mode.listening { background-color: @yellow; }
 #custom-mode.play      { background-color: @red; }
 #custom-mode.idle      { background-color: @overlay0; color: @text; }
+#custom-mode.special   { background-color: @teal; }
 
 #custom-kanji {
     padding: 2px 16px 2px 10px;

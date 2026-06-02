@@ -20,6 +20,9 @@ title="${title:-}"
 [ "$class" = "null" ] && class=""
 [ "$pid" = "null" ] && pid=""
 
+wsname="$(printf '%s' "$json" | jq -r '.workspace.name // empty' 2>/dev/null)" || true
+[ "$wsname" = "null" ] && wsname=""
+
 # walk process tree for nvim if the window is a terminal; fall back to the
 # window title if the pid isn't available.
 has_nvim() {
@@ -31,6 +34,10 @@ has_nvim() {
     return 1
 }
 
+if [[ "$wsname" == special:* ]]; then
+    label="SPECIAL"
+    cls="special"
+else
 case "$class" in
 kitty | foot | Alacritty | alacritty)
     if has_nvim; then
@@ -78,5 +85,6 @@ steam | steam_app_* | gamescope | Lutris | lutris)
     cls="idle"
     ;;
 esac
+fi
 
 printf '{"text":"  %s","class":"%s","alt":"%s"}\n' "$label" "$cls" "$class"
