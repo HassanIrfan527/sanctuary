@@ -131,7 +131,7 @@
                     <property name="use-markup">true</property>
                     <property name="halign">start</property>
                     <property name="valign">center</property>
-                    <property name="label">&lt;span foreground="#b4befe"&gt;@&lt;/span&gt; web   &lt;span foreground="#b4befe"&gt;.&lt;/span&gt; emoji   &lt;span foreground="#b4befe"&gt;/&lt;/span&gt; command   &lt;span foreground="#b4befe"&gt;~&lt;/span&gt; clipboard</property>
+                    <property name="label">&lt;span foreground="#b4befe"&gt;@&lt;/span&gt; web   &lt;span foreground="#b4befe"&gt;.&lt;/span&gt; emoji   &lt;span foreground="#b4befe"&gt;/&lt;/span&gt; command   &lt;span foreground="#b4befe"&gt;~&lt;/span&gt; clipboard   &lt;span foreground="#f5c2e7"&gt;*&lt;/span&gt; notif</property>
                   </object>
                 </child>
                 <child>
