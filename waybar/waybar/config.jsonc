@@ -14,6 +14,7 @@
         "clock"
     ],
     "modules-right": [
+        "custom/mic",
         "tray",
         "image#pet"
     ],
@@ -100,6 +101,16 @@
     "clock": {
         "format": "{:%I:%M %p · %a %d}",
         "tooltip-format": "<tt>{calendar}</tt>"
+    },
+    "custom/mic": {
+        "exec": "/home/anonymous/.config/waybar/scripts/mic.sh",
+        "return-type": "json",
+        "interval": 5,
+        "signal": 8,
+        "on-click": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && pkill -RTMIN+8 waybar",
+        "on-click-right": "kitty --class=wiremix --title=wiremix -e wiremix",
+        "on-scroll-up": "wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SOURCE@ 5%+ && pkill -RTMIN+8 waybar",
+        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SOURCE@ 5%- && pkill -RTMIN+8 waybar"
     },
     "tray": {
         "icon-size": 16,

@@ -206,11 +206,11 @@ sudo dnf copr enable sdegler/hyprland -y
 
 # Core
 sudo dnf install -y hyprland xdg-desktop-portal-hyprland hyprlock hypridle \
-  hyprpicker hyprsunset swww
+  hyprpicker hyprsunset swww hyprpolkitagent hyprland-qtutils
 
 # Bar, launcher & notifications
 sudo dnf install -y waybar fuzzel SwayNotificationCenter swayosd \
-  cliphist walker satty
+  cliphist walker satty wiremix
 
 # Terminal and tools
 sudo dnf install -y kitty zsh zsh-syntax-highlighting tmux bat zoxide \
@@ -225,7 +225,7 @@ cargo install television weathr
 
 # Utils
 sudo dnf install -y brightnessctl playerctl pamixer \
-  wl-clipboard grim slurp polkit-gnome keyd jq socat bc stow
+  wl-clipboard grim slurp keyd jq socat bc stow
 
 # Fonts
 sudo dnf install -y jetbrains-mono-nerd-fonts google-rubik-vf-fonts \

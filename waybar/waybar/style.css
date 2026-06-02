@@ -12,6 +12,7 @@
 @define-color mauve      #cba6f7;
 @define-color blue       #89b4fa;
 @define-color sapphire   #74c7ec;
+@define-color teal       #94e2d5;
 @define-color red        #f38ba8;
 @define-color pink       #f5c2e7;
 @define-color yellow     #f9e2af;
@@ -39,11 +40,21 @@ window#waybar {
 #tray,
 #mpris,
 #pet,
-#image {
+#image,
+#custom-mic {
     border: none;
     border-radius: 16px;
     padding: 2px 14px;
     margin: 0 4px;
+}
+
+/* mic — teal, turns red when muted */
+#custom-mic {
+    background-color: alpha(@teal, 0.22);
+}
+
+#custom-mic.muted {
+    background-color: alpha(@red, 0.22);
 }
 
 /* workspaces — lavender */
