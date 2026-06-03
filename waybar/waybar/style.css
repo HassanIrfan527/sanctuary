@@ -18,9 +18,9 @@
 @define-color yellow     #f9e2af;
 
 * {
-    font-family: "Maple Mono NF", monospace;
+    font-family: "DM Mono", "Maple Mono NF", monospace;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     border: none;
     border-radius: 0;
     min-height: 0;

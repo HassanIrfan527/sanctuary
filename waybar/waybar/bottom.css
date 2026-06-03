@@ -16,59 +16,116 @@
 @define-color yellow     #f9e2af;
 @define-color red        #f38ba8;
 @define-color teal       #94e2d5;
+@define-color peach      #fab387;
+@define-color maroon     #eba0ac;
+@define-color rosewater  #f5e0dc;
+@define-color sky        #89dceb;
+@define-color flamingo   #f2cdcd;
 
 * {
-    font-family: "Maple Mono NF Bold", "Maple Mono NF", monospace;
-    font-size: 13px;
-    font-weight: 700;
-    border: none;
-    border-radius: 0;
-    min-height: 0;
-    box-shadow: none;
-    text-shadow: none;
+  font-family: "DM Mono", "Maple Mono NF", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+  box-shadow: none;
+  text-shadow: none;
 }
 
 window#waybar {
-    background: transparent;
-    color: @text;
+  background: transparent;
+  color: @text;
 }
 
-#left, #right {
-    background: transparent;
+#left,
+#right {
+  background: transparent;
 }
 
-/* ── left pill: [ mode ][ cwd ][ git ] ── */
+/* ── left capsule: [ app-context ][ window title ]   right capsule: [ keyd-mode ][ kanji ] ── */
+
+/* app-context (left cap of left capsule) — keeps its per-app colouring */
 #custom-mode {
-    padding: 2px 14px;
-    color: @black;
-    background-color: @lavender;
-    border-radius: 14px 0 0 14px;
+  padding: 2px 14px;
+  color: @black;
+  background-color: @lavender;
+  border-radius: 14px 0 0 14px;
+  letter-spacing: 1px;
 }
 
-#custom-mode.terminal  { background-color: @lavender; }
-#custom-mode.thinking  { background-color: @mauve; }
-#custom-mode.browse    { background-color: @blue; }
-#custom-mode.coding    { background-color: @sapphire; }
-#custom-mode.files     { background-color: @green; }
-#custom-mode.chat      { background-color: @pink; }
-#custom-mode.listening { background-color: @yellow; }
-#custom-mode.play      { background-color: @red; }
-#custom-mode.idle      { background-color: @overlay0; color: @text; }
-#custom-mode.special   { background-color: @teal; }
-
-#custom-kanji {
-    padding: 2px 16px 2px 10px;
-    background-color: @surface0;
-    color: @mauve;
-    border-radius: 0 14px 14px 0;
-    font-size: 14px;
-    letter-spacing: 1px;
+/* keyd mode block (right cap of right capsule): muted grey in PASSTHROUGH so it
+   never blends into a same-coloured app pill; loud peach in NAVIGATION. */
+#custom-keyd {
+  padding: 2px 14px;
+  color: @text;
+  background-color: @surface1;
+  border-radius: 0 14px 14px 0;
+  letter-spacing: 1px;
+}
+#custom-keyd.navigation {
+  background-color: @peach;
+  color: @black;
 }
 
-/* ── right pill: just window title ── */
+#custom-mode.terminal {
+  background-color: @lavender;
+}
+#custom-mode.thinking {
+  background-color: @mauve;
+}
+#custom-mode.browse {
+  background-color: @blue;
+}
+#custom-mode.coding {
+  background-color: @sapphire;
+}
+#custom-mode.files {
+  background-color: @green;
+}
+#custom-mode.chat {
+  background-color: @pink;
+}
+#custom-mode.listening {
+  background-color: @yellow;
+}
+#custom-mode.watching {
+  background-color: @maroon;
+}
+#custom-mode.play {
+  background-color: @red;
+}
+#custom-mode.notes {
+  background-color: @rosewater;
+}
+#custom-mode.reading {
+  background-color: @sky;
+}
+#custom-mode.creating {
+  background-color: @flamingo;
+}
+#custom-mode.idle {
+  background-color: @overlay0;
+  color: @text;
+}
+#custom-mode.special {
+  background-color: @teal;
+}
+
+/* window title (right cap of the left capsule) */
 #window {
-    padding: 2px 16px;
-    background-color: @surface0;
-    color: @text;
-    border-radius: 14px;
+  padding: 2px 16px;
+  background-color: @surface0;
+  color: @text;
+  border-radius: 0 14px 14px 0;
+}
+
+/* kanji quote (left cap of the right capsule) */
+#custom-kanji {
+  padding: 2px 16px;
+  background-color: @surface0;
+  color: @mauve;
+  border-radius: 14px 0 0 14px;
+  font-size: 14px;
+  letter-spacing: 1px;
 }

@@ -44,37 +44,59 @@ kitty | foot | Alacritty | alacritty)
         label="THINKING"
         cls="thinking"
     else
-        label="TERMINAL"
+        label="TINKERING"
         cls="terminal"
     fi
     ;;
 brave-browser | firefox | zen | app.zen_browser.zen | Brave-browser | org.qutebrowser.qutebrowser)
-    label="BROWSE"
-    cls="browse"
+    # refine by the page title — what you're doing matters more than "a browser"
+    case "${title,,}" in
+        *"youtube music"*|*"music.youtube"*)            label="VIBING";     cls="listening" ;;
+        *youtube*|*twitch*|*netflix*|*"prime video"*)   label="WATCHING";   cls="watching" ;;
+        *gmail*|*"proton mail"*|*outlook*)              label="EMAIL";      cls="reading" ;;
+        *github*|*gitlab*|*"stack overflow"*)           label="BUILDING";   cls="coding" ;;
+        *chatgpt*|*claude*|*perplexity*|*gemini*)       label="PROMPTING";  cls="thinking" ;;
+        *figma*|*excalidraw*|*canva*)                   label="DESIGNING";  cls="creating" ;;
+        *"google docs"*|*notion*|*overleaf*)            label="WRITING";    cls="notes" ;;
+        *reddit*|*twitter*|*instagram*|*"/ x"*)         label="DOOMSCROLL"; cls="chat" ;;
+        *)                                              label="SURFING";    cls="browse" ;;
+    esac
     ;;
-code | Code | code-url-handler | nvim | NVIM)
-    label="CODING"
+code | Code | code-url-handler | VSCodium | codium | dev.zed.Zed | zed | neovide | nvim | NVIM)
+    label="BUILDING"
     cls="coding"
     ;;
-org.gnome.Nautilus | nautilus | yazi)
-    label="FILES"
+org.gnome.Nautilus | nautilus | yazi | thunar | pcmanfm)
+    label="DIGGING"
     cls="files"
     ;;
-discord | TelegramDesktop | Slack | VESKTOP | vesktop)
-    label="CHAT"
+discord | TelegramDesktop | org.telegram.desktop | Slack | VESKTOP | vesktop)
+    label="YAPPING"
     cls="chat"
     ;;
-spotify | Spotify | mpv | mpris | com.spotify.Client)
-    label="LISTENING"
+spotify | Spotify | com.spotify.Client | mpris)
+    label="VIBING"
     cls="listening"
     ;;
-mpv | vlc | VLC)
+mpv | vlc | VLC | io.github.celluloid_player.Celluloid)
     label="WATCHING"
     cls="watching"
     ;;
-steam | steam_app_* | gamescope | Lutris | lutris)
-    label="PLAY"
+steam | steam_app_* | gamescope | Lutris | lutris | heroic)
+    label="GAMING"
     cls="play"
+    ;;
+obsidian | Obsidian | logseq | Logseq)
+    label="SCRIBBLING"
+    cls="notes"
+    ;;
+org.pwmt.zathura | zathura | org.gnome.Evince | evince | com.github.johnfactotum.Foliate)
+    label="READING"
+    cls="reading"
+    ;;
+gimp | GIMP | org.gimp.GIMP | krita | org.kde.krita | Inkscape | org.inkscape.Inkscape | blender | Blender)
+    label="CREATING"
+    cls="creating"
     ;;
 "")
     label="IDLE"
@@ -87,4 +109,4 @@ steam | steam_app_* | gamescope | Lutris | lutris)
 esac
 fi
 
-printf '{"text":"  %s","class":"%s","alt":"%s"}\n' "$label" "$cls" "$class"
+printf '{"text":"%s","class":"%s","alt":"%s"}\n' "$label" "$cls" "$class"

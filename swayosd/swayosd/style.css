@@ -12,7 +12,7 @@
 
 * {
   all: unset;
-  font-family: "Maple Mono NF", monospace;
+  font-family: "DM Mono", "Maple Mono NF", monospace;
 }
 
 /* the pill — exactly the waybar #mpris module:

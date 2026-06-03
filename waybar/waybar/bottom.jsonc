@@ -18,14 +18,22 @@
         "orientation": "horizontal",
         "modules": [
             "custom/mode",
-            "custom/kanji"
+            "hyprland/window"
         ]
     },
     "group/right": {
         "orientation": "horizontal",
         "modules": [
-            "hyprland/window"
+            "custom/kanji",
+            "custom/keyd"
         ]
+    },
+    "custom/keyd": {
+        "exec": "~/.config/hypr/scripts/keyd-mode-status.sh",
+        "return-type": "json",
+        "interval": 1,
+        "signal": 9,
+        "tooltip": false
     },
     "custom/mode": {
         "exec": "~/.config/hypr/scripts/mode-detector.sh",
