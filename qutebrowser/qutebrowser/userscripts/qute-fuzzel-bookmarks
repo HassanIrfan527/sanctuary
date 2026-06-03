@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+#
+# qute-fuzzel-bookmarks — pick a bookmark or quickmark with fuzzel and open
+# it in a new tab.
+#
+# Bind in config.py:
+#   config.bind('<Space>fm', 'spawn --userscript qute-fuzzel-bookmarks')
+#
+# qutebrowser file formats:
+#   bookmarks/urls : "<url> <title...>"   (url first)
+#   quickmarks     : "<name...> <url>"    (url last)
+
+set -euo pipefail
+
+conf="${QUTE_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/qutebrowser}"
+bm="$conf/bookmarks/urls"
+qm="$conf/quickmarks"
+
+err() { printf 'message-error %s\n' "'$1'" >> "$QUTE_FIFO"; exit 0; }
+
+# Build "display\turl" lines. The URL is always the last tab-field so we can
+# recover it after selection regardless of which file it came from.
+lines=$(
+    if [ -f "$bm" ]; then
+        awk 'NF { url=$1; $1=""; sub(/^ +/,""); title=($0==""?url:$0);
+                  printf " %s\t%s\n", title, url }' "$bm"
+    fi
+    if [ -f "$qm" ]; then
+        awk 'NF { url=$NF; $NF=""; sub(/ +$/,""); name=$0;
+                  printf "󰃀 %s\t%s\n", name, url }' "$qm"
+    fi
+)
+
+[ -n "${lines//[$'\n\t ']/}" ] || err "no bookmarks or quickmarks saved yet"
+
+sel=$(printf '%s' "$lines" | fuzzel --dmenu --prompt "open > ") || exit 0
+[ -n "$sel" ] || exit 0
+
+url=${sel##*$'\t'}
+printf 'open -t %s\n' "$url" >> "$QUTE_FIFO"

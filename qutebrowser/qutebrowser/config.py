@@ -167,6 +167,44 @@ c.statusbar.widgets = ['keypress', 'search_match', 'url', 'scroll', 'history', '
 c.hints.border = f'1px solid {palette["peach"]}'
 c.hints.radius = 4
 
+# -- Content blocking (ABP + host blocking) --
+# 'both' uses the python-adblock engine (uBlock/Brave-style ABP lists, incl.
+# cosmetic filtering) AND the host blocker. Run :adblock-update after changing
+# lists to fetch them.
+c.content.blocking.enabled = True
+c.content.blocking.method = 'both'
+c.content.blocking.adblock.lists = [
+    'https://easylist.to/easylist/easylist.txt',
+    'https://easylist.to/easylist/easyprivacy.txt',
+    'https://easylist.to/easylist/fanboy-annoyance.txt',
+    'https://secure.fanboy.co.nz/fanboy-cookiemonster.txt',
+    'https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/filters.txt',
+    'https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/badware.txt',
+    'https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/privacy.txt',
+    'https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/quick-fixes.txt',
+    'https://raw.githubusercontent.com/uBlockOrigin/uAssets/master/filters/unbreak.txt',
+]
+c.content.blocking.hosts.lists = [
+    'https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts',
+]
+
+# -- Search engines (use as :open <key> <query>, e.g. ':open yt lo-fi') --
+c.url.searchengines = {
+    'DEFAULT': 'https://search.brave.com/search?q={}',
+    'br':      'https://search.brave.com/search?q={}',
+    'ddg':     'https://duckduckgo.com/?q={}',
+    'sp':      'https://www.startpage.com/sp/search?query={}',
+    'g':       'https://www.google.com/search?q={}',
+    'yt':      'https://www.youtube.com/results?search_query={}',
+    'gh':      'https://github.com/search?q={}&type=repositories',
+    'gist':    'https://gist.github.com/search?q={}',
+    'aw':      'https://wiki.archlinux.org/index.php?search={}',
+    'w':       'https://en.wikipedia.org/wiki/Special:Search?search={}',
+    'aur':     'https://aur.archlinux.org/packages?K={}',
+    'fp':      'https://packages.fedoraproject.org/search?query={}',
+    'red':     'https://www.reddit.com/search/?q={}',
+}
+
 # -- Keybinds --
 
 # J/K swapped: J=prev tab (left), K=next tab (right)
@@ -189,3 +227,7 @@ config.bind('L', 'forward')
 
 # Space+sv for opening in new window
 config.bind('<Space>sv', 'open -w')
+
+# -- Userscripts (fuzzel-integrated) --
+# Pick a bookmark/quickmark via fuzzel and open in a new tab
+config.bind('<Space>fm', 'spawn --userscript qute-fuzzel-bookmarks')
