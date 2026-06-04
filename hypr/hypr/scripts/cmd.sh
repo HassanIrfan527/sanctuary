@@ -4,6 +4,7 @@
 set -euo pipefail
 
 case "${1:-}" in
+    wifi)     kitty --class=impala-wifi --title=wifi -e impala ;;
     dismiss)  swaync-client --close-all ;;
     dnd)      swaync-client --toggle-dnd ;;
     panel)    swaync-client --toggle-panel ;;
