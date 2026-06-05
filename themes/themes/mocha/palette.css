@@ -1,0 +1,36 @@
+/* ───────────────────────────────────────────────
+   palette · MOCHA (dark default)
+   Catppuccin name-set — imported by waybar / walker /
+   swaync / swayosd. Swapped wholesale by theme-switch.sh.
+   ─────────────────────────────────────────────── */
+
+@define-color base       #1e1e2e;
+@define-color mantle     #181825;
+@define-color crust      #11111b;
+@define-color black      #11111b;
+@define-color surface0   #313244;
+@define-color surface1   #45475a;
+@define-color overlay0   #6c7086;
+@define-color subtext0   #a6adc8;
+@define-color text       #cdd6f4;
+
+@define-color lavender   #b4befe;
+@define-color mauve      #cba6f7;
+@define-color blue       #89b4fa;
+@define-color sapphire   #74c7ec;
+@define-color sky        #89dceb;
+@define-color teal       #94e2d5;
+@define-color green      #a6e3a1;
+@define-color yellow     #f9e2af;
+@define-color peach      #fab387;
+@define-color pink       #f5c2e7;
+@define-color maroon     #eba0ac;
+@define-color rosewater  #f5e0dc;
+@define-color flamingo   #f2cdcd;
+@define-color red        #f38ba8;
+
+/* legibility (waybar): transparent bar + transparent pill base (tints float over the blurred
+   dark layer, unchanged) + faint dark text-shadow */
+@define-color bar_bg     rgba(0, 0, 0, 0);
+@define-color pill_base  rgba(0, 0, 0, 0);
+@define-color shadow     rgba(0, 0, 0, 0.35);

@@ -18,6 +18,17 @@ gcm() {
     [ "$confirm" = "y" ] && git commit -m "$msg"
 }
 
+# y: open yazi, then cd to wherever you ended up when you quit (q).
+# Use `Q` inside yazi to quit WITHOUT cd-ing.
+y() {
+    local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+    yazi "$@" --cwd-file="$tmp"
+    if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+        builtin cd -- "$cwd"
+    fi
+    rm -f -- "$tmp"
+}
+
 # explain() {
 #     "$@" 2>&1 | ollama run llama3.2:3b "Explain this error in 2-3 sentences and suggest a likely fix:"
 # }

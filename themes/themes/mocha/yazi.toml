@@ -1,0 +1,99 @@
+# Cozy — Catppuccin Mocha, matched 1:1 to waybar bottom.css
+# base #1e1e2e  surface0 #313244  surface1 #45475a  overlay0 #6c7086  text #cdd6f4
+# mauve #cba6f7  green #a6e3a1 (= "files" context pill)  yellow #f9e2af  red #f38ba8  teal #94e2d5  pink #f5c2e7  blue #89b4fa
+
+[mgr]
+cwd = { fg = "#94e2d5" }
+
+hovered         = { fg = "#1e1e2e", bg = "#cba6f7" }
+preview_hovered = { underline = true }
+
+find_keyword  = { fg = "#f9e2af", italic = true }
+find_position = { fg = "#f5c2e7", bg = "reset", italic = true }
+
+marker_copied   = { fg = "#a6e3a1", bg = "#a6e3a1" }
+marker_cut      = { fg = "#f38ba8", bg = "#f38ba8" }
+marker_marked   = { fg = "#94e2d5", bg = "#94e2d5" }
+marker_selected = { fg = "#f9e2af", bg = "#f9e2af" }
+
+count_copied   = { fg = "#1e1e2e", bg = "#a6e3a1" }
+count_cut      = { fg = "#1e1e2e", bg = "#f38ba8" }
+count_selected = { fg = "#1e1e2e", bg = "#f9e2af" }
+
+border_symbol = "│"
+border_style  = { fg = "#6c7086" }
+
+[mode]
+normal_main = { fg = "#1e1e2e", bg = "#a6e3a1", bold = true }
+normal_alt  = { fg = "#a6e3a1", bg = "#313244" }
+select_main = { fg = "#1e1e2e", bg = "#f9e2af", bold = true }
+select_alt  = { fg = "#f9e2af", bg = "#313244" }
+unset_main  = { fg = "#1e1e2e", bg = "#f38ba8", bold = true }
+unset_alt   = { fg = "#f38ba8", bg = "#313244" }
+
+[status]
+sep_left  = { open = "", close = "" }
+sep_right = { open = "", close = "" }
+
+perm_type  = { fg = "#89b4fa" }
+perm_read  = { fg = "#f9e2af" }
+perm_write = { fg = "#f38ba8" }
+perm_exec  = { fg = "#a6e3a1" }
+perm_sep   = { fg = "#6c7086" }
+
+progress_label  = { fg = "#cdd6f4", bold = true }
+progress_normal = { fg = "#cba6f7", bg = "#313244" }
+progress_error  = { fg = "#f38ba8", bg = "#313244" }
+
+[pick]
+border   = { fg = "#cba6f7" }
+active   = { fg = "#f5c2e7", bold = true }
+inactive = { fg = "#cdd6f4" }
+
+[input]
+border   = { fg = "#cba6f7" }
+title    = {}
+value    = {}
+selected = { reversed = true }
+
+[cmp]
+border   = { fg = "#cba6f7" }
+active   = { fg = "#f5c2e7", bold = true }
+inactive = { fg = "#cdd6f4" }
+
+[tasks]
+border  = { fg = "#cba6f7" }
+title   = { fg = "#cdd6f4" }
+hovered = { fg = "#f5c2e7", underline = true }
+
+[which]
+mask            = { bg = "#313244" }
+cand            = { fg = "#94e2d5" }
+rest            = { fg = "#6c7086" }
+desc            = { fg = "#f5c2e7" }
+separator       = "  "
+separator_style = { fg = "#45475a" }
+
+[help]
+on      = { fg = "#94e2d5" }
+run     = { fg = "#f5c2e7" }
+hovered = { reversed = true, bold = true }
+footer  = { fg = "#cdd6f4", bg = "#313244" }
+
+[notify]
+title_info  = { fg = "#a6e3a1" }
+title_warn  = { fg = "#f9e2af" }
+title_error = { fg = "#f38ba8" }
+
+[filetype]
+rules = [
+  { mime = "image/*",         fg = "#f5c2e7" },
+  { mime = "{audio,video}/*", fg = "#f9e2af" },
+
+  { mime = "application/{,g}zip",                            fg = "#cba6f7" },
+  { mime = "application/x-{tar,bzip*,7z-compressed,xz,rar}", fg = "#cba6f7" },
+  { mime = "application/{pdf,doc,rtf}",                      fg = "#94e2d5" },
+
+  { name = "*",  fg = "#cdd6f4" },
+  { name = "*/", fg = "#89b4fa" },
+]

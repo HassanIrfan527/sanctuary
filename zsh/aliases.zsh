@@ -17,6 +17,12 @@ alias tva='tv alias'
 # fun aliases
 alias void='sudo dnf'
 
+alias work-on='sudo tailscale up && echo "🔓 Tailscale UP — work DNS + hostnames active"'
+alias work-off='sudo tailscale down && echo "🔒 Tailscale DOWN — encrypted Mullvad DNS active"'
+
+# quick check: where is my DNS going right now?
+alias dns-check='resolvectl query --cache=no example.com 2>&1 | grep -i "encrypted transport"'
+
 # harlequin db connection aliases
 htdb() {
     if [ -z "$POSTGRES_TEST_CONNECTION_STRING" ]; then

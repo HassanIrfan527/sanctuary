@@ -1,0 +1,41 @@
+/* ───────────────────────────────────────────────
+   palette · COZY-WHITE (Gruvbox Light, warm)
+   Gruvbox-Light values mapped onto the Catppuccin
+   name-set so structural CSS stays untouched.
+
+   Philosophy: warm aged-paper cream, ink-brown text
+   (never pure black), burnt-orange as the everyday
+   accent. BRIGHT RED (#cc241d) is reserved for alerts
+   only — it stays mapped to `red`.
+   ─────────────────────────────────────────────── */
+
+/* paper / surfaces (gruvbox bg0 → bg4) */
+@define-color base       #fbf1c7;
+@define-color mantle     #f2e5bc;
+@define-color crust      #ebdbb2;
+@define-color black      #ebdbb2;
+@define-color surface0   #ebdbb2;
+@define-color surface1   #d5c4a1;
+@define-color overlay0   #928374;
+@define-color subtext0   #665c54;
+@define-color text       #3c3836;
+
+/* accents — gruvbox "faded"/neutral variants read best on cream */
+@define-color lavender   #d65d0e;   /* everyday accent (was workspaces/borders) */
+@define-color mauve      #8f3f71;   /* plum — music */
+@define-color blue       #458588;   /* clock */
+@define-color sapphire   #076678;
+@define-color sky        #427b58;
+@define-color teal       #689d6a;
+@define-color green      #79740e;
+@define-color yellow     #b57614;
+@define-color peach      #af3a03;
+@define-color pink       #b16286;   /* desk-pet */
+@define-color maroon     #9d0006;   /* faded red — secondary warm */
+@define-color rosewater  #d65d0e;
+@define-color flamingo   #cc241d;
+@define-color red        #cc241d;   /* ALERT only */
+
+/* legibility (waybar): solid-ish cream strip so ink text reads over ANY wallpaper; no muddy shadow */
+@define-color bar_bg     rgba(251, 241, 199, 0.92);
+@define-color shadow     rgba(0, 0, 0, 0);

@@ -6,6 +6,15 @@
 --  ── Initializing lazy.nvim and its plugins  ──
 require("config.lazy")
 
+-- ── Active theme variant (swapped by theme-switch.sh) ──
+-- "dark" keeps rose-pine + transparency; "cozy-white" → opaque Gruvbox light
+local ok_theme, theme = pcall(require, "theme_active")
+_G.THEME_VARIANT = (ok_theme and theme.variant) or "dark"
+if _G.THEME_VARIANT == "cozy-white" then
+	vim.o.background = "light"
+	pcall(vim.cmd.colorscheme, "gruvbox")
+end
+
 -- ── Treesitter highlighting ──
 vim.api.nvim_create_autocmd("FileType", {
 	callback = function(args)
@@ -88,6 +97,10 @@ vim.opt.termguicolors = true
 vim.api.nvim_create_autocmd("ColorScheme", {
 	pattern = "*",
 	callback = function()
+		-- cozy-white is an opaque light theme — skip the dark transparency hacks
+		if _G.THEME_VARIANT == "cozy-white" then
+			return
+		end
 		local groups = {
 			"Normal",
 			"NormalNC",

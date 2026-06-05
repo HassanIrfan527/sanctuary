@@ -30,6 +30,14 @@ palette = {
     'crust':     '#11111b',
 }
 
+# -- Active theme override (swapped by theme-switch.sh) --
+# cozy-white remaps the same palette keys onto Gruvbox Light.
+import os
+_theme_file = os.path.expanduser('~/.config/qutebrowser/theme-current.py')
+if os.path.exists(_theme_file):
+    with open(_theme_file) as _f:
+        exec(_f.read())
+
 # -- Completion --
 c.colors.completion.fg = palette['text']
 c.colors.completion.odd.bg = palette['mantle']

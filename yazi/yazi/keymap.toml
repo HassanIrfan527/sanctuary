@@ -1,0 +1,7 @@
+[mgr]
+prepend_keymap = [
+  { on = [ "g", "n" ], run = "shell 'nautilus .' --orphan", desc = "Reveal here in Nautilus" },
+  { on = [ "g", "D" ], run = "cd ~/.dotfiles",              desc = "Go to ~/.dotfiles" },
+  { on = [ "g", "?" ], run = "shell 'glow -p ~/.config/yazi/CHEATSHEET.md' --block", desc = "Yazi cheatsheet" },
+  { on = "!",          run = 'shell "$SHELL" --block',      desc = "Drop to a shell here" },
+]

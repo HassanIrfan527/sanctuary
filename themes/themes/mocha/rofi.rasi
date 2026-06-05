@@ -1,0 +1,12 @@
+/* Cozy — Tokyo Night, soft rounded */
+* {
+    bg: #1a1b26dd;
+    fg: #c0caf5;
+    accent: #bb9af7;
+    muted: #565f89;
+    selected-bg: #bb9af71a;
+    selected-fg: #ffc777;
+    border-color: #bb9af733;
+    border-width: 1px;
+    radius: 14px;
+}
