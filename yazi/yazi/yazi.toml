@@ -16,28 +16,43 @@ max_height  = 900
 image_delay = 30
 
 [opener]
-edit = [
-  { run = 'nvim "$@"', block = true, for = "unix" },
-]
-open = [
-  { run = 'xdg-open "$@"', desc = "Open", orphan = true, for = "unix" },
-]
-reveal = [
-  { run = 'nautilus "$@"', orphan = true, desc = "Reveal in Nautilus", for = "unix" },
-]
+# editors
+edit = [ { run = 'nvim "$@"', block = true,   desc = "nvim",        for = "unix" } ]
+code = [ { run = 'code "$@"', orphan = true,   desc = "VS Code",     for = "unix" } ]
+
+# media
+mpv    = [ { run = 'mpv "$@"',    orphan = true, desc = "mpv",       for = "unix" } ]
+vlc    = [ { run = 'vlc "$@"',    orphan = true, desc = "VLC",       for = "unix" } ]
+loupe  = [ { run = 'loupe "$@"',  orphan = true, desc = "Loupe (view)", for = "unix" } ]
+okular = [ { run = 'okular "$@"', orphan = true, desc = "Okular",    for = "unix" } ]
+brave  = [ { run = 'brave-browser "$@"', orphan = true, desc = "Brave", for = "unix" } ]
+
+# generic
+open   = [ { run = 'xdg-open "$@"',  desc = "xdg-open (default app)", orphan = true, for = "unix" } ]
+reveal = [ { run = 'nautilus "$@"', desc = "Reveal in Nautilus",     orphan = true, for = "unix" } ]
 
 [open]
+# First opener in each list = what Enter/o uses; the rest appear in the O picker.
 rules = [
   { name = "*/", use = [ "edit", "open", "reveal" ] },
 
-  { mime = "text/*",  use = [ "edit", "reveal" ] },
-  { mime = "image/*", use = [ "open", "reveal" ] },
-  { mime = "video/*", use = [ "open", "reveal" ] },
-  { mime = "audio/*", use = [ "open", "reveal" ] },
+  { mime = "text/*", use = [ "edit", "code", "open", "reveal" ] },
+
+  { mime = "image/svg+xml", use = [ "loupe", "code", "brave", "reveal" ] },
+  { mime = "image/*",       use = [ "loupe", "open", "brave", "reveal" ] },
+
+  { mime = "video/*", use = [ "mpv", "vlc", "open", "reveal" ] },
+  { mime = "audio/*", use = [ "mpv", "vlc", "open", "reveal" ] },
+
+  { mime = "application/pdf",      use = [ "okular", "open", "brave", "reveal" ] },
+  { mime = "application/epub+zip", use = [ "okular", "open", "reveal" ] },
+
+  { mime = "text/html",                 use = [ "brave", "code", "edit", "reveal" ] },
+  { name = "*.{mkv,mp4,webm,mov,avi,m4v,flv,wmv,mpg,mpeg}", use = [ "mpv", "vlc", "open", "reveal" ] },
+  { name = "*.{mp3,flac,wav,ogg,opus,m4a,aac}",            use = [ "mpv", "vlc", "open", "reveal" ] },
 
   { mime = "application/{,g}zip",                            use = [ "open", "reveal" ] },
   { mime = "application/x-{tar,bzip*,7z-compressed,xz,rar}", use = [ "open", "reveal" ] },
-  { mime = "application/pdf",                                use = [ "open", "reveal" ] },
 
-  { mime = "*", use = [ "open", "edit", "reveal" ] },
+  { mime = "*", use = [ "open", "edit", "code", "reveal" ] },
 ]

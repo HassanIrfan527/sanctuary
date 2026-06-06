@@ -79,8 +79,19 @@ Open this anytime with `glow ~/.config/yazi/CHEATSHEET.md`, or inside Yazi press
 | `g n` | reveal the current dir in Nautilus                |
 | `!`   | drop into a shell right here *(custom)* — `exit` to return |
 
-Openers (see `yazi.toml`): text → nvim · media/pdf → `xdg-open` · everything offers
-"Reveal in Nautilus" via `O`.
+### What `O` offers per filetype (first = Enter default)
+| File        | Apps in the picker                          |
+|-------------|---------------------------------------------|
+| video (mkv/mp4/webm/mov/avi…) | **mpv** · VLC · xdg-open · Nautilus |
+| audio (mp3/flac/opus…)        | **mpv** · VLC · xdg-open · Nautilus |
+| image       | **Loupe** · xdg-open · Brave · Nautilus     |
+| svg         | **Loupe** · VS Code · Brave · Nautilus      |
+| pdf / epub  | **Okular** · xdg-open · Brave · Nautilus    |
+| text/code   | **nvim** · VS Code · xdg-open · Nautilus     |
+| html        | **Brave** · VS Code · nvim · Nautilus        |
+| anything    | always offers **Reveal in Nautilus**         |
+
+To add another app to the picker, edit `[opener]` + `[open]` in `yazi.toml`.
 
 ## Tabs
 
