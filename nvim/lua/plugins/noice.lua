@@ -25,6 +25,7 @@ return {
 				{ filter = { event = "msg_show", kind = "", find = "Already at" }, opts = { skip = true } },
 			},
 			lsp = {
+				progress = { enabled = false },
 				override = {
 					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
 					["vim.lsp.util.stylize_markdown"] = true,
