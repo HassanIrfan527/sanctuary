@@ -20,7 +20,6 @@ super + slash          this cheatsheet
 super + delete         session menu (lock/logout/reboot)
 super + i              bug capture
 super + shift + i      browse bugs
-super + shift + t      study today
 
 ─ focus & layout ─────────────────────────────────────
 super + h j k l        focus window (vim arrows)
@@ -44,7 +43,6 @@ super + print          fullscreen → copy to clipboard
 super + escape         lock screen
 super + shift + b      toggle key sounds
 super + alt + b        switch key sound theme
-super + alt + s        toggle study mode
 super + alt + p        pomodoro
 super + shift + m      play/pause
 super + shift + [/]    prev / next track

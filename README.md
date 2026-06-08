@@ -170,7 +170,6 @@ That's the whole keyd config. All shortcuts live in `keybinds.conf` (single sour
 | `Super+Shift+B` | Toggle key sounds on/off          |
 | `Super+Alt+B`   | Switch key sound theme            |
 | `Super+I`       | Bug capture                       |
-| `Super+Alt+S`   | Toggle study mode                 |
 
 ### Tmux (Prefix: Ctrl+A)
 
