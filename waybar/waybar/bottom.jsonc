@@ -18,7 +18,8 @@
         "orientation": "horizontal",
         "modules": [
             "custom/mode",
-            "hyprland/window"
+            "hyprland/window",
+            "niri/window"
         ]
     },
     "group/right": {
@@ -50,6 +51,11 @@
         "format": "{title}",
         "max-length": 50,
         "separate-outputs": false,
+        "tooltip": false
+    },
+    "niri/window": {
+        "format": "{title}",
+        "max-length": 50,
         "rewrite": {
             "^$": "—"
         },

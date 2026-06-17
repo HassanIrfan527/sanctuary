@@ -26,7 +26,9 @@ window#waybar {
 #mpris,
 #pet,
 #image,
-#custom-mic {
+#custom-mic,
+#custom-niri-minimap,
+#custom-niri-odometer {
     border: none;
     border-radius: 16px;
     padding: 2px 14px;
@@ -44,21 +46,35 @@ window#waybar {
     background-image: linear-gradient(alpha(@red, 0.22), alpha(@red, 0.22));
 }
 
-/* workspaces — lavender */
+/* workspaces — lavender (tight: single current-number pill on niri) */
 #workspaces {
     background-image: linear-gradient(alpha(@lavender, 0.22), alpha(@lavender, 0.22));
+    padding: 2px 4px;
+}
+
+/* niri column minimap — sky (where you are in the scroll strip) */
+#custom-niri-minimap {
+    background-image: linear-gradient(alpha(@sky, 0.22), alpha(@sky, 0.22));
+    color: @text;
+    letter-spacing: 1px;
+}
+
+/* niri scroll odometer — peach (distance walked across columns) */
+#custom-niri-odometer {
+    background-image: linear-gradient(alpha(@peach, 0.22), alpha(@peach, 0.22));
+    color: @text;
 }
 
 #workspaces button {
     background: transparent;
     color: @overlay0;
-    padding: 0 6px;
+    padding: 0 3px;
     border: none;
     border-radius: 0;
 }
 
 #workspaces button label {
-    letter-spacing: 2px;
+    letter-spacing: 0;
 }
 
 #workspaces button.active {

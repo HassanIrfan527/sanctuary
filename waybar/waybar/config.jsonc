@@ -7,9 +7,20 @@
     "margin-left": 12,
     "margin-right": 12,
     "modules-left": [
+        "niri/workspaces",
+        "custom/niri-minimap",
+        "custom/niri-odometer",
         "hyprland/workspaces",
         "mpris"
     ],
+    "niri/workspaces": {
+        "current-only": true,
+        "format": "{value}",
+        "tooltip": false,
+        "on-click": "niri msg action toggle-overview",
+        "on-scroll-up": "niri msg action focus-workspace-up",
+        "on-scroll-down": "niri msg action focus-workspace-down"
+    },
     "modules-center": [
         "clock"
     ],
@@ -79,6 +90,15 @@
         "on-click": "activate",
         "on-scroll-up": "hyprctl dispatch workspace m-1",
         "on-scroll-down": "hyprctl dispatch workspace m+1"
+    },
+    "custom/niri-minimap": {
+        "exec": "/home/anonymous/.config/waybar/scripts/niri-minimap.sh",
+        "tooltip": false,
+        "on-click": "niri msg action toggle-overview"
+    },
+    "custom/niri-odometer": {
+        "exec": "/home/anonymous/.config/waybar/scripts/niri-odometer.sh",
+        "tooltip": false
     },
     "mpris": {
         "format": "{status_icon}  {title}",

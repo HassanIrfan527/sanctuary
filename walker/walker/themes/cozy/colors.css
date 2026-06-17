@@ -1,43 +1,37 @@
 /* ───────────────────────────────────────────────
-   palette · COZY-WHITE (Gruvbox Light, warm)
-   Gruvbox-Light values mapped onto the Catppuccin
-   name-set so structural CSS stays untouched.
-
-   Philosophy: warm aged-paper cream, ink-brown text
-   (never pure black), burnt-orange as the everyday
-   accent. BRIGHT RED (#cc241d) is reserved for alerts
-   only — it stays mapped to `red`.
+   palette · MOCHA (dark default)
+   Catppuccin name-set — imported by waybar / walker /
+   swaync / swayosd. Swapped wholesale by theme-switch.sh.
    ─────────────────────────────────────────────── */
 
-/* paper / surfaces (gruvbox bg0 → bg4) */
-@define-color base       #fbf1c7;
-@define-color mantle     #f2e5bc;
-@define-color crust      #ebdbb2;
-@define-color black      #ebdbb2;
-@define-color surface0   #ebdbb2;
-@define-color surface1   #d5c4a1;
-@define-color overlay0   #928374;
-@define-color subtext0   #665c54;
-@define-color text       #3c3836;
+@define-color base       #1e1e2e;
+@define-color mantle     #181825;
+@define-color crust      #11111b;
+@define-color black      #11111b;
+@define-color surface0   #313244;
+@define-color surface1   #45475a;
+@define-color overlay0   #6c7086;
+@define-color subtext0   #a6adc8;
+@define-color text       #cdd6f4;
 
-/* accents — gruvbox "faded"/neutral variants read best on cream */
-@define-color lavender   #d65d0e;   /* everyday accent (was workspaces/borders) */
-@define-color mauve      #8f3f71;   /* plum — music */
-@define-color blue       #458588;   /* clock */
-@define-color sapphire   #076678;
-@define-color sky        #427b58;
-@define-color teal       #689d6a;
-@define-color green      #79740e;
-@define-color yellow     #b57614;
-@define-color peach      #af3a03;
-@define-color pink       #b16286;   /* desk-pet */
-@define-color maroon     #9d0006;   /* faded red — secondary warm */
-@define-color rosewater  #d65d0e;
-@define-color flamingo   #cc241d;
-@define-color red        #cc241d;   /* ALERT only */
+@define-color lavender   #b4befe;
+@define-color mauve      #cba6f7;
+@define-color blue       #89b4fa;
+@define-color sapphire   #74c7ec;
+@define-color sky        #89dceb;
+@define-color teal       #94e2d5;
+@define-color green      #a6e3a1;
+@define-color yellow     #f9e2af;
+@define-color peach      #fab387;
+@define-color pink       #f5c2e7;
+@define-color maroon     #eba0ac;
+@define-color rosewater  #f5e0dc;
+@define-color flamingo   #f2cdcd;
+@define-color red        #f38ba8;
 
-/* legibility (waybar): bar stays transparent (floating pills); each PILL gets an opaque
-   cream base so ink text reads over ANY wallpaper. No muddy shadow on light. */
+/* legibility (waybar): bar stays transparent (floating pills); each PILL gets a
+   translucent dark base so it has body WITHOUT relying on compositor blur (niri
+   has none). On Hyprland the blur still sits behind it, so it reads fine there too. */
 @define-color bar_bg     rgba(0, 0, 0, 0);
-@define-color pill_base  rgba(251, 241, 199, 0.92);
-@define-color shadow     rgba(0, 0, 0, 0);
+@define-color pill_base  rgba(30, 30, 46, 0.60);
+@define-color shadow     rgba(0, 0, 0, 0.35);

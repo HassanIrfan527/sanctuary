@@ -9,18 +9,27 @@ class=""
 pid=""
 title=""
 
-json="$(hyprctl activewindow -j 2>/dev/null || echo '{}')"
-class="$(printf '%s' "$json" | jq -r '.class // empty' 2>/dev/null)" || true
-pid="$(printf '%s' "$json" | jq -r '.pid // empty' 2>/dev/null)" || true
-title="$(printf '%s' "$json" | jq -r '.title // empty' 2>/dev/null)" || true
+# Focused-window info, compositor-aware. niri's `app_id` == Hyprland's `class`.
+if [[ "${XDG_CURRENT_DESKTOP:-}" == niri || -n "${NIRI_SOCKET:-}" ]]; then
+    json="$(niri msg -j focused-window 2>/dev/null || echo '{}')"
+    [ -z "$json" ] && json='{}'
+    class="$(printf '%s' "$json" | jq -r '.app_id // empty' 2>/dev/null)" || true
+    pid="$(printf '%s' "$json" | jq -r '.pid // empty' 2>/dev/null)" || true
+    title="$(printf '%s' "$json" | jq -r '.title // empty' 2>/dev/null)" || true
+    wsname=""   # no special workspaces in this niri setup
+else
+    json="$(hyprctl activewindow -j 2>/dev/null || echo '{}')"
+    class="$(printf '%s' "$json" | jq -r '.class // empty' 2>/dev/null)" || true
+    pid="$(printf '%s' "$json" | jq -r '.pid // empty' 2>/dev/null)" || true
+    title="$(printf '%s' "$json" | jq -r '.title // empty' 2>/dev/null)" || true
+    wsname="$(printf '%s' "$json" | jq -r '.workspace.name // empty' 2>/dev/null)" || true
+fi
 
 class="${class:-}"
 pid="${pid:-}"
 title="${title:-}"
 [ "$class" = "null" ] && class=""
 [ "$pid" = "null" ] && pid=""
-
-wsname="$(printf '%s' "$json" | jq -r '.workspace.name // empty' 2>/dev/null)" || true
 [ "$wsname" = "null" ] && wsname=""
 
 # walk process tree for nvim if the window is a terminal; fall back to the
@@ -92,11 +101,11 @@ else
         label="BUILDING"
         cls="coding"
         ;;
-    org.gnome.Nautilus | nautilus | yazi | thunar | pcmanfm)
+    org.gnome.Nautilus | nautilus | yazi)
         label="DIGGING"
         cls="files"
         ;;
-    discord | TelegramDesktop | org.telegram.desktop | Slack | VESKTOP | vesktop)
+    discord | VESKTOP | vesktop)
         label="YAPPING"
         cls="chat"
         ;;

@@ -1,0 +1,157 @@
+# Quote-of-the-day source — read by quote-wallpaper.sh
+# Format:  <quote> — <author>      (separator is " — ", a spaced em dash)
+# Lines starting with # and blank lines are ignored.
+# Keep quotes on one line. Avoid using " — " inside a quote (it's the splitter).
+# Curated: polymaths first (the user's favourite), then Rumi, then feel-good / you-got-this / life.
+
+# ── Polymaths ────────────────────────────────────────────────────────────────
+Simplicity is the ultimate sophistication. — Leonardo da Vinci
+Learning never exhausts the mind. — Leonardo da Vinci
+Obstacles do not bend me; every obstacle yields to stern resolve. — Leonardo da Vinci
+Knowing is not enough; we must apply. Willing is not enough; we must do. — Johann Wolfgang von Goethe
+Whatever you can do, or dream you can, begin it. Boldness has genius in it. — Johann Wolfgang von Goethe
+Tell me and I forget, teach me and I may remember, involve me and I learn. — Benjamin Franklin
+An investment in knowledge pays the best interest. — Benjamin Franklin
+Energy and persistence conquer all things. — Benjamin Franklin
+I would rather have questions that can't be answered than answers that can't be questioned. — Richard Feynman
+The first principle is that you must not fool yourself, and you are the easiest person to fool. — Richard Feynman
+Study hard what interests you the most, in the most undisciplined and original manner possible. — Richard Feynman
+If I have seen further it is by standing on the shoulders of giants. — Isaac Newton
+Truth is ever to be found in simplicity, not in the multiplicity of things. — Isaac Newton
+Knowing yourself is the beginning of all wisdom. — Aristotle
+We are what we repeatedly do; excellence, then, is not an act but a habit. — Aristotle
+The more I learn, the more I realize how much I don't know. — Albert Einstein
+Imagination is more important than knowledge. — Albert Einstein
+Be moved like flowing water, be still like a mirror, respond like an echo. — Zhuangzi
+Be the change that you wish to see in the world. — Mahatma Gandhi
+The mind is everything; what you think you become. — Buddha
+Somewhere, something incredible is waiting to be known. — Carl Sagan
+We are a way for the cosmos to know itself. — Carl Sagan
+The most beautiful thing we can experience is the mysterious. — Albert Einstein
+Reason and free inquiry are the only effectual agents against error. — Thomas Jefferson
+Reading furnishes the mind only with materials of knowledge; thinking makes what we read ours. — John Locke
+Doubt is the origin of wisdom. — René Descartes
+Knowledge itself is power. — Francis Bacon
+I am still learning. — Michelangelo
+The noblest pleasure is the joy of understanding. — Leonardo da Vinci
+The brain is wider than the sky. — Emily Dickinson
+That which is overdesigned, too highly specific, anticipates outcome. — Buckminster Fuller
+When I am working on a problem I never think about beauty, but when finished, if it isn't beautiful I know it is wrong. — Buckminster Fuller
+The imagination of nature is far greater than the imagination of man. — Richard Feynman
+
+# ── Rumi ─────────────────────────────────────────────────────────────────────
+The wound is the place where the light enters you. — Rumi
+What you seek is seeking you. — Rumi
+Yesterday I was clever, so I wanted to change the world. Today I am wise, so I am changing myself. — Rumi
+Raise your words, not your voice. It is rain that grows flowers, not thunder. — Rumi
+Let yourself be silently drawn by the strange pull of what you really love. — Rumi
+Don't grieve. Anything you lose comes round in another form. — Rumi
+Set your life on fire. Seek those who fan your flames. — Rumi
+As you start to walk on the way, the way appears. — Rumi
+You were born with wings, why prefer to crawl through life? — Rumi
+Live life as if everything is rigged in your favor. — Rumi
+
+# ── You got this ─────────────────────────────────────────────────────────────
+It always seems impossible until it's done. — Nelson Mandela
+You miss 100% of the shots you don't take. — Wayne Gretzky
+Fall seven times, stand up eight. — Japanese Proverb
+The secret of getting ahead is getting started. — Mark Twain
+Believe you can and you're halfway there. — Theodore Roosevelt
+Our greatest glory is not in never falling, but in rising every time we fall. — Confucius
+Do the best you can until you know better. Then when you know better, do better. — Maya Angelou
+Start where you are. Use what you have. Do what you can. — Arthur Ashe
+Little by little, one travels far. — J.R.R. Tolkien
+A year from now you may wish you had started today. — Karen Lamb
+The expert in anything was once a beginner. — Helen Hayes
+Courage doesn't always roar; sometimes it is the quiet voice saying I will try again tomorrow. — Mary Anne Radmacher
+
+# ── Feel good ────────────────────────────────────────────────────────────────
+Wherever you go, go with all your heart. — Confucius
+Keep your face always toward the sunshine and shadows will fall behind you. — Walt Whitman
+The best way to cheer yourself is to try to cheer someone else up. — Mark Twain
+Happiness is not something ready-made. It comes from your own actions. — Dalai Lama
+There is a crack in everything. That's how the light gets in. — Leonard Cohen
+And now that you don't have to be perfect, you can be good. — John Steinbeck
+Once you choose hope, anything's possible. — Christopher Reeve
+The sun himself is weak when he first rises, and gathers strength as the day gets on. — Charles Dickens
+Joy is not in things; it is in us. — Richard Wagner
+Adopt the pace of nature: her secret is patience. — Ralph Waldo Emerson
+
+# ── Life ─────────────────────────────────────────────────────────────────────
+The unexamined life is not worth living. — Socrates
+In the middle of difficulty lies opportunity. — Albert Einstein
+What we think, we become. — Buddha
+Not all those who wander are lost. — J.R.R. Tolkien
+Life can only be understood backwards; but it must be lived forwards. — Søren Kierkegaard
+The only true wisdom is in knowing you know nothing. — Socrates
+Turn your wounds into wisdom. — Oprah Winfrey
+Go confidently in the direction of your dreams. Live the life you have imagined. — Henry David Thoreau
+It is not length of life, but depth of life. — Ralph Waldo Emerson
+The purpose of life is a life of purpose. — Robert Byrne
+Tension is who you think you should be. Relaxation is who you are. — Chinese Proverb
+Everything you can imagine is real. — Pablo Picasso
+He who has a why to live can bear almost any how. — Friedrich Nietzsche
+The privilege of a lifetime is to become who you truly are. — Carl Jung
+
+# ── Carl Jung ────────────────────────────────────────────────────────────────
+Until you make the unconscious conscious, it will direct your life and you will call it fate. — Carl Jung
+Who looks outside, dreams; who looks inside, awakes. — Carl Jung
+I am not what happened to me, I am what I choose to become. — Carl Jung
+There is no coming to consciousness without pain. — Carl Jung
+Knowing your own darkness is the best method for dealing with the darkness of other people. — Carl Jung
+Your vision will become clear only when you can look into your own heart. — Carl Jung
+Everything that irritates us about others can lead us to an understanding of ourselves. — Carl Jung
+The shoe that fits one person pinches another; there is no recipe for living that suits all cases. — Carl Jung
+
+# ── Fyodor Dostoevsky ────────────────────────────────────────────────────────
+The mystery of human existence lies not in just staying alive, but in finding something to live for. — Fyodor Dostoevsky
+Pain and suffering are always inevitable for a large intelligence and a deep heart. — Fyodor Dostoevsky
+Above all, do not lie to yourself. — Fyodor Dostoevsky
+Beauty will save the world. — Fyodor Dostoevsky
+To live without hope is to cease to live. — Fyodor Dostoevsky
+Man is a mystery; if you spend your whole life trying to unravel it, do not say you have wasted time. — Fyodor Dostoevsky
+The darker the night, the brighter the stars. — Fyodor Dostoevsky
+
+# ── Franz Kafka ──────────────────────────────────────────────────────────────
+A book must be the axe for the frozen sea within us. — Franz Kafka
+I am free, and that is why I am lost. — Franz Kafka
+From a certain point onward there is no longer any turning back. That is the point that must be reached. — Franz Kafka
+In the fight between you and the world, back the world. — Franz Kafka
+Theoretically there is a perfect possibility of happiness: to believe in the indestructible within oneself, and not strive toward it. — Franz Kafka
+
+# ── Rumi (more) ──────────────────────────────────────────────────────────────
+Out beyond ideas of wrongdoing and rightdoing, there is a field. I will meet you there. — Rumi
+Sell your cleverness and buy bewilderment. — Rumi
+The quieter you become, the more you are able to hear. — Rumi
+Why do you stay in prison when the door is so wide open? — Rumi
+Stop acting so small. You are the universe in ecstatic motion. — Rumi
+When you do things from your soul, you feel a river moving in you, a joy. — Rumi
+Be like a tree and let the dead leaves drop. — Rumi
+Your task is not to seek for love, but to find the barriers within yourself you have built against it. — Rumi
+
+# ── Allama Iqbal ─────────────────────────────────────────────────────────────
+Raise the self so high that, before each decree, God Himself asks you: tell me, what is your wish? — Allama Iqbal
+The ultimate aim of the ego is not to see something, but to be something. — Allama Iqbal
+You are a falcon; flight is your vocation. There are skies still waiting before you. — Allama Iqbal
+Nations are born in the hearts of poets; they prosper and die in the hands of politicians. — Allama Iqbal
+
+# ── Imam Ali (A.S) ─────────────────────────────────────────────────────────────────
+Never be happy over what you gain, never be sad over what you lose. — Imam Ali (A.S)
+The tongue of the wise is behind his heart, and the heart of the fool is behind his tongue. — Imam Ali (A.S)
+Do not let your hardships fill you with despair; it is in the darkest nights that the stars shine brightest. — Imam Ali (A.S)
+He who has a thousand friends has not one to spare; he who has one enemy will meet him everywhere. — Imam Ali (A.S)
+If you did not sin, I would fear for you something far greater: self-admiration. — Imam Ali (A.S)
+
+# ── Bulleh Shah ──────────────────────────────────────────────────────────────
+Bulleya! What do I know of who I am? — Bulleh Shah
+Tear down the mosque, tear down the temple, tear down all that can be torn; but never break a human heart, for there God resides. — Bulleh Shah
+Neither Hindu nor Muslim am I; I sit with all on equal ground. — Bulleh Shah
+
+# ── Kindred spirits (Che · Sagan · Frankl · film) ────────────────────────────
+The true revolutionary is guided by great feelings of love. — Che Guevara
+Liberators do not exist; the people liberate themselves. — Che Guevara
+For small creatures such as we, the vastness is bearable only through love. — Carl Sagan
+We are made of star-stuff. — Carl Sagan
+When we are no longer able to change a situation, we are challenged to change ourselves. — Viktor Frankl
+Everything can be taken from a man but one thing: to choose one's attitude in any given set of circumstances. — Viktor Frankl
+Love is the one thing we are capable of perceiving that transcends time and space. — Interstellar

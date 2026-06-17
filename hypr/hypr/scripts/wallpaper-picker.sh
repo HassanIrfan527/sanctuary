@@ -7,14 +7,57 @@
 set -euo pipefail
 
 SELF="$(realpath "${BASH_SOURCE[0]}")"
-IMG_DIRS=("$HOME/Pictures/Wallpapers" "$HOME/Pictures")
-VID_DIRS=("$HOME/Videos")
+
+# ┌─ EDIT HERE to change where wallpapers are sourced from ────────────────────┐
+# │ Both stills and live videos are scanned from these dirs only. Add more     │
+# │ paths to an array (space-separated) to widen the search, e.g.              │
+# │   IMG_DIRS=("$HOME/Pictures/Wallpapers" "$HOME/Pictures/Art")              │
+# └────────────────────────────────────────────────────────────────────────────┘
+IMG_DIRS=("$HOME/Pictures/Wallpapers")
+VID_DIRS=("$HOME/Pictures/Wallpapers")
+
 STATE="${XDG_RUNTIME_DIR:-/tmp}/live-wallpaper.last"
 TAB=$'\t'
 
 # Thumbnail cache — 5K wallpapers decode slowly, so preview a small cached copy.
 CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/wallpaper-thumbs"
 mkdir -p "$CACHE"
+
+# Fitted-wallpaper cache — oversized stills get downscaled to the monitor once
+# (high-quality Lanczos), so swww blits a perfectly-sized image instead of
+# resampling a 5K source on every set. Keyed by path+mtime+target so it's stable.
+FITCACHE="${XDG_CACHE_HOME:-$HOME/.cache}/wallpaper-fitted"
+mkdir -p "$FITCACHE"
+
+# monitor_dims → "WxH" of the largest connected monitor (physical pixels).
+monitor_dims() {
+    hyprctl monitors -j 2>/dev/null \
+        | jq -r 'max_by(.width*.height) | "\(.width)x\(.height)"' 2>/dev/null \
+        || echo "1920x1080"
+}
+
+# fit_to_screen <image> → prints a path swww should display. If the source is
+# wider/taller than the monitor it's downscaled to fit (aspect preserved, only
+# ever shrinks — "WxH>"); otherwise the original path is returned untouched.
+fit_to_screen() {
+    local f="$1" dims sw sh w h mt key out
+    dims="$(monitor_dims)"; sw="${dims%x*}"; sh="${dims#*x}"
+    read -r w h < <(magick identify -format '%w %h\n' "$f" 2>/dev/null) || { printf '%s\n' "$f"; return; }
+    if (( w <= sw && h <= sh )); then printf '%s\n' "$f"; return; fi
+    mt="$(stat -c %Y "$f" 2>/dev/null || echo 0)"
+    key="$(printf '%s:%s:%s' "$f" "$mt" "$dims" | sha1sum | cut -d' ' -f1)"
+    out="$FITCACHE/$key.jpg"
+    if [[ ! -f "$out" ]]; then
+        local tmp="$FITCACHE/$key.$$.tmp.jpg"
+        if magick "$f" -auto-orient -filter Lanczos -resize "${sw}x${sh}>" \
+               -strip -quality 95 "jpg:$tmp" 2>/dev/null; then
+            mv -f "$tmp" "$out"
+        else
+            rm -f "$tmp"; printf '%s\n' "$f"; return
+        fi
+    fi
+    printf '%s\n' "$out"
+}
 
 # thumb <image> → prints path to a cached 640px thumbnail, generating on miss.
 # Keyed by path+mtime so edited images regenerate. Atomic write avoids races
@@ -112,7 +155,8 @@ if [[ "${1:-}" == "__inner" ]]; then
     type="$(cut -f3 <<<"$choice")"
 
     ensure_swww() { pgrep -x swww-daemon >/dev/null || { swww-daemon & sleep 0.4; }; }
-    set_static()  { ensure_swww; swww img "$1" --transition-type grow --transition-pos 0.5,0.5 \
+    set_static()  { ensure_swww; local f; f="$(fit_to_screen "$1")"
+                    swww img "$f" --transition-type grow --transition-pos 0.5,0.5 \
                         --transition-duration 0.8 --transition-fps 60; }
 
     case "$type" in
