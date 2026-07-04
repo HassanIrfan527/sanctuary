@@ -133,6 +133,17 @@ for entry in "${LINKS[@]}"; do
   link_one "$src" "$dest"
 done
 
+# ── seed runtime files that are git-ignored (absent on a fresh clone) ──
+# kitty.conf does `include current-theme.conf`, but that file is regenerated
+# by theme-switch.sh and not tracked. Seed it with the dark theme so kitty
+# works on a fresh machine before the first theme switch.
+seed_theme="$DOTFILES/kitty/kitty/current-theme.conf"
+if [[ ! -e "$seed_theme" ]]; then
+  say ""
+  run "cp '$DOTFILES/themes/themes/mocha/kitty.conf' '$seed_theme'"
+  say "→ seeded: kitty current-theme.conf (dark default)"
+fi
+
 say ""
 if [[ $DRY_RUN == 0 && -d "$BACKUP_DIR" ]]; then
   say "Anything replaced was backed up to: $BACKUP_DIR"
