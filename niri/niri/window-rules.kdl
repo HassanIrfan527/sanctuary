@@ -1,0 +1,38 @@
+// ── Window rules ──────────────────────────────────────────────────────
+window-rule {
+    geometry-corner-radius 10
+    clip-to-geometry true
+    draw-border-with-background false
+}
+
+window-rule {
+    match app-id="org.gnome.Calculator"
+    match app-id="org.gnome.Calendar"
+    match app-id="org.gnome.Weather"
+    match app-id="pavucontrol"
+    match app-id="nm-connection-editor"
+    open-floating true
+}
+
+// Picture-in-Picture floats.
+window-rule {
+    match title="Picture-in-Picture"
+    open-floating true
+}
+
+// File dialogs float.
+window-rule {
+    match title="^(Open File|Save As|Open Folder)"
+    open-floating true
+}
+
+//  cozy drawer apps float (sizes were HL pixel-placements; niri just
+// floats them centered for now — we can fine-tune positions later).
+window-rule {
+    match app-id="affirm-drawer"
+    match app-id="wiremix"
+    match app-id="impala-wifi"
+    match app-id="wallpaper-picker"
+    match app-id="quote-picker"
+    open-floating true
+}

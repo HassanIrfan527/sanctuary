@@ -1,0 +1,16 @@
+include "input.kdl"
+include "layout.kdl"
+include "environment.kdl"
+include "startup.kdl"
+include "window-rules.kdl"
+include "effects.kdl"
+include "binds.kdl"
+
+// ── Misc top-level ────────────────────────────────────────────────────
+prefer-no-csd
+screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
+
+// Don't pop the keybind cheatsheet on every startup (Mod+Shift+/ still shows it).
+hotkey-overlay {
+    skip-at-startup
+}

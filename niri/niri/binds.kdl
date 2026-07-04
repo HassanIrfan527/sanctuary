@@ -1,0 +1,151 @@
+// ── Keybinds ──────────────────────────────────────────────────────────
+binds {
+    // Show this whole list on screen (niri native bonus).
+    Mod+Shift+Slash { show-hotkey-overlay; }
+
+    //── Launch apps ──
+    Mod+Return hotkey-overlay-title="Terminal" { spawn "kitty"; }
+    Mod+E      { spawn "sh" "-c" "kitty -e yazi"; }
+    Mod+Y      { spawn "nautilus"; }
+    Mod+B      { spawn "brave-browser"; }
+    Mod+Z      { spawn "flatpak" "run" "app.zen_browser.zen"; }
+    Mod+Space  hotkey-overlay-title="Launcher" { spawn "walker"; }
+    Mod+O      { spawn "sh" "-c" "~/.config/hypr/scripts/toggle-bottom-bar.sh"; }
+    Mod+A      { spawn "sh" "-c" "~/.config/hypr/scripts/affirmation.sh"; }
+    Mod+Alt+A  { spawn "sh" "-c" "~/.config/hypr/scripts/ambient.sh"; }
+    Mod+Period { spawn "sh" "-c" "~/.config/hypr/scripts/recall.sh"; }
+    Mod+Shift+C { spawn "sh" "-c" "~/.config/hypr/scripts/color-picker.sh"; }
+    Mod+Slash  { spawn "sh" "-c" "~/.config/hypr/scripts/cheatsheet.sh"; }
+    Mod+Shift+W { spawn "sh" "-c" "~/.config/hypr/scripts/wallpaper-picker.sh"; }
+    Mod+Alt+W  { spawn "sh" "-c" "~/.config/hypr/scripts/quote-wallpaper.sh"; }
+    Mod+Alt+Shift+W { spawn "sh" "-c" "~/.config/hypr/scripts/quote-wallpaper.sh --pick"; }
+    Mod+Alt+Z  { spawn "sh" "-c" "~/.config/hypr/scripts/zen-mode.sh"; }
+    Mod+Shift+Z { spawn "sh" "-c" "~/.dotfiles/scripts/journal.py"; }
+
+    //── Overview ──  zoomed-out view of all workspaces/columns; drag windows around
+    Mod+Tab { toggle-overview; }
+
+    //── Window management ──
+    Mod+W       { close-window; }
+    Mod+F       { maximize-column; }        // HL fullscreen 1
+    Mod+Shift+F { fullscreen-window; }      // HL fullscreen 0
+    Mod+Shift+V { toggle-window-floating; }
+    Mod+Alt+C   { center-column; }
+    Mod+V       { spawn "walker" "--provider" "clipboard"; }
+
+    //── Focus (vim) ──  H/L = columns, J/K = rows in a column
+    Mod+H { focus-column-left; }
+    Mod+L { focus-column-right; }
+    Mod+J { focus-window-down; }
+    Mod+K { focus-window-up; }
+    Mod+Left  { focus-column-left; }
+    Mod+Right { focus-column-right; }
+    Mod+Down  { focus-window-down; }
+    Mod+Up    { focus-window-up; }
+    Mod+Semicolon { spawn "sh" "-c" "~/.config/hypr/scripts/window-jump.sh"; }
+
+    //── Move window ──
+    Mod+Shift+H { move-column-left; }
+    Mod+Shift+L { move-column-right; }
+    Mod+Shift+J { move-window-down; }
+    Mod+Shift+K { move-window-up; }
+    Mod+Shift+Left  { move-column-left; }
+    Mod+Shift+Right { move-column-right; }
+    Mod+Shift+Down  { move-window-down; }
+    Mod+Shift+Up    { move-window-up; }
+
+    //── Swap / column shuffle (HL swapwindow) ──
+    // H/L pull-into / push-out-of column (niri's special move). J/K shift in column.
+    Mod+Ctrl+H { consume-or-expel-window-left; }
+    Mod+Ctrl+L { consume-or-expel-window-right; }
+    Mod+Ctrl+J { move-window-down; }
+    Mod+Ctrl+K { move-window-up; }
+
+    //── Resize ──
+    Mod+R       { switch-preset-column-width; }   // cycle the preset widths
+    Mod+Alt+H   { set-column-width "-10%"; }
+    Mod+Alt+L   { set-column-width "+10%"; }
+    Mod+Alt+K   { set-window-height "-10%"; }
+    Mod+Alt+J   { set-window-height "+10%"; }
+
+    //── Columns by index ──  Mod+N jumps to the Nth column in this workspace
+    Mod+1 { focus-column 1; }
+    Mod+2 { focus-column 2; }
+    Mod+3 { focus-column 3; }
+    Mod+4 { focus-column 4; }
+    Mod+5 { focus-column 5; }
+    Mod+6 { focus-column 6; }
+    Mod+7 { focus-column 7; }
+    Mod+8 { focus-column 8; }
+    Mod+9 { focus-column 9; }
+
+    //── Workspaces (niri stacks them vertically) ──  number keys now do columns,
+    // so workspace nav lives on your unified prev/next:
+    Mod+P { focus-workspace-up; }     //   unified "prev"
+    Mod+N { focus-workspace-down; }   //   unified "next"
+
+    //── Reorder column to index ──  Mod+Shift+N makes this the Nth column
+    Mod+Shift+1 { move-column-to-index 1; }
+    Mod+Shift+2 { move-column-to-index 2; }
+    Mod+Shift+3 { move-column-to-index 3; }
+    Mod+Shift+4 { move-column-to-index 4; }
+    Mod+Shift+5 { move-column-to-index 5; }
+    Mod+Shift+6 { move-column-to-index 6; }
+    Mod+Shift+7 { move-column-to-index 7; }
+    Mod+Shift+8 { move-column-to-index 8; }
+    Mod+Shift+9 { move-column-to-index 9; }
+
+    //── Move column to another workspace ──  prev/next on the letter keys
+    Mod+Shift+P { move-column-to-workspace-up; }
+    Mod+Shift+N { move-column-to-workspace-down; }
+
+    //── System ──
+    Mod+Escape       { spawn "hyprlock"; }
+    Mod+Shift+Escape { spawn "busctl" "--system" "call" "org.freedesktop.DisplayManager" "/org/freedesktop/DisplayManager/Seat0" "org.freedesktop.DisplayManager.Seat" "SwitchToGreeter"; }
+    Mod+Delete       { spawn "walker" "--provider" "menus:commands"; }
+    Mod+M            { spawn "sh" "-c" "~/.config/hypr/scripts/caffeine.sh"; }
+    Mod+Shift+E      { quit; }   // exit niri (asks to confirm)
+
+    //── keyd NAVIGATION mode (F24 phantom) ──
+    F24     { spawn "sh" "-c" "~/.config/hypr/scripts/keyd-mode.sh toggle"; }
+    Mod+F24 { spawn "sh" "-c" "~/.config/hypr/scripts/keyd-mode.sh toggle"; }
+
+    //── keyd ARROWS mode — ijkl → arrows (F23 phantom, toggled via Super+Alt+G) ──
+    F23         { spawn "sh" "-c" "~/.config/hypr/scripts/keyd-arrows.sh toggle"; }
+    Mod+F23     { spawn "sh" "-c" "~/.config/hypr/scripts/keyd-arrows.sh toggle"; }
+    Alt+F23     { spawn "sh" "-c" "~/.config/hypr/scripts/keyd-arrows.sh toggle"; }
+    Mod+Alt+F23 { spawn "sh" "-c" "~/.config/hypr/scripts/keyd-arrows.sh toggle"; }
+
+    //── Screenshots (  satty pipeline) ──
+    Print       { spawn "sh" "-c" "~/.config/hypr/scripts/screenshot.sh area"; }
+    Shift+Print { spawn "sh" "-c" "~/.config/hypr/scripts/screenshot.sh edit"; }
+    Mod+Print   { spawn "sh" "-c" "~/.config/hypr/scripts/screenshot.sh screen"; }
+
+    //── Media / volume (via swayosd for the OSD) ──
+    Mod+Shift+A { spawn "kitty" "--class=wiremix" "--title=wiremix" "-e" "wiremix"; }
+    Mod+Shift+M { spawn "playerctl" "play-pause"; }
+    Mod+Shift+BracketRight { spawn "playerctl" "next"; }
+    Mod+Shift+BracketLeft  { spawn "playerctl" "previous"; }
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "swayosd-client" "--output-volume" "raise"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "swayosd-client" "--output-volume" "lower"; }
+    XF86AudioMute        allow-when-locked=true { spawn "swayosd-client" "--output-volume" "mute-toggle"; }
+    Mod+Equal { spawn "swayosd-client" "--output-volume" "raise"; }
+    Mod+Minus { spawn "swayosd-client" "--output-volume" "lower"; }
+    Mod+0     { spawn "swayosd-client" "--output-volume" "mute-toggle"; }
+    XF86MonBrightnessUp   allow-when-locked=true { spawn "swayosd-client" "--brightness" "raise"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "swayosd-client" "--brightness" "lower"; }
+
+    //── Key sounds + theme ──
+    Mod+Shift+B { spawn "sh" "-c" "~/.config/hypr/scripts/toggle-keysounds.sh"; }
+    Mod+Alt+B   { spawn "sh" "-c" "~/.config/hypr/scripts/switch-keysound-theme.sh"; }
+    Mod+Alt+T   { spawn "sh" "-c" "~/.dotfiles/themes/themes/theme-switch.sh toggle"; }
+
+    //── Bug capture ──
+    Mod+I       { spawn "sh" "-c" "~/.config/hypr/scripts/bug-capture.sh"; }
+    Mod+Shift+I { spawn "kitty" "--class=bug-browse" "--title=bugs" "-e" "zsh" "-i" "-c" "cd \"$BUG_DIR\" && nvim \"$(ls -t *.md 2>/dev/null | fzf)\""; }
+
+    //── Night light (wl-gammarelay-rs over D-Bus — instant, no flicker) ──
+    Mod+Shift+Equal { spawn "sh" "-c" "busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Temperature q 3500"; }   // warmer
+    Mod+Shift+Minus { spawn "sh" "-c" "busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Temperature q 4500"; }   // lighter
+    Mod+Shift+0     { spawn "sh" "-c" "busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Temperature q 3800"; }   // baseline 3800K
+}

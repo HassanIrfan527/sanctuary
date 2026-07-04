@@ -1,0 +1,33 @@
+// ── Layout ────────────────────────────────────────────────────────────
+layout {
+    gaps 4                          // inner gap BETWEEN windows (= Hyprland gaps_in 4)
+    struts {
+        left 8
+        right 8
+        top 8
+        bottom 8
+    }
+    center-focused-column "never"   // columns stay put; never auto-recenter
+
+    // Widths cycled by Mod+R. This IS niri's "resize" idiom.
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+    default-column-width { proportion 0.5; }
+
+    border {
+        on
+        width 2
+        active-color "#b4befe"      // focused —  mocha lavender accent
+        inactive-color "#6c7086"    // unfocused —  $inactive
+    }
+    focus-ring { off; }
+}
+
+// ── Overview ──────────────────────────────────────────────────────────
+overview {
+    // zoom 0.5            // 1.0 = no zoom, smaller = further out (default ~0.5)
+    backdrop-color "#1e1e2e"
+}

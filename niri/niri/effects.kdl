@@ -1,0 +1,8 @@
+blur {
+    passes 1        // downsample/upsample iterations — more = larger, smoother, costs GPU
+    offset 5        // per-pass pixel spread; >1 smooths further at NO extra GPU cost
+    noise 0.02      // tiny grain to kill colour banding from the blur
+    saturation 1.3   // 1 = normal; raise for punchier colours behind glass
+    on
+}
+
