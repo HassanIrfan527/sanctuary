@@ -9,9 +9,9 @@ FixedOrder = true
 Action = "/home/anonymous/.config/swaync/scripts/notif-history.sh remove %VALUE%"
 
 function GetEntries()
-    local entries = {}
+	local entries = {}
 
-    local cmd = [[
+	local cmd = [[
 tac '/home/anonymous/.local/state/swaync/history.jsonl' 2>/dev/null | jq -r '
   (now - .ts) as $d |
   (if   $d < 60    then "now"
@@ -22,44 +22,47 @@ tac '/home/anonymous/.local/state/swaync/history.jsonl' 2>/dev/null | jq -r '
 ' 2>/dev/null
 ]]
 
-    local count = 0
-    local handle = io.popen(cmd)
-    if handle then
-        for line in handle:lines() do
-            local id, app, summary, body, rel =
-                line:match("^([^\t]*)\t([^\t]*)\t([^\t]*)\t([^\t]*)\t([^\t]*)$")
-            if id then
-                count = count + 1
+	local count = 0
+	local handle = io.popen(cmd)
+	if handle then
+		for line in handle:lines() do
+			local id, app, summary, body, rel = line:match("^([^\t]*)\t([^\t]*)\t([^\t]*)\t([^\t]*)\t([^\t]*)$")
+			if id then
+				count = count + 1
 
-                local title = app
-                if summary ~= "" then title = app .. "  ·  " .. summary end
+				local title = app
+				if summary ~= "" then
+					title = app .. "  ·  " .. summary
+				end
 
-                local sub = rel
-                if body ~= "" then sub = rel .. "   " .. body end
+				local sub = rel
+				if body ~= "" then
+					sub = rel .. "   " .. body
+				end
 
-                table.insert(entries, {
-                    Text = title,
-                    Subtext = sub,
-                    Value = id,
-                })
-            end
-        end
-        handle:close()
-    end
+				table.insert(entries, {
+					Text = title,
+					Subtext = sub,
+					Value = id,
+				})
+			end
+		end
+		handle:close()
+	end
 
-    if count == 0 then
-        table.insert(entries, {
-            Text = "all caught up",
-            Subtext = "no notifications  󰂠",
-            Value = "",
-        })
-    else
-        table.insert(entries, {
-            Text = "clear all",
-            Subtext = "dismiss every notification",
-            Value = "__ALL__",
-        })
-    end
+	if count == 0 then
+		table.insert(entries, {
+			Text = "all caught up",
+			Subtext = "no notifications  󰂠",
+			Value = "",
+		})
+	else
+		table.insert(entries, {
+			Text = "clear all",
+			Subtext = "dismiss every notification",
+			Value = "__ALL__",
+		})
+	end
 
-    return entries
+	return entries
 end
