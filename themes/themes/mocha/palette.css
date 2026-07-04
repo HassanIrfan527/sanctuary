@@ -29,8 +29,9 @@
 @define-color flamingo   #f2cdcd;
 @define-color red        #f38ba8;
 
-/* legibility (waybar): transparent bar + transparent pill base (tints float over the blurred
-   dark layer, unchanged) + faint dark text-shadow */
+/* legibility (waybar): bar stays transparent (floating pills); each PILL gets a
+   translucent dark base so it has body WITHOUT relying on compositor blur (niri
+   has none). On Hyprland the blur still sits behind it, so it reads fine there too. */
 @define-color bar_bg     rgba(0, 0, 0, 0);
-@define-color pill_base  rgba(0, 0, 0, 0);
+@define-color pill_base  rgba(30, 30, 46, 0.60);
 @define-color shadow     rgba(0, 0, 0, 0.35);

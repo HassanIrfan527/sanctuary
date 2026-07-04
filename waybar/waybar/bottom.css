@@ -47,6 +47,10 @@ window#waybar {
   background-color: @peach;
   color: @black;
 }
+#custom-keyd.arrows {
+  background-color: @sky;
+  color: @black;
+}
 
 #custom-mode.terminal {
   background-color: @lavender;
