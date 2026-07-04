@@ -1,3 +1,7 @@
 # Python
 __pycache__/
 *.py[cod]
+
+# Editor/session backups — regenerated, not config
+*.bak
+*.gnome-backup
