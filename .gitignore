@@ -5,3 +5,6 @@ __pycache__/
 # Editor/session backups — regenerated, not config
 *.bak
 *.gnome-backup
+
+# Runtime theme state — rewritten by theme-switch.sh on every toggle
+kitty/kitty/current-theme.conf
