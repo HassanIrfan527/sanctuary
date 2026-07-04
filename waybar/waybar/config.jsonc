@@ -25,6 +25,7 @@
         "clock"
     ],
     "modules-right": [
+        "custom/boot",
         "custom/mic",
         "tray",
         "image#pet"
@@ -60,8 +61,8 @@
             "class<com.bitwarden.desktop>": "󰌾",
             "class<com.getpostman.Postman>": "󰦔 ",
             "class<scratchterm>": " ",
-            "class<beekeeper-studio>": " "
-            ,"class<firefox>": "󰈹 ",
+            "class<beekeeper-studio>": " ",
+            "class<firefox>": "󰈹 ",
             "class<librewolf>": "󰈹 ",
             "class<[Cc]hromium>": "󰊯 ",
             "class<google-chrome>": "󰊯 ",
@@ -121,6 +122,10 @@
     "clock": {
         "format": "{:%I:%M %p · %a %d}",
         "tooltip-format": "<tt>{calendar}</tt>"
+    },
+    "custom/boot": {
+        "exec": "/home/anonymous/.config/waybar/scripts/boot.py",
+        "interval": 60
     },
     "custom/mic": {
         "exec": "/home/anonymous/.config/waybar/scripts/mic.sh",
