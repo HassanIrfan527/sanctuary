@@ -11,7 +11,7 @@
         "custom/niri-minimap",
         "custom/niri-odometer",
         "hyprland/workspaces",
-        "mpris"
+        "mpris",
     ],
     "niri/workspaces": {
         "current-only": true,

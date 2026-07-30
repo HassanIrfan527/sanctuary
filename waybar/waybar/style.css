@@ -53,7 +53,7 @@ window#waybar {
     alpha(@lavender, 0.22),
     alpha(@lavender, 0.22)
   );
-  padding: 2px 4px;
+  padding: 2px 10px;
 }
 
 /* niri column minimap — sky (where you are in the scroll strip) */

@@ -1,6 +1,6 @@
 // ── Window rules ──────────────────────────────────────────────────────
 window-rule {
-    geometry-corner-radius 10
+    geometry-corner-radius 20
     clip-to-geometry true
     draw-border-with-background false
 }
@@ -35,4 +35,15 @@ window-rule {
     match app-id="wallpaper-picker"
     match app-id="quote-picker"
     open-floating true
+}
+
+
+// Set the overview wallpaper on the backdrop.
+layer-rule {
+  match namespace="^noctalia-overview*"
+  place-within-backdrop true
+}
+layer-rule {
+    match namespace="^noctalia-backdrop"
+    place-within-backdrop true
 }

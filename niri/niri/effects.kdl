@@ -1,8 +1,15 @@
 blur {
-    passes 1        // downsample/upsample iterations — more = larger, smoother, costs GPU
-    offset 5        // per-pass pixel spread; >1 smooths further at NO extra GPU cost
-    noise 0.02      // tiny grain to kill colour banding from the blur
+    passes 2        // downsample/upsample iterations — more = larger, smoother, costs GPU
+    offset 3.0        // per-pass pixel spread; >1 smooths further at NO extra GPU cost
+    noise 0.03      // tiny grain to kill colour banding from the blur
     saturation 1.3   // 1 = normal; raise for punchier colours behind glass
     on
 }
 
+/* Noctalia: blur everywhere without xray for a better look */
+layer-rule {
+  match namespace="^noctalia-(background|launcher-overlay|dock)-.*$"
+  background-effect {
+    xray false
+  }
+}

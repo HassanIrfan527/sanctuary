@@ -2,19 +2,6 @@
 #
 # install.sh — a tiny, explicit replacement for GNU Stow.
 #
-# WHAT STOW DID FOR YOU (the magic you didn't know about):
-#   Stow read `.stowrc` (which said `--target=~/.config`), then for every
-#   top-level folder here it symlinked that folder's *contents* into
-#   ~/.config. e.g. the folder `hypr/hypr/` became the symlink
-#   `~/.config/hypr -> ~/.dotfiles/hypr/hypr`. The double-nesting
-#   (`hypr/hypr`) existed ONLY to feed Stow's package model.
-#
-# WHAT THIS SCRIPT DOES INSTEAD:
-#   No magic, no package model. Just an explicit list below of
-#   "this file/folder in the repo  ->  goes to this path on disk".
-#   You can read every line and know exactly what happens. To add a new
-#   config, add one line to the LINKS array. That's the whole tool.
-#
 # SAFETY:
 #   - If a link is already correct, it's left alone (idempotent).
 #   - If something REAL is in the way, it's moved to a timestamped backup

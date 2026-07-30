@@ -8,7 +8,7 @@ layout {
         bottom 8
     }
     center-focused-column "never"   // columns stay put; never auto-recenter
-
+    // always-center-single-column
     // Widths cycled by Mod+R. This IS niri's "resize" idiom.
     preset-column-widths {
         proportion 0.33333

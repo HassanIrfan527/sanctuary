@@ -2,24 +2,35 @@
 binds {
     // Show this whole list on screen (niri native bonus).
     Mod+Shift+Slash { show-hotkey-overlay; }
-
     //── Launch apps ──
     Mod+Return hotkey-overlay-title="Terminal" { spawn "kitty"; }
     Mod+E      { spawn "sh" "-c" "kitty -e yazi"; }
     Mod+Y      { spawn "nautilus"; }
     Mod+B      { spawn "brave-browser"; }
     Mod+Z      { spawn "flatpak" "run" "app.zen_browser.zen"; }
-    Mod+Space  hotkey-overlay-title="Launcher" { spawn "walker"; }
-    Mod+O      { spawn "sh" "-c" "~/.config/hypr/scripts/toggle-bottom-bar.sh"; }
-    Mod+A      { spawn "sh" "-c" "~/.config/hypr/scripts/affirmation.sh"; }
-    Mod+Alt+A  { spawn "sh" "-c" "~/.config/hypr/scripts/ambient.sh"; }
-    Mod+Period { spawn "sh" "-c" "~/.config/hypr/scripts/recall.sh"; }
-    Mod+Shift+C { spawn "sh" "-c" "~/.config/hypr/scripts/color-picker.sh"; }
-    Mod+Slash  { spawn "sh" "-c" "~/.config/hypr/scripts/cheatsheet.sh"; }
-    Mod+Shift+W { spawn "sh" "-c" "~/.config/hypr/scripts/wallpaper-picker.sh"; }
-    Mod+Alt+W  { spawn "sh" "-c" "~/.config/hypr/scripts/quote-wallpaper.sh"; }
-    Mod+Alt+Shift+W { spawn "sh" "-c" "~/.config/hypr/scripts/quote-wallpaper.sh --pick"; }
-    Mod+Alt+Z  { spawn "sh" "-c" "~/.config/hypr/scripts/zen-mode.sh"; }
+
+    Mod+Space { spawn-sh "qs -c noctalia-shell ipc call launcher toggle"; }
+    Mod+V { spawn-sh "qs -c noctalia-shell ipc call launcher clipboard"; }
+
+    Mod+O { spawn-sh "qs -c noctalia-shell ipc call controlCenter toggle"; }
+
+    Mod+I { spawn-sh "qs -c noctalia-shell ipc call settings toggle"; }
+    // Audio & Brightness
+
+    XF86AudioRaiseVolume { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "increase"; }
+    Mod+Equal { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "increase"; }
+
+    XF86AudioLowerVolume { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "decrease"; }
+    Mod+Minus { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "decrease"; }
+
+    XF86AudioMute { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "muteOutput"; }
+    Mod+0 { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "muteOutput"; }
+
+    XF86MonBrightnessUp { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "brightness" "increase"; }
+    XF86MonBrightnessDown { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "brightness" "decrease"; }
+
+
+    Mod+Shift+W { spawn-sh "qs -c noctalia-shell ipc call wallpaper toggle"; }
     Mod+Shift+Z { spawn "sh" "-c" "~/.dotfiles/scripts/journal.py"; }
 
     //── Overview ──  zoomed-out view of all workspaces/columns; drag windows around
@@ -31,7 +42,6 @@ binds {
     Mod+Shift+F { fullscreen-window; }      // HL fullscreen 0
     Mod+Shift+V { toggle-window-floating; }
     Mod+Alt+C   { center-column; }
-    Mod+V       { spawn "walker" "--provider" "clipboard"; }
 
     //── Focus (vim) ──  H/L = columns, J/K = rows in a column
     Mod+H { focus-column-left; }
@@ -42,7 +52,6 @@ binds {
     Mod+Right { focus-column-right; }
     Mod+Down  { focus-window-down; }
     Mod+Up    { focus-window-up; }
-    Mod+Semicolon { spawn "sh" "-c" "~/.config/hypr/scripts/window-jump.sh"; }
 
     //── Move window ──
     Mod+Shift+H { move-column-left; }
@@ -100,12 +109,7 @@ binds {
     Mod+Shift+N { move-column-to-workspace-down; }
 
     //── System ──
-    Mod+Escape       { spawn "hyprlock"; }
-    Mod+Shift+Escape { spawn "busctl" "--system" "call" "org.freedesktop.DisplayManager" "/org/freedesktop/DisplayManager/Seat0" "org.freedesktop.DisplayManager.Seat" "SwitchToGreeter"; }
-    Mod+Delete       { spawn "walker" "--provider" "menus:commands"; }
-    Mod+M            { spawn "sh" "-c" "~/.config/hypr/scripts/caffeine.sh"; }
-    Mod+Shift+E      { quit; }   // exit niri (asks to confirm)
-
+    Mod+Escape { spawn-sh "qs -c noctalia-shell ipc call lockScreen lock"; }
     //── keyd NAVIGATION mode (F24 phantom) ──
     F24     { spawn "sh" "-c" "~/.config/hypr/scripts/keyd-mode.sh toggle"; }
     Mod+F24 { spawn "sh" "-c" "~/.config/hypr/scripts/keyd-mode.sh toggle"; }
@@ -117,23 +121,17 @@ binds {
     Mod+Alt+F23 { spawn "sh" "-c" "~/.config/hypr/scripts/keyd-arrows.sh toggle"; }
 
     //── Screenshots (  satty pipeline) ──
-    Print       { spawn "sh" "-c" "~/.config/hypr/scripts/screenshot.sh area"; }
-    Shift+Print { spawn "sh" "-c" "~/.config/hypr/scripts/screenshot.sh edit"; }
-    Mod+Print   { spawn "sh" "-c" "~/.config/hypr/scripts/screenshot.sh screen"; }
+    // Print       { spawn "sh" "-c" "~/.config/hypr/scripts/screenshot.sh area"; }
+    // Shift+Print { spawn "sh" "-c" "~/.config/hypr/scripts/screenshot.sh edit"; }
+    // Mod+Print   { spawn "sh" "-c" "~/.config/hypr/scripts/screenshot.sh screen"; }
 
     //── Media / volume (via swayosd for the OSD) ──
-    Mod+Shift+A { spawn "kitty" "--class=wiremix" "--title=wiremix" "-e" "wiremix"; }
+    // Mod+Shift+A { spawn "kitty" "--class=wiremix" "--title=wiremix" "-e" "wiremix"; }
     Mod+Shift+M { spawn "playerctl" "play-pause"; }
     Mod+Shift+BracketRight { spawn "playerctl" "next"; }
     Mod+Shift+BracketLeft  { spawn "playerctl" "previous"; }
-    XF86AudioRaiseVolume allow-when-locked=true { spawn "swayosd-client" "--output-volume" "raise"; }
-    XF86AudioLowerVolume allow-when-locked=true { spawn "swayosd-client" "--output-volume" "lower"; }
-    XF86AudioMute        allow-when-locked=true { spawn "swayosd-client" "--output-volume" "mute-toggle"; }
-    Mod+Equal { spawn "swayosd-client" "--output-volume" "raise"; }
-    Mod+Minus { spawn "swayosd-client" "--output-volume" "lower"; }
-    Mod+0     { spawn "swayosd-client" "--output-volume" "mute-toggle"; }
-    XF86MonBrightnessUp   allow-when-locked=true { spawn "swayosd-client" "--brightness" "raise"; }
-    XF86MonBrightnessDown allow-when-locked=true { spawn "swayosd-client" "--brightness" "lower"; }
+    // XF86MonBrightnessUp   allow-when-locked=true { spawn "swayosd-client" "--brightness" "raise"; }
+    // XF86MonBrightnessDown allow-when-locked=true { spawn "swayosd-client" "--brightness" "lower"; }
 
     //── Key sounds + theme ──
     Mod+Shift+B { spawn "sh" "-c" "~/.config/hypr/scripts/toggle-keysounds.sh"; }
@@ -141,11 +139,9 @@ binds {
     Mod+Alt+T   { spawn "sh" "-c" "~/.dotfiles/themes/themes/theme-switch.sh toggle"; }
 
     //── Bug capture ──
-    Mod+I       { spawn "sh" "-c" "~/.config/hypr/scripts/bug-capture.sh"; }
-    Mod+Shift+I { spawn "kitty" "--class=bug-browse" "--title=bugs" "-e" "zsh" "-i" "-c" "cd \"$BUG_DIR\" && nvim \"$(ls -t *.md 2>/dev/null | fzf)\""; }
 
     //── Night light (wl-gammarelay-rs over D-Bus — instant, no flicker) ──
-    Mod+Shift+Equal { spawn "sh" "-c" "busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Temperature q 3500"; }   // warmer
-    Mod+Shift+Minus { spawn "sh" "-c" "busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Temperature q 4500"; }   // lighter
-    Mod+Shift+0     { spawn "sh" "-c" "busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Temperature q 3800"; }   // baseline 3800K
+    // Mod+Shift+Equal { spawn "sh" "-c" "busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Temperature q 3500"; }   // warmer
+    // Mod+Shift+Minus { spawn "sh" "-c" "busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Temperature q 4500"; }   // lighter
+    // Mod+Shift+0     { spawn "sh" "-c" "busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Temperature q 3800"; }   // baseline 3800K
 }

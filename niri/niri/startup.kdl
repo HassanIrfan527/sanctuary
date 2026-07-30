@@ -1,21 +1,4 @@
 // ── Startup ───────────────────────────────────────────────────────────
-// Ported from autostart.conf. Dropped: hyprpm reload (HL plugins),
-// hyprctl setcursor (HL), and hyprsunset (replaced by wl-gammarelay-rs below).
-spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP"
-spawn-at-startup "systemctl" "--user" "import-environment" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP"
-spawn-at-startup "hyprpolkitagent"
-spawn-at-startup "waybar"
-spawn-at-startup "swaync"
-spawn-at-startup "swww-daemon"
-spawn-at-startup "hypridle"
-spawn-at-startup "swayosd-server"
-spawn-at-startup "systemctl" "--user" "start" "elephant.service"
-spawn-at-startup "walker" "--gapplication-service"
-spawn-at-startup "gnome-keyring-daemon" "--start" "--components=secrets"
-spawn-at-startup "gsettings" "set" "org.gnome.desktop.interface" "color-scheme" "prefer-dark"
-spawn-at-startup "gsettings" "set" "org.gnome.desktop.interface" "gtk-theme" "catppuccin-mocha-lavender-standard+default"
-spawn-at-startup "gsettings" "set" "org.gnome.desktop.interface" "cursor-theme" "Drop-Purple"
-spawn-at-startup "gsettings" "set" "org.gnome.desktop.interface" "cursor-size" "24"
-spawn-at-startup "sh" "-c" "~/.config/hypr/scripts/keysounds-daemon.sh"
-// Night light — wl-gammarelay-rs daemon stays resident to HOLD the tint
-spawn-at-startup "sh" "-c" "~/.cargo/bin/wl-gammarelay-rs & sleep 1.5; busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Temperature q 3800"
+
+// For Noctalia shell
+spawn-at-startup "qs" "-c" "noctalia-shell"
