@@ -33,6 +33,7 @@ binds {
     Mod+Shift+W { spawn-sh "qs -c noctalia-shell ipc call wallpaper toggle"; }
     Mod+Shift+Z { spawn "sh" "-c" "~/.dotfiles/scripts/journal.py"; }
 
+    Mod+A {spawn-sh "qs -c noctalia-shell ipc call plugin:notes-scratchpad togglePanel";}
     //── Overview ──  zoomed-out view of all workspaces/columns; drag windows around
     Mod+Tab { toggle-overview; }
 
@@ -120,23 +121,20 @@ binds {
     Alt+F23     { spawn "sh" "-c" "~/.config/hypr/scripts/keyd-arrows.sh toggle"; }
     Mod+Alt+F23 { spawn "sh" "-c" "~/.config/hypr/scripts/keyd-arrows.sh toggle"; }
 
-    //── Screenshots (  satty pipeline) ──
+    //── Screenshots
     // Print       { spawn "sh" "-c" "~/.config/hypr/scripts/screenshot.sh area"; }
     // Shift+Print { spawn "sh" "-c" "~/.config/hypr/scripts/screenshot.sh edit"; }
     // Mod+Print   { spawn "sh" "-c" "~/.config/hypr/scripts/screenshot.sh screen"; }
 
-    //── Media / volume (via swayosd for the OSD) ──
-    // Mod+Shift+A { spawn "kitty" "--class=wiremix" "--title=wiremix" "-e" "wiremix"; }
+    //── Media / volume
+    Mod+Shift+A { spawn "kitty" "--class=wiremix" "--title=wiremix" "-e" "wiremix"; }
     Mod+Shift+M { spawn "playerctl" "play-pause"; }
     Mod+Shift+BracketRight { spawn "playerctl" "next"; }
     Mod+Shift+BracketLeft  { spawn "playerctl" "previous"; }
-    // XF86MonBrightnessUp   allow-when-locked=true { spawn "swayosd-client" "--brightness" "raise"; }
-    // XF86MonBrightnessDown allow-when-locked=true { spawn "swayosd-client" "--brightness" "lower"; }
 
     //── Key sounds + theme ──
-    Mod+Shift+B { spawn "sh" "-c" "~/.config/hypr/scripts/toggle-keysounds.sh"; }
-    Mod+Alt+B   { spawn "sh" "-c" "~/.config/hypr/scripts/switch-keysound-theme.sh"; }
-    Mod+Alt+T   { spawn "sh" "-c" "~/.dotfiles/themes/themes/theme-switch.sh toggle"; }
+    // Mod+Shift+B { spawn "sh" "-c" "~/.config/hypr/scripts/toggle-keysounds.sh"; }
+    // Mod+Alt+B   { spawn "sh" "-c" "~/.config/hypr/scripts/switch-keysound-theme.sh"; }
 
     //── Bug capture ──
 

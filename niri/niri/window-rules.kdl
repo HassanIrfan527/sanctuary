@@ -26,17 +26,6 @@ window-rule {
     open-floating true
 }
 
-//  cozy drawer apps float (sizes were HL pixel-placements; niri just
-// floats them centered for now — we can fine-tune positions later).
-window-rule {
-    match app-id="affirm-drawer"
-    match app-id="wiremix"
-    match app-id="impala-wifi"
-    match app-id="wallpaper-picker"
-    match app-id="quote-picker"
-    open-floating true
-}
-
 
 // Set the overview wallpaper on the backdrop.
 layer-rule {

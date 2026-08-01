@@ -5,6 +5,7 @@ include "startup.kdl"
 include "window-rules.kdl"
 include "effects.kdl"
 include "binds.kdl"
+include "./noctalia.kdl"
 
 // ── Misc top-level ────────────────────────────────────────────────────
 prefer-no-csd
@@ -19,4 +20,6 @@ debug {
   // Allows notification actions and window activation from Noctalia.
   honor-xdg-activation-with-invalid-serial
 }
+
+
 
