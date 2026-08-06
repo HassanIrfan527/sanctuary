@@ -4,36 +4,36 @@ binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
     //── Launch apps ──
     Mod+Return hotkey-overlay-title="Terminal" { spawn "kitty"; }
-    Mod+E      { spawn "sh" "-c" "kitty -e yazi"; }
+    Mod+E      { spawn "sh" "-c" "kitty -e superfile"; }
     Mod+Y      { spawn "nautilus"; }
-    Mod+B      { spawn "brave-browser"; }
+    Mod+B      { spawn "brave"; }
     Mod+Z      { spawn "flatpak" "run" "app.zen_browser.zen"; }
 
-    Mod+Space { spawn-sh "qs -c noctalia-shell ipc call launcher toggle"; }
-    Mod+V { spawn-sh "qs -c noctalia-shell ipc call launcher clipboard"; }
+    Mod+Space { spawn-sh "noctalia-shell ipc call launcher toggle"; }
+    Mod+V { spawn-sh "noctalia-shell ipc call launcher clipboard"; }
 
-    Mod+O { spawn-sh "qs -c noctalia-shell ipc call controlCenter toggle"; }
+    Mod+O { spawn-sh "noctalia-shell ipc call controlCenter toggle"; }
 
-    Mod+I { spawn-sh "qs -c noctalia-shell ipc call settings toggle"; }
+    Mod+I { spawn-sh "noctalia-shell ipc call settings toggle"; }
     // Audio & Brightness
 
-    XF86AudioRaiseVolume { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "increase"; }
-    Mod+Equal { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "increase"; }
+    XF86AudioRaiseVolume { spawn "noctalia-shell" "ipc" "call" "volume" "increase"; }
+    Mod+Equal { spawn "noctalia-shell" "ipc" "call" "volume" "increase"; }
 
-    XF86AudioLowerVolume { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "decrease"; }
-    Mod+Minus { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "decrease"; }
+    XF86AudioLowerVolume { spawn "noctalia-shell" "ipc" "call" "volume" "decrease"; }
+    Mod+Minus { spawn "noctalia-shell" "ipc" "call" "volume" "decrease"; }
 
-    XF86AudioMute { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "muteOutput"; }
-    Mod+0 { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "volume" "muteOutput"; }
+    XF86AudioMute { spawn "noctalia-shell" "ipc" "call" "volume" "muteOutput"; }
+    Mod+0 { spawn "noctalia-shell" "ipc" "call" "volume" "muteOutput"; }
 
-    XF86MonBrightnessUp { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "brightness" "increase"; }
-    XF86MonBrightnessDown { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "brightness" "decrease"; }
+    XF86MonBrightnessUp { spawn "noctalia-shell" "ipc" "call" "brightness" "increase"; }
+    XF86MonBrightnessDown { spawn "noctalia-shell" "ipc" "call" "brightness" "decrease"; }
 
 
-    Mod+Shift+W { spawn-sh "qs -c noctalia-shell ipc call wallpaper toggle"; }
+    Mod+Shift+W { spawn-sh "noctalia-shell ipc call wallpaper toggle"; }
     Mod+Shift+Z { spawn "sh" "-c" "~/.dotfiles/scripts/journal.py"; }
 
-    Mod+A {spawn-sh "qs -c noctalia-shell ipc call plugin:notes-scratchpad togglePanel";}
+    Mod+A {spawn-sh "noctalia-shell ipc call plugin:notes-scratchpad togglePanel";}
     //── Overview ──  zoomed-out view of all workspaces/columns; drag windows around
     Mod+Tab { toggle-overview; }
 
@@ -110,17 +110,7 @@ binds {
     Mod+Shift+N { move-column-to-workspace-down; }
 
     //── System ──
-    Mod+Escape { spawn-sh "qs -c noctalia-shell ipc call lockScreen lock"; }
-    //── keyd NAVIGATION mode (F24 phantom) ──
-    F24     { spawn "sh" "-c" "~/.config/hypr/scripts/keyd-mode.sh toggle"; }
-    Mod+F24 { spawn "sh" "-c" "~/.config/hypr/scripts/keyd-mode.sh toggle"; }
-
-    //── keyd ARROWS mode — ijkl → arrows (F23 phantom, toggled via Super+Alt+G) ──
-    F23         { spawn "sh" "-c" "~/.config/hypr/scripts/keyd-arrows.sh toggle"; }
-    Mod+F23     { spawn "sh" "-c" "~/.config/hypr/scripts/keyd-arrows.sh toggle"; }
-    Alt+F23     { spawn "sh" "-c" "~/.config/hypr/scripts/keyd-arrows.sh toggle"; }
-    Mod+Alt+F23 { spawn "sh" "-c" "~/.config/hypr/scripts/keyd-arrows.sh toggle"; }
-
+    Mod+Escape { spawn-sh "noctalia-shell ipc call lockScreen lock"; }
     //── Screenshots
     // Print       { spawn "sh" "-c" "~/.config/hypr/scripts/screenshot.sh area"; }
     // Shift+Print { spawn "sh" "-c" "~/.config/hypr/scripts/screenshot.sh edit"; }
@@ -132,14 +122,4 @@ binds {
     Mod+Shift+BracketRight { spawn "playerctl" "next"; }
     Mod+Shift+BracketLeft  { spawn "playerctl" "previous"; }
 
-    //── Key sounds + theme ──
-    // Mod+Shift+B { spawn "sh" "-c" "~/.config/hypr/scripts/toggle-keysounds.sh"; }
-    // Mod+Alt+B   { spawn "sh" "-c" "~/.config/hypr/scripts/switch-keysound-theme.sh"; }
-
-    //── Bug capture ──
-
-    //── Night light (wl-gammarelay-rs over D-Bus — instant, no flicker) ──
-    // Mod+Shift+Equal { spawn "sh" "-c" "busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Temperature q 3500"; }   // warmer
-    // Mod+Shift+Minus { spawn "sh" "-c" "busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Temperature q 4500"; }   // lighter
-    // Mod+Shift+0     { spawn "sh" "-c" "busctl --user set-property rs.wl-gammarelay / rs.wl.gammarelay Temperature q 3800"; }   // baseline 3800K
 }

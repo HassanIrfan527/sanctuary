@@ -28,42 +28,42 @@
     {
       "type": "chassis",
       "outputColor": "33",
-      "key": "  ├ ",
+      "key": "  ├ 󰪫 ",
       "keyColor": "36"
     },
     {
       "type": "cpu",
       "outputColor": "33",
-      "key": "  ├ ",
+      "key": "  ├  ",
       "keyColor": "36"
     },
     {
       "type": "gpu",
       "outputColor": "33",
-      "key": "  ├ ",
+      "key": "  ├  ",
       "keyColor": "36"
     },
     {
       "type": "memory",
       "outputColor": "33",
-      "key": "  ├ ",
+      "key": "  ├  ",
       "keyColor": "36"
     },
     {
       "type": "disk",
       "outputColor": "33",
-      "key": "  ├ ",
+      "key": "  ├  ",
       "keyColor": "36"
     },
     {
       "type": "display",
-      "key": "  ├ ",
+      "key": "  ├  ",
       "keyColor": "36",
       "outputColor": "33"
     },
     {
       "type": "battery",
-      "key": "  ├ ",
+      "key": "  ├  ",
       "keyColor": "36",
       "outputColor": "33"
     },
@@ -91,7 +91,7 @@
     },
     {
       "type": "kernel",
-      "key": "  ├ ",
+      "key": "  ├  ",
       "keyColor": "33",
       "outputColor": "36"
     },

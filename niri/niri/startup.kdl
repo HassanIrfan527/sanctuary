@@ -1,7 +1,4 @@
 // ── Startup ───────────────────────────────────────────────────────────
 
 // For Noctalia shell
-spawn-at-startup "qs" "-c" "noctalia-shell"
-
-spawn-at-startup "python3" "/home/anonymous/.local/bin/n8n-notify.py"
-spawn-at-startup "podman" "start" "n8n" "n8n_tunnel"
+spawn-at-startup "noctalia-shell"

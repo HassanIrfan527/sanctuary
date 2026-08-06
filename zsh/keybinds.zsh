@@ -1,7 +1,7 @@
 # Note: zsh-vi-mode handles `bindkey -v` and KEYTIMEOUT on its own.
 
 # fzf key bindings (Ctrl+R history, Ctrl+T files, Alt+C cd)
-source /usr/share/fzf/shell/key-bindings.zsh
+eval "$(fzf --zsh)"
 
 # Insert mode — keep familiar terminal keys working
 bindkey -M viins '^[[1;5C' forward-word
