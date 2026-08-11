@@ -14,6 +14,19 @@ window-rule {
     open-floating true
 }
 
+window-rule {
+    match app-id="keysound-launcher"
+    open-floating true
+    default-column-width { fixed 700; }
+    default-window-height { fixed 700; }
+}
+
+window-rule {
+    match title="Brave"
+
+    open-maximized true
+}
+
 // Picture-in-Picture floats.
 window-rule {
     match title="Picture-in-Picture"

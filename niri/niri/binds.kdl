@@ -1,13 +1,12 @@
 // ── Keybinds ──────────────────────────────────────────────────────────
 binds {
-    // Show this whole list on screen (niri native bonus).
-    Mod+Shift+Slash { show-hotkey-overlay; }
     //── Launch apps ──
     Mod+Return hotkey-overlay-title="Terminal" { spawn "kitty"; }
     Mod+E      { spawn "sh" "-c" "kitty -e superfile"; }
     Mod+Y      { spawn "nautilus"; }
     Mod+B      { spawn "brave"; }
-    Mod+Z      { spawn "flatpak" "run" "app.zen_browser.zen"; }
+
+    Mod+Shift+A { spawn-sh "noctalia-shell ipc call bar toggle"; }
 
     Mod+Space { spawn-sh "noctalia-shell ipc call launcher toggle"; }
     Mod+V { spawn-sh "noctalia-shell ipc call launcher clipboard"; }
@@ -71,6 +70,9 @@ binds {
     Mod+Ctrl+J { move-window-down; }
     Mod+Ctrl+K { move-window-up; }
 
+    // Tabs
+    Mod+G { toggle-column-tabbed-display; }
+
     //── Resize ──
     Mod+R       { switch-preset-column-width; }   // cycle the preset widths
     Mod+Alt+H   { set-column-width "-10%"; }
@@ -117,9 +119,9 @@ binds {
     // Mod+Print   { spawn "sh" "-c" "~/.config/hypr/scripts/screenshot.sh screen"; }
 
     //── Media / volume
-    Mod+Shift+A { spawn "kitty" "--class=wiremix" "--title=wiremix" "-e" "wiremix"; }
     Mod+Shift+M { spawn "playerctl" "play-pause"; }
     Mod+Shift+BracketRight { spawn "playerctl" "next"; }
     Mod+Shift+BracketLeft  { spawn "playerctl" "previous"; }
 
+Mod+Shift+S { spawn "kitty" "--class" "keysound-launcher" "-e" "/home/dweller/.dotfiles/scripts/keysounds.sh"; }
 }

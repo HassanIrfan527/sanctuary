@@ -2,3 +2,5 @@
 
 // For Noctalia shell
 spawn-at-startup "noctalia-shell"
+spawn-sh-at-startup "bash /home/$USER/.dotfiles/scripts/keysounds.sh"
+
