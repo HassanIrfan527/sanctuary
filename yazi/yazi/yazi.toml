@@ -34,7 +34,7 @@ reveal = [ { run = 'nautilus "$@"', desc = "Reveal in Nautilus",     orphan = tr
 [open]
 # First opener in each list = what Enter/o uses; the rest appear in the O picker.
 rules = [
-  { name = "*/", use = [ "edit", "open", "reveal" ] },
+  { url = "*/", use = [ "edit", "open", "reveal" ] },
 
   { mime = "text/*", use = [ "edit", "code", "open", "reveal" ] },
 
@@ -48,8 +48,8 @@ rules = [
   { mime = "application/epub+zip", use = [ "okular", "open", "reveal" ] },
 
   { mime = "text/html",                 use = [ "brave", "code", "edit", "reveal" ] },
-  { name = "*.{mkv,mp4,webm,mov,avi,m4v,flv,wmv,mpg,mpeg}", use = [ "mpv", "vlc", "open", "reveal" ] },
-  { name = "*.{mp3,flac,wav,ogg,opus,m4a,aac}",            use = [ "mpv", "vlc", "open", "reveal" ] },
+  { url = "*.{mkv,mp4,webm,mov,avi,m4v,flv,wmv,mpg,mpeg}", use = [ "mpv", "vlc", "open", "reveal" ] },
+  { url = "*.{mp3,flac,wav,ogg,opus,m4a,aac}",            use = [ "mpv", "vlc", "open", "reveal" ] },
 
   { mime = "application/{,g}zip",                            use = [ "open", "reveal" ] },
   { mime = "application/x-{tar,bzip*,7z-compressed,xz,rar}", use = [ "open", "reveal" ] },
