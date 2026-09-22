@@ -1,0 +1,4 @@
+- A python script to track my screentime and apps and website i visit
+- A python script to track my music usage
+- An fzf-based userscript for qutebrowser to fetch bookmarks
+- An fzf-based userscript for qutebrowser to fetch logins from rbw

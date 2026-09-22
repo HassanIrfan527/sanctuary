@@ -181,7 +181,7 @@ c.statusbar.widgets = [
     "tabs",
     "progress",
 ]
-c.hints.border = f'1px solid {palette["peach"]}'
+c.hints.border = f"1px solid {palette['peach']}"
 c.hints.radius = 4
 
 # -- Content blocking (ABP + host blocking) --
@@ -208,17 +208,13 @@ c.content.blocking.hosts.lists = [
 # -- Search engines (use as :open <key> <query>, e.g. ':open yt lo-fi') --
 c.url.searchengines = {
     "DEFAULT": "https://search.brave.com/search?q={}",
+    "nix": "https://search.nixos.org/packages?channel=unstable&query={}",
     "br": "https://search.brave.com/search?q={}",
     "ddg": "https://duckduckgo.com/?q={}",
     "sp": "https://www.startpage.com/sp/search?query={}",
-    "g": "https://www.google.com/search?q={}",
     "yt": "https://www.youtube.com/results?search_query={}",
     "gh": "https://github.com/search?q={}&type=repositories",
-    "gist": "https://gist.github.com/search?q={}",
-    "aw": "https://wiki.archlinux.org/index.php?search={}",
     "w": "https://en.wikipedia.org/wiki/Special:Search?search={}",
-    "aur": "https://aur.archlinux.org/packages?K={}",
-    "fp": "https://packages.fedoraproject.org/search?query={}",
     "red": "https://www.reddit.com/search/?q={}",
 }
 
@@ -245,6 +241,9 @@ config.bind("L", "forward")
 # Space+sv for opening in new window
 config.bind("<Space>sv", "open -w")
 
+# Launch the rbw fzf prompt to fill credentials
+# config.bind("<Space>lf", "spawn --userscript qute-rbw", mode="insert")
 # -- Userscripts (fuzzel-integrated) --
+
 # Pick a bookmark/quickmark via fuzzel and open in a new tab
-config.bind("<Space>fm", "spawn --userscript qute-fuzzel-bookmarks")
+# config.bind("<Space>fm", "spawn --userscript qute-fuzzel-bookmarks")

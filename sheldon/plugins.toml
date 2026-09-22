@@ -8,15 +8,12 @@ github = "jeffreytse/zsh-vi-mode"
 [plugins.zsh-autopair]
 github = "hlissner/zsh-autopair"
 
-[plugins.zsh-abbr]
-github = "olets/zsh-abbr"
-
 [plugins.fzf-tab]
 github = "Aloxaf/fzf-tab"
 
-# zsh-syntax-highlighting
-[plugins.zsh-syntax-highlighting]
-github = "zsh-users/zsh-syntax-highlighting"
+# fast-syntax-highlighting
+[plugins.fast-syntax-highlighting]
+github = "zdharma-continuum/fast-syntax-highlighting"
 
 [plugins.extract]
 github = "ohmyzsh/ohmyzsh"
