@@ -29,35 +29,26 @@ DRY_RUN=0
 # Destinations mostly land in ~/.config, but a few go straight to $HOME.
 LINKS=(
   # ── whole-directory links into ~/.config ──
-  "elephant/elephant     : ~/.config/elephant"
   "fuzzel/fuzzel         : ~/.config/fuzzel"
   "glow/glow             : ~/.config/glow"
-  "hypr/hypr             : ~/.config/hypr"
-  "hyprlock/hyprlock     : ~/.config/hyprlock"
-  "mako/mako             : ~/.config/mako"
-  "qylock/qylock         : ~/.config/qylock"
   "swaync/swaync         : ~/.config/swaync"
-  "swayosd/swayosd       : ~/.config/swayosd"
   "television/television : ~/.config/television"
   "themes/themes         : ~/.config/themes"
-  "walker/walker         : ~/.config/walker"
-  "waybar/waybar         : ~/.config/waybar"
-  "wlogout/wlogout       : ~/.config/wlogout"
+  "waybar                : ~/.config/waybar"
   "yazi/yazi             : ~/.config/yazi"
   "niri/niri             : ~/.config/niri"
 
   # ── single-file links (config dir stays real, one file is linked) ──
   "sheldon/plugins.toml               : ~/.config/sheldon/plugins.toml"
   "starship/themes/rose-pine-moon.toml : ~/.config/starship.toml"
-  "vscode/code-flags.conf             : ~/.config/code-flags.conf"
 
   # ── links that go straight to $HOME (not ~/.config) ──
-  "git/gitconfig            : ~/.gitconfig"
-  "git/gitconfig-work       : ~/.gitconfig-work"
+  # gitconfig / gitconfig-work are NOT here on purpose — home-manager
+  # (home/modules/git.nix) owns both, via programs.git and home.file.
+  # mako is NOT here either — it is uninstalled; an installed mako steals
+  # org.freedesktop.Notifications from swaync. Config kept at mako/ regardless.
   "git/git-hooks/pre-commit : ~/.git-hooks/pre-commit"
-  "tmux.conf                : ~/.tmux.conf"
-  "zsh/.p10k.zsh            : ~/.p10k.zsh"
-  "vscode/settings.json     : ~/settings.json"
+  "zsh/.zshrc               : ~/.zshrc"
 
   # ── adopted: repo now holds the current config, symlinked into place ──
   "kitty/kitty             : ~/.config/kitty"

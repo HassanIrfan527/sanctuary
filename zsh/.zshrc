@@ -1,27 +1,17 @@
-# Fastfetch
-fastfetch -c ~/.config/fastfetch/config.jsonc
-
-# kotofetch --modes quotes.toml --source true --translation romaji
+zmodload zsh/zprof
 
 # ~/.zshrc
 
-# User specific environment: update PATH if needed
-# Note: Zsh supports POSIX style exports just like Bash
 if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
     PATH="$HOME/.local/bin:${PATH}"
 fi
 if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
     PATH="$HOME/bin:${PATH}"
 fi
-if [[ ":$PATH:" != *":$HOME/.cargo/bin:"* ]]; then
-    PATH="$HOME/.cargo/bin:${PATH}"
-fi
+
 export PATH
 
-# Uncomment if you don’t like systemctl’s auto-paging
-# export SYSTEMD_PAGER=
-
-# Load custom files in ~/.bashrc.d (you can rename directory to ~/.zshrc.d if you like)
+# Load custom files in ~/.bashrc.d
 if [ -d ~/.zshrc.d ]; then
     for rc in ~/.zshrc.d/*; do
         if [ -f "$rc" ]; then
@@ -30,15 +20,6 @@ if [ -d ~/.zshrc.d ]; then
     done
 fi
 unset rc
-
-# Aliases
-source ~/.dotfiles/zsh/aliases.zsh
-
-# Utils
-source ~/.dotfiles/zsh/utils.zsh
-
-# SE 101 bug capture (bug / bugstats)
-source ~/.dotfiles/zsh/bugs.zsh
 
 # Completion system (required before fzf-tab)
 autoload -Uz compinit && compinit
@@ -51,14 +32,6 @@ zstyle ':fzf-tab:*' switch-group '<' '>'
 # Starship Initialization
 export STARSHIP_CONFIG="$HOME/.config/starship.toml"
 eval "$(starship init zsh)"
-
-starship-theme() {
-    local themes_dir="$HOME/.dotfiles/starship/themes"
-    local theme=$(ls "$themes_dir"/*.toml | xargs -n1 basename -s .toml | fuzzel --dmenu -p "starship theme: ")
-    [[ -z "$theme" ]] && return
-    ln -sf "$themes_dir/${theme}.toml" "$HOME/.config/starship.toml"
-    echo "switched to: $theme"
-}
 
 # Zoxide Initialization
 eval "$(zoxide init zsh)"
@@ -89,63 +62,144 @@ zshaddhistory() {
 setopt AUTO_CD AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT
 setopt INTERACTIVE_COMMENTS
 
-# thefuck — corrects the previous command (`fuck`)
-eval "$(thefuck --alias)"
-
-# Keybinds (defines widgets + zvm_after_init hook — must precede sheldon)
-source ~/.dotfiles/zsh/keybinds.zsh
-
 # zsh-vi-mode: init at source time (prevents recursion with starship prompt)
-ZVM_INIT_MODE=sourcing
+export ZVM_INIT_MODE=sourcing
 
 # Plugins via sheldon (loads zsh-vi-mode, zsh-abbr, zsh-autopair, autocomplete, syntax-highlighting)
 eval "$(sheldon source)"
 
-# End of ~/.zshrc
+export PATH="$HOME/.config/composer/vendor/bin:$PATH"
 
-export PATH="$PATH:$HOME/.composer/vendor/bin"
-
-# vapi
-export VAPI_INSTALL="$HOME/.vapi"
-export PATH="$VAPI_INSTALL/bin:$PATH"
 export MANPATH=""$HOME/.vapi"/share/man:$MANPATH"
 
 export PATH="$HOME/.npm-global/bin:$PATH"
-export PATH="$HOME/.cargo/bin:$PATH"
 export EDITOR=nvim
 export VISUAL=nvim
 
 export PATH="$HOME/go/bin:$PATH"
-export GI_TYPELIB_PATH="/usr/local/lib64/girepository-1.0:$GI_TYPELIB_PATH"
 
-export NVM_DIR="$HOME/.config/nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
-
-# pixiecode memory search — semantic lookup across public + private memories
-mem() {
-    local root="${PIXIECODE_ROOT:-$HOME/Development/pixiecode}"
-    local py="$root/venv/.venv/bin/python3"
-    local cli="$root/tools/memory/cli.py"
-    if [[ ! -x "$py" || ! -f "$cli" ]]; then
-        echo "mem: pixiecode CLI not found at $cli" >&2
-        return 1
-    fi
-    if [[ $# -eq 0 ]]; then
-        echo "Usage: mem <query> [--top-k N] [--category preferences|entities|events|cases|patterns|tools|skills]"
-        echo "       mem-reindex                 # rebuild vector DB (add --full to re-embed)"
-        echo "       mem-status                  # show indexed counts + provider"
-        return 0
-    fi
-    "$py" "$cli" search "$@"
-}
-
-mem-reindex() {
-    local root="${PIXIECODE_ROOT:-$HOME/Development/pixiecode}"
-    "$root/venv/.venv/bin/python3" "$root/tools/memory/cli.py" reindex "$@"
-}
-
-mem-status() {
-    local root="${PIXIECODE_ROOT:-$HOME/Development/pixiecode}"
-    "$root/venv/.venv/bin/python3" "$root/tools/memory/cli.py" status
-}
+echo 'eval "$(atuin init zsh)"' >>~/.zshrc
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
+eval "$(atuin init zsh)"
