@@ -175,18 +175,24 @@ width.
 |---|---|
 | **Workspaces** | `█` active / `░` inactive / `▓` urgent, mauve border. **The favourite element — ASCII blocks. Keep this language and extend it elsewhere.** |
 | **Clock** | `[ 15:08  Tue 22 ]`, peach, **centred**. |
-| **Music** | `▶` / `‖` + artist — title, 42ch truncation, lavender. Dims when paused. Click toggles playback, scroll skips. Right-click is deliberately unbound — a floating player TUI is the eventual answer, not a popup. |
+| **Music** | `▶` / `‖` + **title — artist**, 42ch truncation, lavender. Title leads, so a long entry clips the artist and keeps the track name. Dims when paused. Click toggles playback, scroll skips. Right-click is deliberately unbound — a floating player TUI is the eventual answer, not a popup. |
 | **Mic** | `[ mic on ]` green / `[ mic -- ]` neutral. A readout first: **right-click** cuts the mic, **left-click** opens `wiremix` as a floating terminal. `Mod+M` is the real interface. |
 | **Separator** | `│` in `surface1`, no fill, no border. Splits the right side into an audio cluster and a system cluster. |
 | **Tray** | Neutral border. **Unsolved — see §7.** |
-| **Notifications** | Rising block by queue depth — `▁ ▃ ▅ ▇ █` for 1/2/3/4/5+, peach, far right. Click toggles the centre, right-click toggles DND. Renders nothing when empty. |
+| **Notifications** | Rising block by queue depth — `▁ ▃ ▅ ▇ █` for 1/2/3/4/5+, peach, far right. Click toggles the centre, right-click toggles DND. **The one module that stays visible when empty** (dim `[ ░ ]`): it is the click target for the centre, and an affordance you cannot see is one you cannot press. |
 | **Volume** | **Off the bar since 2026-09-22.** `scripts/volume.sh` still works and the `[ vol ████░░░ ]` meter is intact if it is ever wanted back; volume now lives on the keybinds and in `wiremix`. |
 
 **NixOS gotcha:** the binary is wrapped — `pkill -x waybar` matches nothing. Use
 `pkill -x .waybar-wrapped`. Stacked invisible instances caused a long debug detour once already.
-**This applies to every wrapped binary here**, and it cuts both ways: `pgrep -x noctalia` also
-returns nothing while noctalia is very much running as `.noctalia-wrapp`. Match on the full path
-(`pgrep -f /run/current-system/sw/bin/noctalia`) before concluding something is dead.
+**This applies to every wrapped binary here**, and it cuts both ways: `pgrep -x noctalia`
+returns nothing while noctalia is very much running as `.noctalia-wrapp`. So does `pgrep -x
+swaync` (`.swaync-wrapped`) and `pgrep -x awww-daemon` (`.awww-daemon-wr` — comm is truncated at
+15 characters, so even the full wrapped name does not match). This has caused a wrong "it is not
+running" conclusion four separate times.
+
+**Rule: never check a daemon's liveness by process name here.** Ask the daemon — `awww query`,
+`swaync-client -c`, `makoctl list`. `wallpaper.sh` does exactly this; checking by name started a
+second daemon that core-dumped.
 
 **Muting:** borders are the accent mixed ~45% into `surface0` (`@define-color b_lavender
 mix(@lavender, @surface0, 0.45)` and friends). Identity survives, nothing shouts. Text keeps the

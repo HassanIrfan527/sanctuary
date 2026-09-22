@@ -8,9 +8,9 @@ spawn-sh-at-startup "/home/dweller/.dotfiles/scripts/sanctuary/bar.sh start"
 // Notifications + the centre.
 spawn-at-startup "swaync"
 
-// Wallpaper. The daemon has to be up before anything asks it to draw, so the
-// restore waits on it rather than racing.
-spawn-sh-at-startup "(command -v awww-daemon || command -v swww-daemon) >/dev/null && { awww-daemon 2>/dev/null || swww-daemon; } & sleep 1; /home/dweller/.dotfiles/scripts/sanctuary/wallpaper.sh restore"
+// Wallpaper. The script starts the daemon itself and waits for it to answer,
+// so there is no sleep-and-hope race here.
+spawn-at-startup "/home/dweller/.dotfiles/scripts/sanctuary/wallpaper.sh" "restore"
 
 // Night light. Manual, always on: the daemon just holds a temperature and the
 // keybinds move it. No scheduling, no geoclue, no sunrise maths. The last value

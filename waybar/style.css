@@ -90,10 +90,15 @@ window#waybar { background: transparent; }
 #pulseaudio.mic      { color: @green;    border-color: @b_green; }
 #pulseaudio.mic.source-muted { color: @overlay0; border-color: @surface1; }
 
-/* Last island in the row. Click toggles the centre, right-click toggles DND. */
-#custom-notification       { color: @peach;    border-color: @b_peach; padding: 0 10px; }
+/* Last island in the row. Click toggles the centre, right-click toggles DND.
+   This is the one module that stays visible when empty — it is the click target
+   for the centre, and an affordance you cannot see is one you cannot press.
+   Empty goes neutral rather than away. */
+#custom-notification         { color: @surface2; border-color: @surface1; padding: 0 10px; }
+#custom-notification.empty   { color: @surface2; border-color: @surface1; }
+#custom-notification.waiting { color: @peach;    border-color: @b_peach; }
 /* Do-not-disturb: still counting, but muted — the block stays, the accent goes. */
-#custom-notification.dnd   { color: @overlay0; border-color: @surface1; }
+#custom-notification.dnd     { color: @overlay0; border-color: @surface1; }
 /* Centred. The one module read without being looked for, so it gets the
    middle of the bar and the warmest accent. */
 #clock               { color: @peach;    border-color: @b_peach; }
