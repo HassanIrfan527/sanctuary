@@ -1,6 +1,24 @@
 // ── Startup ───────────────────────────────────────────────────────────
+// The Sanctuary. Every line here replaced something noctalia used to do.
 
-// For Noctalia shell
-spawn-at-startup "noctalia-shell"
-spawn-sh-at-startup "bash /home/$USER/.dotfiles/scripts/keysounds.sh"
+// Bar. Launched through the script because NixOS wraps the binary and a
+// bare `waybar` can stack invisible instances — see the script's comment.
+spawn-sh-at-startup "/home/dweller/.dotfiles/scripts/sanctuary/bar.sh start"
 
+// Notifications + the centre.
+spawn-at-startup "swaync"
+
+// Wallpaper. The daemon has to be up before anything asks it to draw, so the
+// restore waits on it rather than racing.
+spawn-sh-at-startup "(command -v awww-daemon || command -v swww-daemon) >/dev/null && { awww-daemon 2>/dev/null || swww-daemon; } & sleep 1; /home/dweller/.dotfiles/scripts/sanctuary/wallpaper.sh restore"
+
+// Night light. Manual, always on: the daemon just holds a temperature and the
+// keybinds move it. No scheduling, no geoclue, no sunrise maths. The last value
+// you set is restored here.
+spawn-at-startup "/home/dweller/.dotfiles/scripts/sanctuary/nightlight.sh" "start"
+
+// Idle -> lock -> screens off. `lock` catches `loginctl lock-session`, so
+// Mod+Escape, suspend and idle all end up in the same locker.
+spawn-at-startup "/home/dweller/.dotfiles/scripts/sanctuary/idle.sh"
+
+spawn-sh-at-startup "bash /home/$USER/.dotfiles/scripts/keysounds.sh toggle"

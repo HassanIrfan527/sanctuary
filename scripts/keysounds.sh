@@ -1,38 +1,56 @@
 #!/usr/bin/env bash
 
-OFF_OPTION="🛑 Turn OFF"
+STATEFILE="${XDG_STATE_HOME:-$HOME/.local/state}/keysound_current"
+mkdir -p "$(dirname "$STATEFILE")"
 
-# 1. Fetch available sound list
-list=$(mechsim -l 2>/dev/null | sed '1,2d'| sed 's/^[[:space:]]*//')
+ACTION=$1
 
-# 2. Always display fzf menu (with Turn OFF option at top)
-selected=$(printf '%s\n%s' "$OFF_OPTION" "$list" | fzf --layout=reverse --border=rounded --height=100% --prompt="Select Keysound > ")
+case "$ACTION" in
+    toggle)
+        if pgrep -x mechsim >/dev/null; then
+            pkill -f "mechsim" 2>/dev/null
 
-# 3. Handle selection
-if [ "$selected" = "$OFF_OPTION" ]; then
+            # noctalia's toast IPC is gone; this is the standard notification
+            # path, so it works with swaync (or anything else that owns the bus).
+            notify-send -a keysounds "Keysounds off" "Typing is quiet again" 2>/dev/null
+        else
+            KEYSOUND=$(<"$STATEFILE")
+            nohup mechsim -s "$KEYSOUND" -V 100 >/dev/null 2>&1 &
 
-    # Kill running process
-   pkill -f "mechsim" 2>/dev/null
+            notify-send -a keysounds "Keysounds on" "$KEYSOUND" 2>/dev/null
+        fi
+        ;;
+    choose)
 
-    toast_json=$(jq -n \
-      --arg title "Keysounds" \
-      --arg body "Disabled" \
-      '{title: $title, body: $body}')
+        OFF_OPTION="🛑 Turn OFF"
 
-    noctalia-shell ipc call toast send "$toast_json" 2>/dev/null
+        # 1. Fetch available sound list
+        list=$(mechsim -l 2>/dev/null | sed '1,2d' | sed 's/^[[:space:]]*//')
 
-elif [ -n "$selected" ]; then
+        # 2. Always display fzf menu (with Turn OFF option at top)
+        SELECTED=$(printf '%s\n%s' "$OFF_OPTION" "$list" | fzf --layout=reverse --border=sharp --height=100% --prompt="Select Keysound > ")
 
-    # Kill old instance if running, then start new selected sound
-    pkill -f "mechsim" 2>/dev/null
+        # 3. Handle selection
+        if [ "$SELECTED" = "$OFF_OPTION" ]; then
 
-    nohup mechsim -s "$selected" -V 100 > /tmp/mechsim.log 2>&1 &
+            # Kill running process
+            pkill -f "mechsim" 2>/dev/null
 
-    toast_json=$(jq -n \
-      --arg title "Keysound Changed" \
-      --arg body "Sound Selected: $selected" \
-      '{title: $title, body: $body}')
+            notify-send -a keysounds "Keysounds off" "Typing is quiet again" 2>/dev/null
 
-    noctalia-shell ipc call toast send "$toast_json" 2>/dev/null
+        elif [ -n "$SELECTED" ]; then
 
-fi
+            echo "$SELECTED" >"$STATEFILE"
+            # Kill old instance if running, then start new selected sound
+            pkill -f "mechsim" 2>/dev/null
+
+            nohup mechsim -s "$SELECTED" -V 100 >/tmp/mechsim.log 2>&1 &
+
+            notify-send -a keysounds "Keysound changed" "$SELECTED" 2>/dev/null
+
+        fi
+        ;;
+    *)
+        exit 1
+        ;;
+esac

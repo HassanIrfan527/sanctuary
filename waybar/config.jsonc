@@ -1,0 +1,67 @@
+// The Sanctuary — waybar
+// Direction: TUI-native. Square islands, ASCII/block glyphs, per-module accent
+// borders. See ../DESIGN-BRIEF.md before changing anything here.
+//
+// Run:  ~/.dotfiles/scripts/sanctuary/bar.sh start|stop|toggle|restart
+// Kill: pkill -x .waybar-wrapped     <- NixOS wraps the binary; plain `waybar` won't match
+//
+// Layout:  [workspaces]        [clock]        [music] [mic] │ [tray] [notif]
+// The clock is centred because it is the one thing read without being looked
+// for. Everything actionable sits right, where the pointer already is.
+{
+  "layer": "top",
+  "position": "top",
+  "height": 36,
+  "spacing": 0,
+  "margin-top": 4,
+  "margin-left": 8,
+  "margin-right": 8,
+
+  "modules-left":   ["niri/workspaces"],
+  "modules-center": ["clock"],
+  "modules-right":  ["custom/music", "pulseaudio#mic", "custom/sep", "tray", "custom/notification"],
+
+  "niri/workspaces": {
+    "format": "{icon}",
+    "format-icons": { "active": "█", "default": "░", "urgent": "▓" }
+  },
+
+  "clock": { "format": "[ {:%H:%M  %a %d} ]", "tooltip": false },
+
+  // Click toggles playback; scroll skips. Right-click is deliberately unbound
+  // for now — a floating player TUI is the eventual answer, not a popup.
+  "custom/music": {
+    "exec": "$HOME/.dotfiles/waybar/scripts/music.sh",
+    "return-type": "json", "interval": 3, "tooltip": false,
+    "on-click":       "playerctl play-pause",
+    "on-scroll-up":   "playerctl next",
+    "on-scroll-down": "playerctl previous"
+  },
+
+  // Readout, not a button — but the two things you'd ever want from it are
+  // here anyway: right-click cuts the mic, left-click opens the real mixer as
+  // a floating terminal (DESKTOP-PLAN.md §3).
+  "pulseaudio#mic": {
+    "format": "[ mic {format_source} ]",
+    "format-source": "on", "format-source-muted": "--",
+    "tooltip": false,
+    "on-click":       "kitty --class sanctuary-mixer -e wiremix",
+    "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
+  },
+
+  // Box-drawing divider between the audio group and the system group.
+  // Not an island: no fill, no border, just a rule in the row.
+  "custom/sep": { "format": "│", "tooltip": false },
+
+  "tray": { "icon-size": 14, "spacing": 8 },
+
+  // Far right, last thing in the row. Rising block — ▁ ▃ ▅ ▇ █ by queue depth.
+  // Streams from `swaync-client -swb`: the script stays resident and emits a
+  // line per event, so there is no polling interval at all.
+  "custom/notification": {
+    "exec": "$HOME/.dotfiles/waybar/scripts/notifications.sh",
+    "return-type": "json", "tooltip": false, "restart-interval": 5,
+    "on-click":       "swaync-client -t",
+    "on-click-right": "swaync-client -d"
+  }
+}

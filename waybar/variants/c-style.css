@@ -1,0 +1,47 @@
+/* VARIANT C — bracketed ASCII: square, per-module accent, assertive */
+/* Catppuccin Mocha — the palette you already run in niri */
+@define-color crust    #11111b;
+@define-color mantle   #181825;
+@define-color base     #1e1e2e;
+@define-color surface0 #313244;
+@define-color surface1 #45475a;
+@define-color surface2 #585b70;
+@define-color overlay0 #6c7086;
+@define-color subtext0 #a6adc8;
+@define-color text     #cdd6f4;
+@define-color lavender #b4befe;
+@define-color mauve    #cba6f7;
+@define-color peach    #fab387;
+@define-color green    #a6e3a1;
+@define-color yellow   #f9e2af;
+@define-color red      #f38ba8;
+
+* {
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 12px;
+  min-height: 0;
+  text-shadow: none;
+  box-shadow: none;
+}
+window#waybar { background: transparent; }
+
+#workspaces, #custom-music, #pulseaudio.mic, #custom-notification, #tray, #clock {
+  background: @crust;
+  border-radius: 0;
+  padding: 0 12px;
+  margin: 4px 3px;
+  border: 1px solid @surface1;
+}
+#workspaces { padding: 0 8px; border-color: @mauve; }
+#workspaces button { padding: 0 3px; background: transparent; color: @surface2; font-size: 11px; }
+#workspaces button.active { color: @mauve; }
+#workspaces button.urgent { color: @red; }
+#workspaces button:hover { background: transparent; color: @subtext0; }
+
+#custom-music        { color: @lavender; border-color: @lavender; }
+#custom-music.paused { color: @overlay0; border-color: @surface1; }
+#pulseaudio.mic      { color: @green;    border-color: @green; }
+#pulseaudio.mic.source-muted { color: @overlay0; border-color: @surface1; }
+#custom-notification { color: @peach;    border-color: @peach; }
+#clock               { color: @peach;    border-color: @peach; }
+#tray                { border-color: @surface1; padding: 0 10px; }

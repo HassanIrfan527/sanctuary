@@ -6,10 +6,6 @@ blur {
     on
 }
 
-/* Noctalia: blur everywhere without xray for a better look */
-layer-rule {
-  match namespace="^noctalia-(background|launcher-overlay|dock)-.*$"
-  background-effect {
-    xray false
-  }
-}
+// The bar, the launcher and the notification centre are deliberately NOT
+// blurred. They are islands with a solid fill — visible structure is the
+// craft, and transparency was tried and rejected twice (DESIGN-BRIEF.md §3).

@@ -1,8 +1,16 @@
 // ── Window rules ──────────────────────────────────────────────────────
+// 2px, not 20 — the island language is square (DESIGN-BRIEF.md §2).
 window-rule {
-    geometry-corner-radius 20
+    geometry-corner-radius 2
     clip-to-geometry true
     draw-border-with-background false
+}
+
+window-rule {
+  background-effect {
+    blur true
+    xray false
+  }
 }
 
 window-rule {
@@ -40,12 +48,41 @@ window-rule {
 }
 
 
-// Set the overview wallpaper on the backdrop.
+// Put the wallpaper on the overview backdrop. Matches both names because
+// upstream renamed swww -> awww at 0.12.
 layer-rule {
-  match namespace="^noctalia-overview*"
-  place-within-backdrop true
-}
-layer-rule {
-    match namespace="^noctalia-backdrop"
+    match namespace="^[as]www-daemon$"
     place-within-backdrop true
+}
+
+// ── The Sanctuary's floating terminals ────────────────────────────────
+// Every "panel" in this desktop is a real kitty window with a class, so niri
+// animates it like anything else and it inherits the kitty theme. That IS the
+// panel system (DESKTOP-PLAN.md §3).
+window-rule {
+    match app-id="sanctuary-mixer"
+    open-floating true
+    default-column-width { fixed 900; }
+    default-window-height { fixed 620; }
+}
+
+window-rule {
+    match app-id="sanctuary-wallpaper"
+    open-floating true
+    default-column-width { fixed 1100; }
+    default-window-height { fixed 760; }
+}
+
+window-rule {
+    match app-id="sanctuary-clipboard"
+    open-floating true
+    default-column-width { fixed 820; }
+    default-window-height { fixed 520; }
+}
+
+window-rule {
+    match app-id="sanctuary-music"
+    open-floating true
+    default-column-width { fixed 900; }
+    default-window-height { fixed 600; }
 }

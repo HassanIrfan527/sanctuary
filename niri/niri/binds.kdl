@@ -6,33 +6,54 @@ binds {
     Mod+Y      { spawn "nautilus"; }
     Mod+B      { spawn "brave"; }
 
-    Mod+Shift+A { spawn-sh "noctalia-shell ipc call bar toggle"; }
+    //── Launcher ──
+    Mod+Space hotkey-overlay-title="Launcher" {
+        spawn-sh "fuzzel --config=$HOME/.dotfiles/fuzzel/fuzzel/fuzzel.ini";
+    }
 
-    Mod+Space { spawn-sh "noctalia-shell ipc call launcher toggle"; }
-    Mod+V { spawn-sh "noctalia-shell ipc call launcher clipboard"; }
+    //── Notifications (swaync) ──
+    Mod+Shift+D hotkey-overlay-title="Notification centre" { spawn "swaync-client" "-t"; }
+    Mod+Ctrl+D  { spawn "swaync-client" "-C"; }   // close all
+    Mod+Alt+D   { spawn "swaync-client" "-d"; }   // do-not-disturb toggle
 
-    Mod+O { spawn-sh "noctalia-shell ipc call controlCenter toggle"; }
+    //── Panels that are really terminals ──
+    // The panel-free answer to every GUI popup: a TUI in a floating kitty with
+    // a class niri has a window-rule for. See DESKTOP-PLAN.md §3.
+    Mod+V hotkey-overlay-title="Clipboard" {
+        spawn "kitty" "--class" "sanctuary-clipboard" "-e" "/home/dweller/.dotfiles/scripts/sanctuary/clipboard.sh";
+    }
+    Mod+Alt+M hotkey-overlay-title="Audio mixer" {
+        spawn "kitty" "--class" "sanctuary-mixer" "-e" "wiremix";
+    }
+    Mod+Shift+W hotkey-overlay-title="Wallpaper" {
+        spawn "/home/dweller/.dotfiles/scripts/sanctuary/wallpaper.sh" "pick";
+    }
+    Mod+Shift+A { spawn "/home/dweller/.dotfiles/scripts/sanctuary/bar.sh" "toggle"; }
 
-    Mod+I { spawn-sh "noctalia-shell ipc call settings toggle"; }
-    // Audio & Brightness
+    //── Audio ──  wpctl talks to pipewire directly; the bar is the readout.
+    XF86AudioRaiseVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+" "-l" "1.0"; }
+    Mod+Equal            { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+" "-l" "1.0"; }
+    XF86AudioLowerVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+    Mod+Minus            { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+    XF86AudioMute        { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    Mod+0                { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
 
-    XF86AudioRaiseVolume { spawn "noctalia-shell" "ipc" "call" "volume" "increase"; }
-    Mod+Equal { spawn "noctalia-shell" "ipc" "call" "volume" "increase"; }
+    // Mic is a readout on the bar and a keybind here — never a button.
+    Mod+M         { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
+    XF86AudioMicMute { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
 
-    XF86AudioLowerVolume { spawn "noctalia-shell" "ipc" "call" "volume" "decrease"; }
-    Mod+Minus { spawn "noctalia-shell" "ipc" "call" "volume" "decrease"; }
+    // No brightness binds: this machine has no /sys/class/backlight device.
 
-    XF86AudioMute { spawn "noctalia-shell" "ipc" "call" "volume" "muteOutput"; }
-    Mod+0 { spawn "noctalia-shell" "ipc" "call" "volume" "muteOutput"; }
+    //── Night light ──  manual, always on. Warmer = more filter.
+    //   Clamped to 1500-6500K; 6500 is neutral daylight, i.e. off.
+    Mod+Ctrl+Minus hotkey-overlay-title="Night light warmer" {
+        spawn "/home/dweller/.dotfiles/scripts/sanctuary/nightlight.sh" "warmer";
+    }
+    Mod+Ctrl+Equal hotkey-overlay-title="Night light cooler" {
+        spawn "/home/dweller/.dotfiles/scripts/sanctuary/nightlight.sh" "cooler";
+    }
+    Mod+Ctrl+0 { spawn "/home/dweller/.dotfiles/scripts/sanctuary/nightlight.sh" "reset"; }
 
-    XF86MonBrightnessUp { spawn "noctalia-shell" "ipc" "call" "brightness" "increase"; }
-    XF86MonBrightnessDown { spawn "noctalia-shell" "ipc" "call" "brightness" "decrease"; }
-
-
-    Mod+Shift+W { spawn-sh "noctalia-shell ipc call wallpaper toggle"; }
-    Mod+Shift+Z { spawn "sh" "-c" "~/.dotfiles/scripts/journal.py"; }
-
-    Mod+A {spawn-sh "noctalia-shell ipc call plugin:notes-scratchpad togglePanel";}
     //── Overview ──  zoomed-out view of all workspaces/columns; drag windows around
     Mod+Tab { toggle-overview; }
 
@@ -112,16 +133,26 @@ binds {
     Mod+Shift+N { move-column-to-workspace-down; }
 
     //── System ──
-    Mod+Escape { spawn-sh "noctalia-shell ipc call lockScreen lock"; }
-    //── Screenshots
-    // Print       { spawn "sh" "-c" "~/.config/hypr/scripts/screenshot.sh area"; }
-    // Shift+Print { spawn "sh" "-c" "~/.config/hypr/scripts/screenshot.sh edit"; }
-    // Mod+Print   { spawn "sh" "-c" "~/.config/hypr/scripts/screenshot.sh screen"; }
+    // logind's Lock signal, which swayidle's `lock` handler turns into
+    // swaylock. Same path as idle-lock and suspend-lock, so there is one
+    // locker and one look.
+    Mod+Escape hotkey-overlay-title="Lock" { spawn "loginctl" "lock-session"; }
 
     //── Media / volume
     Mod+Shift+M { spawn "playerctl" "play-pause"; }
     Mod+Shift+BracketRight { spawn "playerctl" "next"; }
     Mod+Shift+BracketLeft  { spawn "playerctl" "previous"; }
 
-Mod+Shift+S { spawn "kitty" "--class" "keysound-launcher" "-e" "/home/dweller/.dotfiles/scripts/keysounds.sh"; }
+    Mod+Shift+S { spawn "kitty" "--class" "keysound-launcher" "-e" "/home/dweller/.dotfiles/scripts/keysounds.sh" "choose"; }
+    Mod+Alt+S { spawn "bash" "-c" "/home/dweller/.dotfiles/scripts/keysounds.sh toggle"; }
+
+    //── Screenshots
+    Print { 
+        spawn "bash" "-c" "~/.dotfiles/scripts/screenshot.sh"
+    }
+
+    // 2. Select region -> Open in Swappy for editing
+    Shift+Print { 
+        spawn "sh" "-c" "grim -g \"$(slurp)\" - | swappy -f -" 
+    }
 }

@@ -1,0 +1,453 @@
+/* The Sanctuary — swaync (notification centre + toasts)
+   Direction: TUI-native. Square islands, ASCII labels, no artwork.
+   Read ~/.dotfiles/DESIGN-BRIEF.md before changing colours or shapes.
+
+   swaync 0.12.6 is GTK4, so unlike waybar's GTK3 this file gets real CSS
+   custom properties — `var()` works here. The palette is therefore declared
+   once at :root and everything below refers to it.
+
+   swaync's own default sheet drives itself from a set of --noti-* variables.
+   Overriding those at :root does most of the retheming on its own; the rules
+   after it are for shape, type and the ASCII affordances, which are not
+   variable-driven. */
+
+:root {
+  /* ── Catppuccin Mocha ─────────────────────────────────────────────── */
+  --crust: rgb(17, 17, 27);
+  --mantle: rgb(24, 24, 37);
+  --base: rgb(30, 30, 46);
+  --surface0: rgb(49, 50, 68);
+  --surface1: rgb(69, 71, 90);
+  --surface2: rgb(88, 91, 112);
+  --overlay0: rgb(108, 112, 134);
+  --subtext0: rgb(166, 173, 200);
+  --text: rgb(205, 214, 244);
+  --lavender: rgb(180, 190, 254);
+  --mauve: rgb(203, 166, 247);
+  --peach: rgb(250, 179, 135);
+  --green: rgb(166, 227, 161);
+  --red: rgb(243, 139, 168);
+
+  /* Accent mixed ~45% into surface0 — the bar's muting, kept identical. */
+  --b-lavender: rgb(121, 127, 170);
+  --b-peach: rgb(159, 122, 103);
+  --b-red: rgb(150, 101, 124);
+
+  --ease: 160ms ease-out;
+
+  /* ── swaync's own variables, repointed ─────────────────────────────── */
+  --cc-bg: var(--crust);
+  --noti-border-color: var(--surface1);
+  --noti-bg: 17, 17, 27;
+  --noti-bg-alpha: 1;
+  --noti-bg-darker: var(--crust);
+  --noti-bg-hover: var(--mantle);
+  --noti-bg-focus: var(--base);
+  --noti-close-bg: transparent;
+  --noti-close-bg-hover: transparent;
+  --text-color: var(--text);
+  --text-color-disabled: var(--surface2);
+  --bg-selected: var(--surface0);
+
+  /* Square. 0–2px radius, no exceptions (DESIGN-BRIEF §2). */
+  --border-radius: 0;
+  --border: 1px solid var(--surface1);
+  --notification-shadow: none;
+
+  /* No artwork anywhere — app icons are full-colour assets that cannot be
+     restyled, the same problem the tray has (DESIGN-BRIEF §7). */
+  --notification-icon-size: 0px;
+  --notification-app-icon-size: 0px;
+  --notification-group-icon-size: 0px;
+
+  --font-size-summary: 12px;
+  --font-size-body: 12px;
+}
+
+/* Fallback names for swaync's pre-GTK4.16 code paths. */
+@define-color cc-bg rgb(17, 17, 27);
+@define-color noti-bg rgb(17, 17, 27);
+@define-color noti-bg-opaque rgb(17, 17, 27);
+@define-color noti-bg-hover rgb(24, 24, 37);
+@define-color noti-bg-focus rgb(30, 30, 46);
+@define-color noti-border-color rgb(69, 71, 90);
+@define-color text-color rgb(205, 214, 244);
+@define-color text-color-disabled rgb(88, 91, 112);
+@define-color bg-selected rgb(49, 50, 68);
+
+* {
+  font-family: "JetBrainsMono Nerd Font", monospace;
+  font-size: 12px;
+  text-shadow: none;
+  box-shadow: none;
+}
+
+notificationwindow,
+blankwindow,
+.blank-window {
+  background: transparent;
+}
+
+/* ── The centre ──────────────────────────────────────────────────────────
+   One island, same construction as a bar module: crust fill, 1px muted
+   lavender border, square. */
+.control-center {
+  background: var(--crust);
+  border: 1px solid var(--b-lavender);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 10px;
+}
+
+.control-center .control-center-list {
+  background: transparent;
+  padding: 0;
+}
+
+.control-center .control-center-list-placeholder {
+  color: var(--surface2);
+  font-size: 12px;
+  padding: 24px 0;
+}
+
+/* ── Header: [ notifications ]        [ clear all ] ──────────────────── */
+.widget-title {
+  background: transparent;
+  color: var(--lavender);
+  margin: 0 0 10px 0;
+  padding: 0 2px 8px 2px;
+  border-bottom: 1px solid var(--surface0);
+}
+
+.widget-title > label {
+  color: var(--lavender);
+  font-size: 12px;
+  font-weight: normal;
+}
+
+/* The clear-all button IS the delete affordance. Its label is set to
+   "[ clear all ]" in config.json, so the brackets are real text, not a
+   drawn box — the box around it is the island border doing its usual job. */
+.widget-title > button {
+  background: transparent;
+  color: var(--surface2);
+  border: 1px solid var(--surface1);
+  border-radius: 0;
+  padding: 1px 8px;
+  box-shadow: none;
+  transition: color var(--ease), border-color var(--ease);
+}
+
+.widget-title > button:hover {
+  background: transparent;
+  color: var(--red);
+  border-color: var(--b-red);
+}
+
+/* ── Do-not-disturb: a square checkbox, not a pill switch ────────────── */
+.widget-dnd {
+  background: transparent;
+  color: var(--subtext0);
+  margin: 0 0 10px 0;
+  padding: 0 2px;
+}
+
+.widget-dnd > label {
+  color: var(--subtext0);
+  font-size: 12px;
+}
+
+/* GTK sizes the slider from the switch's content box. Too tight a switch and
+   the slider is asked for a negative size ("GtkGizmo reported min width -13"),
+   so the box is deliberately roomier than it looks. */
+.widget-dnd > switch {
+  background: transparent;
+  border: 1px solid var(--surface1);
+  border-radius: 0;
+  min-width: 42px;
+  min-height: 20px;
+  padding: 1px;
+  transition: border-color var(--ease), background var(--ease);
+}
+
+.widget-dnd > switch:checked {
+  background: transparent;
+  border-color: var(--b-peach);
+}
+
+/* The slider is the block that fills the box — █ moving inside [ ]. */
+.widget-dnd > switch > slider {
+  background: var(--surface2);
+  border: none;
+  border-radius: 0;
+  min-width: 18px;
+  min-height: 16px;
+  margin: 0;
+}
+
+.widget-dnd > switch:checked > slider {
+  background: var(--peach);
+}
+
+/* ── Notification cards ──────────────────────────────────────────────── */
+.notification-row {
+  background: transparent;
+  outline: none;
+  padding: 0;
+  margin: 0 0 6px 0;
+}
+
+.notification-row:focus,
+.notification-row:hover {
+  background: transparent;
+}
+
+.notification-row .notification-background {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-row .notification-background .notification {
+  background: var(--crust);
+  border: 1px solid var(--surface1);
+  /* The left stripe is the urgency readout — border colour is identity,
+     exactly as on the bar. */
+  border-left: 2px solid var(--surface2);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  transition: background var(--ease), border-color var(--ease);
+}
+
+.notification-row .notification-background .notification:hover {
+  background: var(--mantle);
+}
+
+.notification-row .notification-background .notification.low {
+  border-left-color: var(--surface1);
+}
+
+.notification-row .notification-background .notification.normal {
+  border-left-color: var(--b-lavender);
+}
+
+.notification-row .notification-background .notification.critical {
+  border-left-color: var(--red);
+}
+
+.notification-row .notification-background .notification .notification-default-action {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content {
+  background: transparent;
+  padding: 9px 11px;
+  margin: 0;
+}
+
+/* Artwork off at every size knob swaync exposes. */
+.notification-row .notification-background .notification .notification-default-action .notification-content .image,
+.notification-row .notification-background .notification .notification-default-action .notification-content .body-image,
+.notification-row .notification-background .notification .notification-default-action .notification-content .app-icon {
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .summary {
+  color: var(--text);
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .body {
+  color: var(--overlay0);
+  font-size: 12px;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .time {
+  color: var(--surface2);
+  font-size: 11px;
+  margin-right: 24px;
+}
+
+/* ── Close: the [x] on every card ────────────────────────────────────────
+   swaync renders this as a GtkButton holding a symbolic ×. GTK cannot swap
+   an icon for text from CSS — there is no `content:` — so the ASCII reading
+   comes from the square 1px box around it, and the symbolic glyph inherits
+   `color` like any monochrome icon would. */
+.close-button {
+  background: transparent;
+  color: var(--surface2);
+  border: 1px solid var(--surface1);
+  border-radius: 0;
+  min-width: 20px;
+  min-height: 20px;
+  margin: 7px 7px 0 0;
+  padding: 0;
+  box-shadow: none;
+  transition: color var(--ease), border-color var(--ease);
+}
+
+.close-button:hover {
+  background: transparent;
+  color: var(--red);
+  border-color: var(--b-red);
+}
+
+/* ── Actions: the clickable affordances on an actionable notification ──
+   These are real buttons with real labels supplied by the sending app, so
+   bracketing them in a square border is the whole treatment. */
+.notification-action {
+  background: transparent;
+  color: var(--lavender);
+  border: 1px solid var(--b-lavender);
+  border-radius: 0;
+  margin: 0 5px 8px 5px;
+  padding: 2px 10px;
+  box-shadow: none;
+  transition: color var(--ease), border-color var(--ease), background var(--ease);
+}
+
+.notification-action:hover {
+  background: var(--surface0);
+  color: var(--text);
+  border-color: var(--lavender);
+}
+
+.notification-action:first-child {
+  margin-left: 11px;
+}
+
+.notification-action:last-child {
+  margin-right: 11px;
+}
+
+.notification-row .notification-background .notification .notification-alt-actions {
+  background: transparent;
+}
+
+/* ── Groups ──────────────────────────────────────────────────────────── */
+.notification-group {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-group .notification-group-headers {
+  color: var(--surface2);
+  font-size: 11px;
+  margin: 0 0 3px 2px;
+}
+
+.notification-group .notification-group-icon {
+  min-width: 0;
+  min-height: 0;
+  opacity: 0;
+}
+
+.notification-group .notification-group-buttons {
+  background: transparent;
+}
+
+.notification-group .notification-group-close-button .close-button {
+  margin: 0 2px;
+}
+
+.notification-group.low .notification-row .notification-background .notification {
+  border-left-color: var(--surface1);
+}
+
+.notification-group.normal .notification-row .notification-background .notification {
+  border-left-color: var(--b-lavender);
+}
+
+.notification-group.critical .notification-row .notification-background .notification {
+  border-left-color: var(--red);
+}
+
+/* ── Toasts ──────────────────────────────────────────────────────────────
+   The floating stack. Same card construction, so a toast and its entry in
+   the centre are recognisably the same object. */
+.floating-notifications {
+  background: transparent;
+}
+
+.floating-notifications .notification {
+  background: var(--crust);
+  border: 1px solid var(--surface1);
+  border-left: 2px solid var(--surface2);
+  border-radius: 0;
+  box-shadow: none;
+  margin: 4px;
+}
+
+.floating-notifications .notification.low {
+  border-left-color: var(--surface1);
+}
+
+.floating-notifications .notification.normal {
+  border-left-color: var(--b-lavender);
+}
+
+.floating-notifications .notification.critical {
+  border-left-color: var(--red);
+}
+
+/* ── Progress (notifications that carry one) ─────────────────────────── */
+.notification-row .notification-background .notification .notification-default-action .notification-content progressbar {
+  background: var(--surface0);
+  border-radius: 0;
+  min-height: 3px;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content progressbar progress {
+  background: var(--b-lavender);
+  border-radius: 0;
+}
+
+/* ── Scrollbar: a rule, not a pill ───────────────────────────────────── */
+scrollbar {
+  background: transparent;
+  border: none;
+}
+
+/* Same negative-size trap as the dnd switch: GTK subtracts the scrollbar's
+   own padding from the slider, so a 3px slider computes below zero. */
+scrollbar slider {
+  background: var(--surface1);
+  border: none;
+  border-radius: 0;
+  min-width: 8px;
+  min-height: 24px;
+  margin: 0;
+  transition: background var(--ease);
+}
+
+scrollbar slider:hover {
+  background: var(--surface2);
+}
+
+/* ── Inline reply, if an app ever sends one ──────────────────────────── */
+.inline-reply-entry {
+  background: var(--base);
+  color: var(--text);
+  border: 1px solid var(--surface1);
+  border-radius: 0;
+  caret-color: var(--lavender);
+}
+
+.inline-reply-button {
+  background: transparent;
+  color: var(--lavender);
+  border: 1px solid var(--b-lavender);
+  border-radius: 0;
+  margin-left: 4px;
+}

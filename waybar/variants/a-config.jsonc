@@ -1,0 +1,33 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 36,
+  "spacing": 0,
+  "margin-top": 4,
+  "margin-left": 8,
+  "margin-right": 8,
+
+  "modules-left":   ["niri/workspaces"],
+  "modules-center": ["custom/music"],
+  "modules-right":  ["pulseaudio#mic", "custom/notification", "tray", "clock"],
+
+  "niri/workspaces": {
+    "format": "{icon}",
+    "format-icons": { "active": "●", "default": "○", "urgent": "●" }
+  },
+  "custom/music": {
+    "exec": "$HOME/.dotfiles/waybar/scripts/music.sh",
+    "return-type": "json", "interval": 3, "tooltip": false
+  },
+  "pulseaudio#mic": {
+    "format": "MIC {format_source}",
+    "format-source": "◆", "format-source-muted": "◇",
+    "tooltip": false
+  },
+  "custom/notification": {
+    "exec": "$HOME/.dotfiles/waybar/scripts/notifications.sh",
+    "interval": 2, "tooltip": false
+  },
+  "tray": { "icon-size": 14, "spacing": 8 },
+  "clock": { "format": "{:%H:%M  %a %d}", "tooltip": false }
+}

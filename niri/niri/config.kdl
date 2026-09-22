@@ -5,7 +5,6 @@ include "startup.kdl"
 include "window-rules.kdl"
 include "effects.kdl"
 include "binds.kdl"
-include "./noctalia.kdl"
 
 // ── Misc top-level ────────────────────────────────────────────────────
 prefer-no-csd
@@ -17,9 +16,8 @@ hotkey-overlay {
 }
 
 debug {
-  // Allows notification actions and window activation from Noctalia.
+  // Lets a notification's action buttons focus the app that sent it. Written
+  // for noctalia originally; swaync needs exactly the same thing, so this
+  // stays after the cutover.
   honor-xdg-activation-with-invalid-serial
 }
-
-
-

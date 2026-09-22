@@ -1,6 +1,10 @@
 # My System config - I'll call it "The Sanctuary"
 
-My system configuration for Fedora —  noctalia shell, vim-first keybinds, and a keyboard-driven workflow.
+My system configuration for NixOS — niri + **The Sanctuary** (a self-owned desktop: waybar,
+swaync, fuzzel, swww), vim-first keybinds, and a keyboard-driven workflow.
+
+See `DESKTOP-PLAN.md` for what is built and in what order, and `DESIGN-BRIEF.md` for how
+anything new should look before you write a line of it.
 
 ## FYI
 
@@ -17,7 +21,7 @@ Fun fact: I did use claude code (vibe-coded), to adjust the hyprland configurati
 | ---------------- | ----------------------------------------------------------- |
 | OS               | Fedora 44                                                   |
 | WM               | Niri (Default) + Hyprland                                                    |
-| Shell            | Noctalia Shell                                                               |
+| Shell            | The Sanctuary — waybar + swaync + fuzzel (see `DESIGN-BRIEF.md`)              |
 | Login Manager    | sddm                                                        |
 | Terminal         | Kitty (cursor trails, blur, transparency)                   |
 | Shell            | Zsh + Starship + zsh-autocomplete + zsh-syntax-highlighting |

@@ -1,0 +1,64 @@
+{
+  "$schema": "/etc/xdg/swaync/configSchema.json",
+
+  "//": "The Sanctuary — swaync. Read ~/.dotfiles/DESIGN-BRIEF.md before changing.",
+  "//shape": "Square islands, ASCII labels, no artwork. All colour lives in style.css.",
+
+  "ignore-gtk-theme": true,
+  "cssPriority": "user",
+
+  "positionX": "right",
+  "positionY": "top",
+  "layer": "overlay",
+  "control-center-layer": "top",
+  "layer-shell": true,
+  "layer-shell-cover-screen": false,
+
+  "control-center-margin-top": 44,
+  "control-center-margin-right": 12,
+  "control-center-margin-bottom": 12,
+  "control-center-margin-left": 0,
+  "control-center-width": 440,
+  "control-center-height": 720,
+  "notification-window-width": 400,
+  "fit-to-screen": false,
+
+  "timeout": 5,
+  "timeout-low": 4,
+  "timeout-critical": 0,
+
+  "image-visibility": "never",
+  "notification-icon-size": 0,
+  "notification-body-image-height": 0,
+  "notification-body-image-width": 0,
+
+  "notification-grouping": true,
+  "relative-timestamps": true,
+  "keyboard-shortcuts": true,
+  "hide-on-clear": true,
+  "hide-on-action": true,
+  "transition-time": 160,
+
+  "text-empty": "— nothing waiting —",
+  "script-fail-notify": true,
+
+  "widgets": [
+    "title",
+    "dnd",
+    "notifications"
+  ],
+
+  "widget-config": {
+    "title": {
+      "text": "[ notifications ]",
+      "clear-all-button": true,
+      "button-text": "[ clear all ]"
+    },
+    "dnd": {
+      "text": "[ do not disturb ]"
+    },
+    "notifications": {
+      "vexpand": true
+    }
+  }
+}

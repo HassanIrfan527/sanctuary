@@ -1,0 +1,64 @@
+# The Sanctuary — mako
+# Direction: TUI-native. Square bordered boxes, monospace, muted Mocha.
+# Read ~/.dotfiles/DESIGN-BRIEF.md before changing colours or shapes.
+#
+# Toasts only. There is no notification centre by design (DESIGN-BRIEF §1) —
+# the whole "centre" feature is `makoctl dismiss --all` on a keybind.
+#
+# mako has no include mechanism and no variables, so the palette is inlined here.
+# If Mocha ever changes, this file and waybar/style.css both need the edit.
+
+font=JetBrainsMono Nerd Font 11
+background-color=#11111bf2
+text-color=#a6adc8
+border-color=#45475a
+border-size=1
+border-radius=0
+progress-color=over #313244
+
+width=400
+height=160
+padding=11,14
+margin=5
+outer-margin=44,12
+anchor=top-right
+layer=overlay
+max-visible=4
+sort=-time
+
+# No icons: app icons are full-colour artwork and cannot be restyled — the same
+# problem the tray has (DESIGN-BRIEF §7). The app name in ASCII brackets does the
+# identifying job instead, in the system's own typeface.
+icons=0
+markup=1
+actions=1
+history=1
+text-alignment=left
+default-timeout=5000
+ignore-timeout=0
+
+# [ app-name ]  Summary
+#               body
+format=<span color="#585b70">[ %a ]</span>  <b>%s</b>\n%b
+
+[grouped]
+format=<span color="#585b70">[ %a ×%g ]</span>  <b>%s</b>\n%b
+
+[urgency=low]
+border-color=#313244
+text-color=#6c7086
+default-timeout=4000
+
+[urgency=normal]
+border-color=#45475a
+
+# Critical is the only thing allowed to use red, and the only thing that waits
+# for you rather than expiring.
+[urgency=critical]
+border-color=#c2748c
+text-color=#f38ba8
+default-timeout=0
+
+# Mode toggled by `makoctl mode -t do-not-disturb` — for focus blocks.
+[mode=do-not-disturb]
+invisible=1
