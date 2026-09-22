@@ -48,12 +48,11 @@ window-rule {
 }
 
 
-// Put the wallpaper on the overview backdrop. Matches both names because
-// upstream renamed swww -> awww at 0.12.
-layer-rule {
-    match namespace="^[as]www-daemon$"
-    place-within-backdrop true
-}
+// NOTE: do NOT add `place-within-backdrop true` for the wallpaper daemon.
+// It moves the background surface into niri's overview backdrop, which means
+// it stops being drawn on the normal workspace view — i.e. no wallpaper at all
+// until you open the overview. Cost me a "the wallpaper is not applying" bug
+// while `awww query` cheerfully reported it was displaying the image.
 
 // ── The Sanctuary's floating terminals ────────────────────────────────
 // Every "panel" in this desktop is a real kitty window with a class, so niri

@@ -161,7 +161,7 @@ reference.
 
 ```
 ┌─────────┐                    ┌──────────────┐          ┌───────────────────┐ ┌────────────┐   ┌───────┐ ┌─────┐
-│ ░  █  ░ │                    │[ 15:08 Tue 22]│          │ ▶ KAWAI YUTO — …  │ │ [ mic on ] │ │ │ tray  │ │ [▃] │
+│ ░  █  ░ │                  │[ 05:27 PM Tue 22]│          │ ▶ KAWAI YUTO — …  │ │ [ mic on ] │ │ │ tray  │ │ [▃] │
 └─────────┘                    └──────────────┘          └───────────────────┘ └────────────┘   └───────┘ └─────┘
    mauve                            peach                       lavender            green      sep neutral  peach
 ```
@@ -174,7 +174,7 @@ width.
 | Module | Spec |
 |---|---|
 | **Workspaces** | `█` active / `░` inactive / `▓` urgent, mauve border. **The favourite element — ASCII blocks. Keep this language and extend it elsewhere.** |
-| **Clock** | `[ 15:08  Tue 22 ]`, peach, **centred**. |
+| **Clock** | `[ 05:27 PM  Tue 22 ]`, peach, **centred**. 12-hour; `%I` is zero-padded and `%p` fixed-width, so the island never changes width and its neighbours never shuffle. |
 | **Music** | `▶` / `‖` + **title — artist**, 42ch truncation, lavender. Title leads, so a long entry clips the artist and keeps the track name. Dims when paused. Click toggles playback, scroll skips. Right-click is deliberately unbound — a floating player TUI is the eventual answer, not a popup. |
 | **Mic** | `[ mic on ]` green / `[ mic -- ]` neutral. A readout first: **right-click** cuts the mic, **left-click** opens `wiremix` as a floating terminal. `Mod+M` is the real interface. |
 | **Separator** | `│` in `surface1`, no fill, no border. Splits the right side into an audio cluster and a system cluster. |
@@ -191,8 +191,17 @@ swaync` (`.swaync-wrapped`) and `pgrep -x awww-daemon` (`.awww-daemon-wr` — co
 running" conclusion four separate times.
 
 **Rule: never check a daemon's liveness by process name here.** Ask the daemon — `awww query`,
-`swaync-client -c`, `makoctl list`. `wallpaper.sh` does exactly this; checking by name started a
-second daemon that core-dumped.
+`swaync-client -c`. `wallpaper.sh` does exactly this; checking by name started a second daemon
+that core-dumped.
+
+**niri: do not put `place-within-backdrop true` on the wallpaper daemon's layer rule.** It moves
+the background surface into the overview backdrop, so it stops being drawn on the normal
+workspace view — the wallpaper disappears entirely until you open the overview, while
+`awww query` still reports it as displaying. Diagnosed the hard way.
+
+**`wl-copy` must stay resident** — it owns the Wayland selection until something replaces it —
+so anything running it inside a terminal keeps that terminal alive. `clipboard.sh` wraps it in
+`setsid`; without that the picker window never closes after you pick something.
 
 **Muting:** borders are the accent mixed ~45% into `surface0` (`@define-color b_lavender
 mix(@lavender, @surface0, 0.45)` and friends). Identity survives, nothing shouts. Text keeps the

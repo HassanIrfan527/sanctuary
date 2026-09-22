@@ -26,7 +26,9 @@
     "format-icons": { "active": "█", "default": "░", "urgent": "▓" }
   },
 
-  "clock": { "format": "[ {:%H:%M  %a %d} ]", "tooltip": false },
+  // 12-hour. %I is zero-padded and %p is fixed-width, so the island never
+  // changes width and the modules beside it never shuffle.
+  "clock": { "format": "[ {:%I:%M %p  %a %d} ]", "tooltip": false },
 
   // Click toggles playback; scroll skips. Right-click is deliberately unbound
   // for now — a floating player TUI is the eventual answer, not a popup.

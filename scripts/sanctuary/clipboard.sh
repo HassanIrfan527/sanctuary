@@ -14,4 +14,8 @@ sel=$(cliphist list | fzf \
   --bind 'ctrl-j:down,ctrl-k:up' \
   --bind 'ctrl-x:execute-silent(cliphist delete <<< {})+reload(cliphist list)')
 
-[ -n "$sel" ] && cliphist decode <<< "$sel" | wl-copy
+# `setsid` is load-bearing. wl-copy MUST stay resident — it owns the Wayland
+# selection until something replaces it — and while it holds kitty's pty the
+# picker window never closes. setsid moves it into its own session so the
+# terminal can exit while the clipboard keeps working.
+[ -n "$sel" ] && cliphist decode <<< "$sel" | setsid wl-copy >/dev/null 2>&1
