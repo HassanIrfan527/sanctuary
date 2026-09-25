@@ -1,0 +1,215 @@
+/*
+  The Sanctuary — walker stylesheet.
+  Tokens from DESIGN-BRIEF.md §4. Catppuccin Mocha, radius 0, JetBrainsMono.
+
+  walker compiles this with `grass` (a Sass implementation) before handing it
+  to GTK, so Sass features are available — but nothing here needs them, and
+  plain CSS is what the rest of this desktop is written in.
+*/
+
+@define-color crust    #11111b;
+@define-color surface0 #313244;
+@define-color surface1 #45475a;
+@define-color overlay0 #6c7086;
+@define-color subtext0 #a6adc8;
+@define-color text     #cdd6f4;
+@define-color lavender #b4befe;
+@define-color mauve    #cba6f7;
+
+/* walker's default theme opens with `all: unset`, which is what makes a
+   GTK4 app themeable from scratch rather than fighting Adwaita. Keep it. */
+* {
+  all: unset;
+}
+
+/* One family, whole system (§2). 13px, not the bar's 12: the bar is glanced
+   at, this is read while tired, and it is the one surface where a point of
+   extra size costs nothing — the same call fuzzel.ini made. */
+.window,
+.box-wrapper {
+  font-family: "JetBrainsMono Nerd Font", monospace;
+  font-size: 13px;
+}
+
+/* ── The island ────────────────────────────────────────────────────────
+   crust fill, 1px muted-lavender border, radius 0. The border tone is
+   carried over from fuzzel.ini so the launcher keeps its identity across
+   the swap, and no shadow: §2 wants visible structure, not depth. */
+.box-wrapper {
+  background: @crust;
+  border: 1px solid #8b92b8;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+}
+
+.box {
+  padding: 0;
+}
+
+/* ── Banner ── */
+.banner {
+  color: @lavender;
+  padding: 10px 12px 8px 12px;
+  /* The block glyphs sit tight vertically or the three lines read as three
+     separate things instead of one mark. */
+  line-height: 1.0;
+}
+
+/* The rule under the input. A `─` glyph and a 1px border are the same line
+   to the eye, and a border tracks the box width for free where a run of
+   characters would have to be counted. */
+.search-container {
+  border-top: 1px solid @surface0;
+  border-bottom: 1px solid @surface0;
+  border-radius: 0;
+  padding: 0;
+}
+
+.prompt {
+  color: @lavender;
+  padding: 8px 8px 8px 12px;
+}
+
+.input {
+  background: transparent;
+  color: @text;
+  caret-color: @lavender;
+  padding: 8px 12px 8px 0;
+  border: none;
+  border-radius: 0;
+}
+
+.input placeholder {
+  color: @surface1;
+}
+
+.input selection {
+  background: @surface0;
+  color: @text;
+}
+
+/* ── The list ────────────────────────────────────────────────────────── */
+.content-container,
+.scroll,
+.list {
+  padding: 0;
+  background: transparent;
+}
+
+.list {
+  color: @subtext0;
+}
+
+/* Scrollbars off. The list is short, the counter is gone, and an overlay
+   scrollbar fading in and out is exactly the hover-to-reveal §1 rejects. */
+scrollbar,
+.scroll scrollbar {
+  opacity: 0;
+  -gtk-icon-size: 0px;
+}
+
+.item-box {
+  padding: 3px 12px;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* Selection is a filled surface0 row, not a coloured highlight — the block
+   of fill is the indicator, same idea as `█` in the workspace module and
+   the same choice fuzzel.ini made. */
+child:selected .item-box,
+row:selected .item-box {
+  background: @surface0;
+}
+
+.item-text {
+  color: @subtext0;
+}
+
+child:selected .item-text,
+row:selected .item-text {
+  color: @text;
+}
+
+.item-subtext {
+  color: @overlay0;
+  font-size: 13px;
+}
+
+/* ── The gutter: `█` current, `░` idle ───────────────────────────────────
+   Both characters are really drawn, stacked in the overlay from item.xml.
+   CSS cannot change a label's text, but it can change its alpha, so the
+   pair is cross-faded on selection. This is the bar's workspace indicator
+   turned on its side. */
+.gutter {
+  padding-right: 10px;
+}
+
+.gutter-idle {
+  color: @surface1;
+  opacity: 1;
+}
+
+.gutter-active {
+  color: @lavender;
+  opacity: 0;
+}
+
+child:selected .gutter-active,
+row:selected .gutter-active {
+  opacity: 1;
+}
+
+child:selected .gutter-idle,
+row:selected .gutter-idle {
+  opacity: 0;
+}
+
+/* ── Empty states ── */
+.placeholder,
+.elephant-hint {
+  color: @surface1;
+  padding: 14px 12px;
+}
+
+/* ── Icons off ──────────────────────────────────────────────────────────
+   App icons are full-colour artwork and cannot be restyled — the tray
+   problem in §7, same cause, which is why fuzzel.ini had icons-enabled=no.
+   The widgets stay (walker looks up their ids) and are shrunk to nothing. */
+.item-image {
+  /* 1px, not 0. `-gtk-icon-size: 0px` makes GTK fail an internal assertion
+     (`gtk_icon_theme_lookup_by_gicon: assertion 'size > 0' failed`) once per
+     row per keystroke, which floods the log. 1px is invisible and legal. */
+  -gtk-icon-size: 1px;
+  opacity: 0;
+  min-width: 0;
+  min-height: 0;
+}
+
+.item-image-text {
+  font-size: 0px;
+  opacity: 0;
+  min-width: 0;
+}
+
+/* ── Chrome that is present but never shown ── */
+.keybinds,
+.global-keybinds,
+.item-keybinds,
+.item-quick-activation,
+.preview,
+.preview-box {
+  opacity: 0;
+  font-size: 0px;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  min-height: 0;
+  border: none;
+}
+
+.error {
+  color: #f38ba8;
+  padding: 8px 12px;
+}

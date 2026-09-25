@@ -1,0 +1,57 @@
+# The Sanctuary — walker
+#
+# Launcher UI. Bound to Mod+Space. The backend is elephant, started as a
+# systemd user service by `services.elephant.enable` in /etc/nixos/services.nix
+# — walker 2.x is a front end only and will sit on "Waiting for elephant..."
+# without it.
+#
+# Read ~/.dotfiles/DESIGN-BRIEF.md §5 before changing colours or shapes.
+#
+# Only the keys that differ from walker's own defaults are set here; walker
+# merges this over its built-in config. The full annotated default is at
+# resources/config.toml in the walker source if a key needs looking up.
+
+theme = "sanctuary"
+
+# Same behaviour fuzzel was configured for: dismiss on focus loss, and a
+# second Mod+Space closes rather than stacking a second launcher.
+click_to_close = true
+close_when_open = true
+as_window = false # layer-shell, not a window
+
+# No chrome that is not the list. fuzzel showed no keybind hints and no quick
+# activation buttons, and the brief's §2 has no room for a legend nobody reads
+# when tired. Every action still has a keybind, they are just not printed.
+hide_quick_activation = true
+hide_action_hints = true
+hide_return_action = true
+
+selection_wrap = true # cyclic, matching the TUI launcher it replaces
+
+[shell]
+layer = "overlay" # same layer fuzzel used
+exclusive_zone = -1
+
+[providers]
+# Desktop entries only, which is exactly what fuzzel.ini did with
+# `list-executables-in-path=no`. elephant ships calc, clipboard, files,
+# websearch, symbols and more — adding one is adding one word to this list,
+# but each one dilutes the fuzzy match, and the brief is explicit that a
+# diluted launcher "stopped being one keypress".
+default = [ "desktopapplications" ]
+empty = [ "desktopapplications" ]
+ignore_preview = [ "desktopapplications" ]
+
+[placeholders]
+# `input` replaces fuzzel's placeholder=filter. `list` is the empty state —
+# §2 says render nothing, and swaync's "— nothing waiting —" is the house
+# form of nothing, so this matches it rather than saying "No Results".
+"default" = { input = "filter", list = "— nothing —" }
+
+[keybinds]
+# Control+j/k for movement, carried over from fuzzel.ini and clipboard.sh.
+# The whole OS is vim (README.md); the launcher does not get an exception.
+close = [ "Escape" ]
+next = [ "Down", "ctrl j", "ctrl n" ]
+previous = [ "Up", "ctrl k", "ctrl p" ]
+toggle_exact = [ "ctrl e" ]

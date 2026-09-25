@@ -1,13 +1,31 @@
 /* The Sanctuary — waybar
-   Direction: TUI-native. Square islands, ASCII/block glyphs, per-module accent borders.
-   Read ../DESIGN-BRIEF.md before changing colours or shapes.
+   Direction: TUI-native. Square islands, ASCII/block glyphs, per-module accent
+   identity. Read ../DESIGN-BRIEF.md before changing colours or shapes.
 
-   Structure: every module is its own island (crust fill, 1px border, 0 radius).
-   The border colour is the module's identity — it is how you tell them apart at a
-   glance without reading. Neutral border = nothing to report.
+   ── What changed 2026-09-25 ────────────────────────────────────────────────
+   The islands used to be a plain 1px accent rectangle, which is a *widget*
+   border, not a drawn one. They are now frames drawn the way a TUI draws one:
+   a dim rule on all four sides plus a bright accent tick at each corner — the
+   CSS equivalent of `┌───┐`. The accent moved from the whole outline to the
+   corners only, so identity still reads at a glance but the bar stops looking
+   like six coloured boxes.
 
-   Muting: borders are the accent mixed down into @surface0, so identity survives
-   but nothing shouts. Text keeps the full accent, because text has to be read. */
+   ── How the frame is built ────────────────────────────────────────────────
+   GTK3 has no pseudo-elements, so there is nothing to hang a corner mark on.
+   What it does have is multiple background layers with independent size and
+   position — so the whole frame is painted as 12 flat gradients:
+
+     8 corner arms   6px x 1px horizontal + 1px x 8px vertical, per corner
+     4 edges         100% x 1px top/bottom, 1px x 100% left/right
+
+   The first layer paints on top, so corners are listed first and win over the
+   edges they overlap. `background-position` and `background-size` are the same
+   for every island and live in the shared rule below; only the colours differ
+   per module, which is why each module rule is one long background-image list.
+
+   Trade-off, deliberate: GTK cannot transition a gradient, so state changes on
+   the frame snap instead of fading. Text colour still fades at 160ms, which is
+   the part the eye actually tracks. */
 
 /* Catppuccin Mocha — the palette you already run in niri */
 @define-color crust    #11111b;
@@ -26,12 +44,9 @@
 @define-color yellow   #f9e2af;
 @define-color red      #f38ba8;
 
-/* Muted borders — accent pulled ~45% toward surface0. Identity without volume. */
-@define-color b_mauve    mix(@mauve,    @surface0, 0.55);
-@define-color b_lavender mix(@lavender, @surface0, 0.45);
-@define-color b_peach    mix(@peach,    @surface0, 0.45);
-@define-color b_green    mix(@green,    @surface0, 0.45);
-@define-color b_red      mix(@red,      @surface0, 0.30);
+/* The rule the frames are drawn in. Dim enough to close the box, quiet enough
+   that the corner ticks are what you actually see. */
+@define-color frame    #45475a;
 
 * {
   font-family: "JetBrainsMono Nerd Font";
@@ -43,26 +58,51 @@
 window#waybar { background: transparent; }
 
 /* ── islands ─────────────────────────────────────────────────────────────── */
+/* Shared geometry. Every island is the same box; only the frame colours and the
+   padding change. `border: none` because the frame is painted, not bordered. */
 #workspaces, #custom-music, #custom-volume, #pulseaudio.mic,
 #custom-notification, #tray, #clock {
-  background: @crust;
+  background-color: @crust;
+  background-repeat: no-repeat;
+  border: none;
   border-radius: 0;
-  padding: 0 12px;
+  padding: 0 13px;
   margin: 4px 3px;
-  border: 1px solid @surface1;
-  /* Motion: short, ease-out, nothing bounces (DESIGN-BRIEF §2). State changes
-     fade rather than snap — music pausing, mic cutting, volume muting. */
-  transition: color 160ms ease-out,
-              border-color 160ms ease-out,
-              background-color 160ms ease-out;
+
+  /* 8 corner arms, then the 4 edges — order matters, first layer is on top. */
+  background-position:
+    left top, left top, right top, right top,
+    left bottom, left bottom, right bottom, right bottom,
+    left top, left bottom, left top, right top;
+  background-size:
+    6px 1px, 1px 6px, 6px 1px, 1px 6px,
+    6px 1px, 1px 6px, 6px 1px, 1px 6px,
+    100% 1px, 100% 1px, 1px 100%, 1px 100%;
+
+  /* Motion: short, ease-out, nothing bounces (DESIGN-BRIEF §2). */
+  transition: color 160ms ease-out, background-color 160ms ease-out;
 }
 
-#workspaces { padding: 0 8px; border-color: @b_mauve; }
+/* Workspaces — mauve. Braille cells: `⣿` focused, `⠶` idle, `⣶` urgent. The glyphs
+   are pulled from CommitMono in the markup (config.jsonc) because JetBrainsMono
+   carries no braille. */
+#workspaces {
+  padding: 0 10px;
+  background-image:
+    linear-gradient(@mauve,@mauve), linear-gradient(@mauve,@mauve),
+    linear-gradient(@mauve,@mauve), linear-gradient(@mauve,@mauve),
+    linear-gradient(@mauve,@mauve), linear-gradient(@mauve,@mauve),
+    linear-gradient(@mauve,@mauve), linear-gradient(@mauve,@mauve),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame);
+}
+/* Braille needs the extra points to read as dots rather than a smudge, and the
+   glyph is narrower than a block so it can afford the padding. */
 #workspaces button {
-  padding: 0 3px;
+  padding: 0 5px;
   background: transparent;
   color: @surface2;
-  font-size: 11px;
+  font-size: 15px;
   transition: color 160ms ease-out;
 }
 #workspaces button.active { color: @mauve; }
@@ -72,41 +112,141 @@ window#waybar { background: transparent; }
 /* A slow breath, not a blink. Only ever fires on urgent. */
 @keyframes urgent {
   from { color: @red; }
-  to   { color: @b_red; }
+  to   { color: @surface2; }
 }
 
-/* ── modules ─────────────────────────────────────────────────────────────── */
-/* Click toggles playback, scroll skips — see config.jsonc. */
-#custom-music        { color: @lavender; border-color: @b_lavender; }
-#custom-music.paused { color: @overlay0; border-color: @surface1; }
+/* Clock — peach, centred. Time reads full accent, meridiem and date step down
+   to overlay0/subtext0, brackets and the field divider down to the frame
+   colour: punctuation is structure, not content (format in config.jsonc). */
+#clock {
+  color: @peach;
+  background-image:
+    linear-gradient(@peach,@peach), linear-gradient(@peach,@peach),
+    linear-gradient(@peach,@peach), linear-gradient(@peach,@peach),
+    linear-gradient(@peach,@peach), linear-gradient(@peach,@peach),
+    linear-gradient(@peach,@peach), linear-gradient(@peach,@peach),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame);
+}
 
-/* Block meter. Currently OFF the bar — the module was removed from
-   config.jsonc on 2026-09-22; volume lives on the keybinds and in wiremix.
-   Kept because scripts/volume.sh still works and the meter may come back. */
-#custom-volume       { color: @subtext0; border-color: @surface1; padding: 0 10px; }
-#custom-volume.live  { color: @lavender; border-color: @b_lavender; }
-#custom-volume.muted { color: @overlay0; border-color: @surface1; }
+/* Music — lavender. Carries an 8-cell `▓░` position meter (scripts/music.sh),
+   the same block language as the workspaces, pulled down to subtext so the
+   track title stays the thing you read. */
+#custom-music {
+  color: @lavender;
+  background-image:
+    linear-gradient(@lavender,@lavender), linear-gradient(@lavender,@lavender),
+    linear-gradient(@lavender,@lavender), linear-gradient(@lavender,@lavender),
+    linear-gradient(@lavender,@lavender), linear-gradient(@lavender,@lavender),
+    linear-gradient(@lavender,@lavender), linear-gradient(@lavender,@lavender),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame);
+}
+/* Paused: nothing to report, so the corners go neutral with the text. */
+#custom-music.paused {
+  color: @overlay0;
+  background-image:
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame);
+}
 
-#pulseaudio.mic      { color: @green;    border-color: @b_green; }
-#pulseaudio.mic.source-muted { color: @overlay0; border-color: @surface1; }
+/* Volume — currently OFF the bar (removed from config.jsonc 2026-09-22).
+   scripts/volume.sh still renders `[ vol ████░░░ ]` if the meter ever returns. */
+#custom-volume {
+  color: @subtext0;
+  padding: 0 11px;
+  background-image:
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame);
+}
+#custom-volume.live {
+  color: @lavender;
+  background-image:
+    linear-gradient(@lavender,@lavender), linear-gradient(@lavender,@lavender),
+    linear-gradient(@lavender,@lavender), linear-gradient(@lavender,@lavender),
+    linear-gradient(@lavender,@lavender), linear-gradient(@lavender,@lavender),
+    linear-gradient(@lavender,@lavender), linear-gradient(@lavender,@lavender),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame);
+}
+#custom-volume.muted { color: @overlay0; }
 
-/* Last island in the row. Click toggles the centre, right-click toggles DND.
-   This is the one module that stays visible when empty — it is the click target
-   for the centre, and an affordance you cannot see is one you cannot press.
-   Empty goes neutral rather than away. */
-#custom-notification         { color: @surface2; border-color: @surface1; padding: 0 10px; }
-#custom-notification.empty   { color: @surface2; border-color: @surface1; }
-#custom-notification.waiting { color: @peach;    border-color: @b_peach; }
+/* Mic — green while live. A readout, not a button. */
+#pulseaudio.mic {
+  color: @green;
+  background-image:
+    linear-gradient(@green,@green), linear-gradient(@green,@green),
+    linear-gradient(@green,@green), linear-gradient(@green,@green),
+    linear-gradient(@green,@green), linear-gradient(@green,@green),
+    linear-gradient(@green,@green), linear-gradient(@green,@green),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame);
+}
+#pulseaudio.mic.source-muted {
+  color: @overlay0;
+  background-image:
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame);
+}
+
+/* Tray — neutral corners. Still unsolved (DESIGN-BRIEF §7): the icons are app
+   artwork and cannot be restyled, so the frame is all the control there is. */
+#tray {
+  padding: 0 11px;
+  background-image:
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame);
+}
+
+/* Notifications — last island in the row. The one module that stays visible
+   when empty: it is the click target for the centre, and an affordance you
+   cannot see is one you cannot press. Empty goes neutral rather than away. */
+#custom-notification,
+#custom-notification.empty,
+#custom-notification.dnd {
+  color: @surface2;
+  padding: 0 11px;
+  background-image:
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@surface2,@surface2), linear-gradient(@surface2,@surface2),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame);
+}
+/* Something is waiting: the corners light, the rising block does the counting. */
+#custom-notification.waiting {
+  color: @peach;
+  background-image:
+    linear-gradient(@peach,@peach), linear-gradient(@peach,@peach),
+    linear-gradient(@peach,@peach), linear-gradient(@peach,@peach),
+    linear-gradient(@peach,@peach), linear-gradient(@peach,@peach),
+    linear-gradient(@peach,@peach), linear-gradient(@peach,@peach),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame),
+    linear-gradient(@frame,@frame), linear-gradient(@frame,@frame);
+}
 /* Do-not-disturb: still counting, but muted — the block stays, the accent goes. */
-#custom-notification.dnd     { color: @overlay0; border-color: @surface1; }
-/* Centred. The one module read without being looked for, so it gets the
-   middle of the bar and the warmest accent. */
-#clock               { color: @peach;    border-color: @b_peach; }
-#tray                { border-color: @surface1; padding: 0 10px; }
+#custom-notification.dnd { color: @overlay0; }
 
 /* ── divider ─────────────────────────────────────────────────────────────── */
-/* Not an island: no fill, no border. A rule between the audio group and the
-   system group, so the right side reads as two clusters instead of five boxes. */
+/* Not an island: no fill, no frame. A rule between the audio cluster and the
+   system cluster, so the right side reads as two groups instead of five boxes. */
 #custom-sep {
   color: @surface1;
   background: transparent;

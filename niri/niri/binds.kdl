@@ -7,7 +7,12 @@ binds {
     Mod+B      { spawn "brave"; }
 
     //── Launcher ──
+    // fsel TUI in a floating kitty. -d detaches launched apps, or they die with it.
     Mod+Space hotkey-overlay-title="Launcher" {
+        spawn "kitty" "--class" "sanctuary-run" "-e" "fsel" "-d";
+    }
+    // The way back, one keypress rather than a config edit.
+    Mod+Shift+Space hotkey-overlay-title="Launcher (fuzzel fallback)" {
         spawn-sh "fuzzel --config=$HOME/.dotfiles/fuzzel/fuzzel/fuzzel.ini";
     }
 
@@ -43,6 +48,19 @@ binds {
     XF86AudioMicMute { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
 
     // No brightness binds: this machine has no /sys/class/backlight device.
+
+    //── Meeting recorder ──  two separate mono 16 kHz WAVs, not one stereo mix:
+    //   me.wav from the mic, them.wav from the default sink's monitor. Separate
+    //   files mean speaker separation is structural, so the transcription step
+    //   never needs a diarization model. Toggle: same key starts and stops.
+    Mod+Shift+R hotkey-overlay-title="Record meeting (toggle)" {
+        spawn "/home/dweller/.dotfiles/scripts/sanctuary/meeting-rec.sh" "toggle";
+    }
+    // Practice mode: mic only. No second party to capture, and a monitor capture
+    // would just record your own playback back at you.
+    Mod+Alt+R hotkey-overlay-title="Record practice (mic only)" {
+        spawn "/home/dweller/.dotfiles/scripts/sanctuary/meeting-rec.sh" "toggle" "--solo";
+    }
 
     //── Night light ──  manual, always on. Warmer = more filter.
     //   Clamped to 1500-6500K; 6500 is neutral daylight, i.e. off.

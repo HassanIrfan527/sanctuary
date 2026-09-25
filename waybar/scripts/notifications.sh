@@ -26,7 +26,10 @@ emit() {
     *) glyph="█"; cls="waiting" ;;
   esac
   [ "$dnd" = "true" ] && cls="dnd"
-  printf '{"text":"[ %s ]","class":"%s","tooltip":false}\n' "$glyph" "$cls"
+  # Brackets are punctuation, not content — dimmed to the frame colour so the
+  # block is what the eye lands on. Same rule as the clock and the mic.
+  local d="<span color='#45475a'>" e="</span>"
+  printf '{"text":"%s","class":"%s","tooltip":false}\n' "${d}[${e} ${glyph} ${d}]${e}" "$cls"
 }
 
 prime() {

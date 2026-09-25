@@ -7,8 +7,10 @@ Companion to `DESKTOP-PLAN.md` (what we're building, in what order). This file i
 **how it should look and behave**.
 
 **Status:** direction settled. Bar, launcher, notifications, wallpaper, lock and night light built.
-noctalia removed from every config. SDDM theming unstarted.
-**Updated:** 2026-09-22
+Launcher is **walker** as of 2026-09-22 (a terminal launcher was built the same day and turned
+down — §3). fuzzel kept installed as the fallback. noctalia removed from every config. SDDM
+theming unstarted.
+**Updated:** 2026-09-25
 
 ---
 
@@ -102,6 +104,25 @@ nothingness **and** beauty; that direction delivered only the first half.
 **What survived from it:** the burnout rule in §1, empty-states-render-nothing, and mic-live
 earning an accent. Everything else is gone.
 
+**Terminal launcher (fzf in a floating kitty).** Built, run, rejected — 2026-09-22, the same day
+as the fuzzel→walker move. It worked and it looked right: a drawn `┌─ the sanctuary ─┐` frame, a
+live `apps / up / load` banner, `█`/`░` down the gutter, aligned columns, desktop-entry actions,
+launch-count ordering. It is kept unbound at `scripts/sanctuary/run.sh`.
+
+Rejected for two reasons, and the look was not one of them:
+
+1. **~400ms to open**, against fuzzel's ~20ms, because a terminal has to boot first. The only fix
+   was a resident kitty at ~120MB, which fails DESKTOP-PLAN.md §1.
+2. **"we're overcomplicating things."** 250 lines of shell, an awk `.desktop` parser, a launch
+   history file and a niri window rule, to open applications. Harry's words: *"no i dont like the
+   terminal one. just use walker."*
+
+**The lesson, and it is the reusable one:** "the desktop should look like a TUI" (§2) is about the
+*visual language* — square, monospace, block glyphs, bracketed labels — **not** about literally
+running things in terminals. A GTK4 launcher with a hand-written widget tree reaches ~90% of the
+same look in 3 config files and opens in 80ms. Do not reach for a terminal again just because a
+surface needs to look like characters; reach for it when the thing genuinely is text.
+
 **Do not re-propose minimal/transparent/monochrome chrome.** It has been tested against this
 user twice and failed twice.
 
@@ -161,7 +182,7 @@ reference.
 
 ```
 ┌─────────┐                    ┌──────────────┐          ┌───────────────────┐ ┌────────────┐   ┌───────┐ ┌─────┐
-│ ░  █  ░ │                  │[ 05:27 PM Tue 22]│          │ ▶ KAWAI YUTO — …  │ │ [ mic on ] │ │ │ tray  │ │ [▃] │
+│ ⠶ ⣿ ⠶ ⠶│                  │[ 05:27 PM Tue 22]│          │ ▶ KAWAI YUTO — …  │ │ [ mic on ] │ │ │ tray  │ │ [▃] │
 └─────────┘                    └──────────────┘          └───────────────────┘ └────────────┘   └───────┘ └─────┘
    mauve                            peach                       lavender            green      sep neutral  peach
 ```
@@ -171,11 +192,26 @@ Everything actionable is right, where the pointer already is, and the
 notification block is dead last so it never moves when something else changes
 width.
 
+**Islands are drawn frames as of 2026-09-25, not bordered widgets.** A plain 1px accent
+rectangle is what every GTK bar looks like; a TUI panel is a dim rule with a brighter corner.
+Each island is now painted as **12 background layers** — four edges in `surface1` plus eight
+corner arms (8×1px and 1×8px) in the module's accent — so it reads as `┌───┐` and the accent
+lives in the corners instead of shouting round the whole outline. GTK3 has no pseudo-elements,
+so multiple background layers with independent `background-size`/`background-position` are the
+only way to mark a corner. Cost, accepted: GTK cannot transition a gradient, so frame state
+changes snap; text colour still fades at 160ms, and that is the part the eye tracks.
+
+**Punctuation is structure, not content.** Brackets, the field divider and the module's own
+label drop to `#45475a`/`overlay0` via pango markup, while the value keeps the accent — you read
+`10:04` before you read `[`, and `on` before you read `mic`. For the clock the markup is written
+*inside* the strftime spec, which works because strftime passes anything that is not a `%` escape
+straight through.
+
 | Module | Spec |
 |---|---|
-| **Workspaces** | `█` active / `░` inactive / `▓` urgent, mauve border. **The favourite element — ASCII blocks. Keep this language and extend it elsewhere.** |
-| **Clock** | `[ 05:27 PM  Tue 22 ]`, peach, **centred**. 12-hour; `%I` is zero-padded and `%p` fixed-width, so the island never changes width and its neighbours never shuffle. |
-| **Music** | `▶` / `‖` + **title — artist**, 42ch truncation, lavender. Title leads, so a long entry clips the artist and keeps the track name. Dims when paused. Click toggles playback, scroll skips. Right-click is deliberately unbound — a floating player TUI is the eventual answer, not a popup. |
+| **Workspaces** | **Braille cells since 2026-09-25**: `⣿` focused / `⠶` idle / `⣶` urgent, mauve. Dot density carries the state and the colour confirms it; 15px, 5px button padding, because braille needs the points to read as dots. The block pair `█`/`░` it replaced is still the house language everywhere else (launcher gutter, notification meter, volume meter) — this module just says it in braille. **Non-optional:** the glyphs are wrapped in `<span font_family='CommitMono Nerd Font'>` — see the font trap below. |
+| **Clock** | `[ 10:04 AM │ Fri 25 ]`, peach, **centred**. Two-tone: time in full peach, meridiem `overlay0`, date `subtext0`, brackets and divider at frame grey. 12-hour; `%I` is zero-padded and `%p` fixed-width, so the island never changes width and its neighbours never shuffle. |
+| **Music** | `▶ ▓▓▓░░░░░ │ title — artist`, 34ch truncation, lavender. The 8-cell position meter (2026-09-25) is the workspace block language reused — filled `subtext0`, empty frame grey — and renders nothing when the player reports no `mpris:length`, because a meter stuck at 0 is a lie. Title leads, so a long entry clips the artist and keeps the track name. Dims when paused. Click toggles playback, scroll skips. Right-click is deliberately unbound — a floating player TUI is the eventual answer, not a popup. |
 | **Mic** | `[ mic on ]` green / `[ mic -- ]` neutral. A readout first: **right-click** cuts the mic, **left-click** opens `wiremix` as a floating terminal. `Mod+M` is the real interface. |
 | **Separator** | `│` in `surface1`, no fill, no border. Splits the right side into an audio cluster and a system cluster. |
 | **Tray** | Neutral border. **Unsolved — see §7.** |
@@ -214,6 +250,20 @@ than the rest at 0.45.
 - `@keyframes` will not take comma-joined selectors. `0%, 100% { }` fails to parse with
   *"Expected closing bracket after keyframes block"*; use `from`/`to` plus `alternate`.
 - Colour expressions (`mix()`, `alpha()`, `shade()`) *are* allowed inside `@define-color`.
+- **JetBrainsMono Nerd Font has zero braille coverage** (`fc-list 'JetBrainsMono Nerd Font:charset=28ff'`
+  returns nothing). The per-glyph fallback then draws *every* braille codepoint as the same 8-dot
+  grid, so `⠄ ⠆ ⠶ ⠿ ⣿` all come out identical and any braille meter is meaningless — it looks like
+  it rendered, which is why this took four test rounds to spot. Naming a braille-capable font in
+  the pango markup (`<span font_family='CommitMono Nerd Font'>`) fixes it per glyph and leaves the
+  rest of the bar on JetBrainsMono. A CSS `font-family` on the module works too, but the markup
+  route keeps the exception where the exception is. Installed fonts with braille: CommitMono Nerd
+  Font, Maple Mono NF, DejaVu, FreeMono, Cozette.
+- Multiple background layers **do** work, with per-layer `background-size` / `background-position`
+  / `background-repeat`. This is what draws the corner frames; first layer paints on top.
+- Gradients **cannot** be transitioned. Anything that must fade has to ride on `color` or
+  `background-color`.
+- A `#workspaces button` keeps the GTK theme's corner radius unless you set `border-radius: 0`
+  on it explicitly — an inverse-video active cell comes out rounded otherwise.
 
 ### Notifications + centre (swaync) — BUILT, not yet switched on
 
@@ -252,30 +302,208 @@ from the square border around its symbolic glyph, not from replacing it.
 not acquire notification name"*. Verified as far as that point: both `config.json` and
 `style.css` load with zero parse errors.
 
-### Launcher (fuzzel) — BUILT
+### Launcher (walker + elephant) — BUILT · 2026-09-22
 
-`~/.dotfiles/fuzzel/fuzzel/fuzzel.ini`. Bound to **Mod+Space**.
+`~/.dotfiles/walker/walker/`, stowed to `~/.config/walker`. **Mod+Space.** fuzzel stays installed
+and **Mod+Shift+Space** still opens it.
 
-**This reverses the earlier "do not use fuzzel" ruling.** The original objection was that
-layer-shell surfaces are not animated by niri, so the launcher would pop in while real windows
-slide. Harry chose fuzzel anyway on 2026-09-22; the animation gap is acceptable at this size.
-If it starts to grate, niri 26.04's `layer-rule` is the place to look before reopening the
-terminal-launcher option.
+```
+┌──────────────────────────────────────────────────────────┐
+│  █▀▄ █ █ █▄ █   the sanctuary                            │
+│  █▀▄ █ █ █ ▀█                                            │
+│  ▀ ▀ ▀▀▀ ▀  ▀                                            │
+├──────────────────────────────────────────────────────────┤
+│ [ run ] filter                                           │
+├──────────────────────────────────────────────────────────┤
+│ █ Blender               3D modeler                       │
+│ ░ Bluetooth Manager                                      │
+│ ░ Brave Web Browser     Web Browser                      │
+│ ░ btop++                System Monitor                   │
+└──────────────────────────────────────────────────────────┘
+```
 
-Styled as one island in the bar's language: crust fill, 1px muted-lavender border, radius 0,
-JetBrainsMono, `[ run ]` prompt, **no icons** (app icons are full-colour artwork and cannot be
-restyled — the tray problem in §7, same cause). Selection is a filled `surface0` row rather than
-a coloured highlight: the block of fill is the indicator, same idea as `█` in the workspace
-module.
+**Two processes, and only one of them is resident.** walker 2.x is a GTK4 + layer-shell front end
+with no data of its own; **elephant** is the provider service that knows about desktop entries.
+Without elephant, walker opens and sits on "Waiting for elephant...". elephant runs as a systemd
+*user* service via `services.elephant.enable` in `/etc/nixos/services.nix`, bound to
+`graphical-session.target` so it starts and dies with the session. walker itself has **no startup
+entry and no pre-warmed instance** — a cold walker is on screen in ~80ms measured, which is
+fuzzel's own order of magnitude, so there is nothing to keep warm.
 
-`list-executables-in-path` is **off**. On it, the list ran past 1400 entries and the fuzzy match
-diluted badly — the launcher stopped being one keypress. Desktop entries only (~44).
+elephant auto-detects the compositor and launches through it — the log line is
+`runprefix autodetect="niri msg action spawn --"`. Nothing had to be configured for that.
 
-**Matching is tuned, not default.** `match-mode=fzf` with `fields=name,generic,keywords`;
-`comment` and `categories` are left out on purpose because they match far too loosely and push
-the thing you meant down the list. `show-actions=yes` surfaces desktop-entry actions ("new
-window", "preferences"). Font is 13px rather than the bar's 12 — the bar is glanced at, this is
-read while tired, and it is the one surface where a point of extra size costs nothing.
+| Element | Spec | Real characters? |
+|---|---|---|
+| **Gutter** | `█` current row / `░` every other, down the left edge — the bar's workspace language turned on its side. | **Yes** — see the overlay trick below |
+| **Banner** | 3-line block `RUN` in lavender with `the sanctuary` beside it. | **Yes** |
+| **Prompt** | `[ run ]` in lavender, `filter` ghost text. Carried over from `fuzzel.ini` verbatim. | **Yes** |
+| **Empty state** | `— nothing —`, set from `[placeholders]` in `config.toml`. The house form of nothing, matching swaync's `— nothing waiting —`. | **Yes** |
+| **Rows** | Name capped at 22 chars, `GenericName` beside it in `overlay0`. An entry with no GenericName renders no subtitle — walker's own `subtext_transformer` calls `set_visible(false)` on an empty one, so §2's empty-states-render-nothing comes free. | n/a |
+| **Selection** | A filled `surface0` row, not a coloured highlight — the block of fill is the indicator, same call `fuzzel.ini` made. | n/a |
+| **Island** | crust fill, 1px `#8b92b8` border, radius 0, no shadow. Border tone carried over from `fuzzel.ini` so the surface keeps its identity across the swap. | **No — 1px CSS border** |
+| **Icons** | Off. App icons are full-colour artwork that cannot be restyled (§7, same cause as the tray). | n/a |
+| **Keybind hints / quick-activation** | Off. fuzzel printed no legend and neither does this. | n/a |
+
+**Where the line is between real characters and rendered ones.** A `─` glyph in JetBrainsMono and
+a 1px CSS border are the same line to the eye, and a border tracks the box width for free where a
+run of `─` would have to be counted against a pixel width. So the hairlines are CSS and
+**everything wider than a hairline is a character.** That is the whole compromise, and it is
+smaller than it sounded before it was built.
+
+#### The gutter: getting `█`/`░` back after calling it impossible
+
+The known GTK wall is that CSS has no `content:` property, so a stylesheet cannot swap one
+character for another — the same wall the swaync close button hit. Since which glyph a row shows
+depends on whether the row is selected, and only CSS knows that, the bar's `█`/`░` pair looked
+unreachable. **It is not.**
+
+Ship *both* characters, stacked in a `GtkOverlay` so they occupy the same cell, and let CSS flip
+their `opacity` on `child:selected`:
+
+```xml
+<object class="GtkOverlay" id="SanctuaryGutter">
+  <child>              <object class="GtkLabel" id="SanctuaryGutterIdle">   ░ </object></child>
+  <child type="overlay"><object class="GtkLabel" id="SanctuaryGutterActive"> █ </object></child>
+</object>
+```
+```css
+.gutter-idle { opacity: 1; }  .gutter-active { opacity: 0; }
+child:selected .gutter-idle { opacity: 0; }  child:selected .gutter-active { opacity: 1; }
+```
+
+Both glyphs are genuinely drawn; one is just at zero alpha. Nothing is approximated with a
+background tint. **This generalises: any state-dependent glyph in GTK can be done as a stack of
+real characters cross-faded by opacity.** Worth remembering the next time `content:` is the
+obvious answer and is missing.
+
+#### Theming traps, all four verified the hard way
+
+- **`item.xml` in a custom theme is NEVER READ.** walker's loader iterates a fixed filename list —
+  `layout.xml`, `keybind.xml`, `style.scss`, `style.css`, `preview.xml` — plus one
+  `item_<provider>.xml` per provider elephant reports. The generic `item.xml` name only exists
+  inside walker's embedded default. The row template here is
+  **`item_desktopapplications.xml`**, and adding a provider to `[providers]` means adding its
+  `item_<provider>.xml` too or that provider falls back to walker's built-in two-line row. This
+  cost a full debugging round: the theme loaded, the banner and colours applied, and the rows
+  silently kept the default layout with no gutter.
+- **A custom theme inherits the default.** `setup_theme_from_path` starts from `Theme::default()`
+  and overwrites only the files present, so this theme is three files and not fifteen.
+- **`-gtk-icon-size: 0px` floods the log.** GTK asserts `size > 0` internally
+  (`gtk_icon_theme_lookup_by_gicon: assertion 'size > 0' failed`), once per row per keystroke.
+  Use `1px` — invisible and legal. That took the GTK criticals from a flood to zero.
+- **Cap the subtitle's `max-width-chars`.** GTK sizes a box from its children's natural width, so
+  without a cap an entry like *"Equalizer, Compressor and Other Audio Effects"* widens the whole
+  island and the launcher changes width with whatever matched.
+
+Objects can safely be *omitted* from a custom layout — walker guards every lookup with
+`if let Some(...)` — but hiding via CSS is still preferred, because a future walker version may
+start requiring one.
+
+#### What was lost coming from fuzzel, and it is permanent
+
+**Matched characters are no longer highlighted.** fuzzel painted them mauve (`match=cba6f7ff`) and
+the fzf launcher did the same. walker sets row text with `label.set_text()`; `set_markup` appears
+nowhere outside its preview module, so there is no Pango markup on list rows and no way to colour
+a substring. This is not a theming gap that can be configured around — it is absent from the
+renderer. It is the one thing fuzzel did better, and the reason `fuzzel.ini` is still on disk.
+
+Also gone: the live `apps / up / load` readout the terminal launcher had. walker reads `layout.xml`
+once at startup, so the banner is static text. Printing a number that would be a lie five minutes
+later is worse than not printing it, so the caption is the name instead.
+
+#### The cost, measured
+
+| | |
+|---|---|
+| open, cold, no resident walker | **~80 ms** (fuzzel ~20 ms, the fzf launcher ~400 ms) |
+| resident walker | **none** |
+| elephant, as shipped here (2 providers) | **48 MB RSS — 11 MB anonymous** |
+| elephant, nixpkgs default (25 providers) | 369 MB RSS — 122 MB anonymous |
+| elephant startup | 61 ms, 57 desktop files indexed |
+
+**elephant's default build enables all 25 providers and that is not acceptable here.** Several are
+for other distros entirely and do nothing but log an error and switch themselves off
+(`pacman: executable file not found`, `apt-cache command not found`). Note which number matters:
+most of the 369 MB is `RssFile` — mapped `.so` and shared-library pages, shared and reclaimable.
+The figure representing real pressure is the anonymous one, and **122 MB is roughly what the
+warm-kitty launcher was rejected for.** Trimmed, it is 11 MB, which is not worth arguing about.
+
+So `/etc/nixos/services.nix` pins a trimmed build:
+
+```nix
+services.elephant.package = pkgs.elephant.override {
+  enabledProviders = [ "desktopapplications" "calc" ];
+};
+```
+
+**`calc` is in that list to dodge a nixpkgs bug, not because the launcher needs it.** The package's
+`postInstall` is:
+
+```
+wrapProgram $out/bin/elephant \
+  --prefix PATH : ${lib.makeBinPath runtimeDeps} \
+  --set ELEPHANT_PROVIDER_DIR "$out/lib/elephant/providers"
+```
+
+`runtimeDeps` is empty unless one of `files` / `bluetooth` / `calc` / `clipboard` is enabled. With
+it empty that middle line becomes `--prefix PATH : ` , which consumes the following flag, and the
+build dies at the very end with **`makeWrapper doesn't understand the arg
+ELEPHANT_PROVIDER_DIR`** — after compiling successfully, which makes it read like a compile
+problem when it is an argument-quoting one. `calc` pulls `libqalculate` and keeps `runtimeDeps`
+non-empty. Any `enabledProviders` list excluding all four hits this. Worth reporting upstream.
+
+`[providers]` in `config.toml` is separately held to `desktopapplications` alone — the same
+decision `fuzzel.ini` made with `list-executables-in-path=no`, for the same stated reason: a
+diluted fuzzy match means the launcher "stopped being one keypress". calc is built but not
+queried; adding it to the query set is one word.
+
+Adding a provider is three edits, not one: `enabledProviders` in `services.nix`, `[providers]` in
+`config.toml`, and an `item_<provider>.xml` in the theme or it renders as walker's default
+two-line row. elephant also ships `clipboard`, `files`, `websearch`, `symbols`, `unicode`, `todo`,
+`playerctl`, `niriactions`, `nirisessions` and `windows` — `windows` in particular is an alt-tab
+replacement sitting there unused.
+
+### Clipboard picker (cliphist + fzf) — BUILT · clear-all added 2026-09-22
+
+`scripts/sanctuary/clipboard.sh`. **Mod+V.** A floating kitty (`sanctuary-clipboard`) running
+`cliphist list` through fzf. This one stays a terminal on purpose — clipboard history *is* text,
+so a TUI is not a costume here, it is the honest shape. Contrast §3, where the launcher was not.
+
+```
+┌ clipboard ────────────────────────────────────────────────────┐
+│ [ paste ]                                            555/555 │
+│ ───────────────────────────────────────────────────────────── │
+│ ▌ [ clear all ]                                               │
+│ ▸ 1952    [1/19/32 built, 45 copied (277.7 MiB)] building n·· │
+│ ▌ 1951    Mod+R {spawn-sh "noctalia msg config-reload";}      │
+└───────────────────────────────────────────────────────────────┘
+```
+
+| Element | Spec |
+|---|---|
+| **Clear all** | A real selectable row, `[ clear all ]`, pinned at the top. Selecting it runs `cliphist wipe`. |
+| **Delete one** | `Ctrl+X` on any row — deletes that entry and reloads in place. |
+| **Movement** | `Ctrl+J` / `Ctrl+K`, house style. |
+
+**Why clear-all is a row and not only a keybind.** Same reasoning §1 gives for the notification
+centre's `[ clear all ]` button: an affordance you cannot see is one you cannot press. Harry asked
+for it directly — *"a text entry in the clipboard menu to clear the clipboard items."*
+
+**`--bind 'load:down'`, not `start:down`.** The clear row sits at the top, so the cursor has to
+begin one row below it or the default Enter wipes 555 entries instead of pasting the newest one.
+The `start` event fires *before* the item list exists, so the cursor move was silently discarded
+and the pointer sat on `[ clear all ]` at open — verified by rendering it. `load` fires once the
+list is in, and also re-fires after a `Ctrl+X` reload, which is the behaviour you want anyway.
+
+**No confirmation prompt, deliberately.** `cliphist wipe` is not reversible, but §1 says nothing
+regularly touched may require navigating, and clipboard history rebuilds itself within a day.
+Being one row out of the default cursor position is the whole safety margin.
+
+**The rows are not ANSI-coloured, deliberately.** Colouring `[ clear all ]` would mean passing
+`--ansi` to fzf, and every other row here is arbitrary text off the internet. Letting fzf
+interpret escape sequences in copied content mangles the list at best. The brackets carry the
+affordance instead — which is the house language anyway.
 
 ### Windows (niri) — BUILT
 
@@ -351,15 +579,30 @@ The block-glyph workspace indicator is the strongest element built so far. Exten
 
 - ~~**Volume** as a block meter~~ — done, `[ vol ████░░░ ]`. **Brightness skipped: no
   `/sys/class/backlight` device on this machine.** It is a desktop; there is nothing to dim.
+- ~~**Music position** as a block meter~~ — done 2026-09-25, `▓▓▓░░░░░` in the music island
+- ~~**Islands as drawn frames** (corner ticks instead of a full accent outline)~~ — done 2026-09-25
 - **Battery / capacity** bars in the same idiom (desktop, so low priority)
 - **A floating player TUI** on the music module's right-click — `rmpc` in a `sanctuary-music`
   window. The niri window-rule is already written and waiting; only the bind is missing.
 - ~~**Box-drawing separators**~~ — done, one `│` between the audio and system clusters
+- ~~**Braille** in the bar~~ — in as of 2026-09-25: the workspace indicator is braille cells.
+  Read the font trap in §5 before adding any more of it.
+- **Workspace density**: a variant that sizes each cell by how many windows the workspace holds
+  (`⠄ ⠆ ⠶ ⠿ ⣿`, event-driven off `niri msg -j event-stream`) was built and left unbound in
+  `runs/2026-09-25_waybar-ascii-redesign/output/`. It turns the indicator into a readout — which
+  desktops have work waiting — if the plain strip ever feels too quiet.
 - **CPU/RAM** as braille sparklines (`⣀⣄⣆⣇⣿`) if a system module is ever wanted. Deliberately
   not built: it adds a polling process, and §1 of `DESKTOP-PLAN.md` says every process has to
   earn its RAM on an i5-6500.
 - ~~**Notification count** as block glyphs~~ — done, `▁ ▃ ▅ ▇ █`
+- ~~**The launcher** in the same idiom~~ — done, and it is the biggest surface running the `█`/`░`
+  pair: walker's gutter marks the current row `█` and every other row `░`, cross-faded by
+  opacity. See §5 — the technique generalises to any state-dependent glyph in GTK.
 - A **`fastfetch`/`kotofetch` dashboard** on a keybind, same visual language
+- **A window switcher.** elephant already ships a `windows` provider, and `niriactions` /
+  `nirisessions` besides. An alt-tab in the launcher's own language is one provider away — one
+  word in `[providers]`, one word in `enabledProviders`, and an `item_windows.xml`. Nothing to
+  build from scratch. See §5's trap list before writing that item template.
 
 Also open: whether the bar gets a name from `NAMING-CONVENTION.md`.
 

@@ -73,6 +73,13 @@ window-rule {
 }
 
 window-rule {
+    match app-id="sanctuary-run"
+    open-floating true
+    default-column-width { fixed 900; }
+    default-window-height { fixed 600; }
+}
+
+window-rule {
     match app-id="sanctuary-clipboard"
     open-floating true
     default-column-width { fixed 820; }

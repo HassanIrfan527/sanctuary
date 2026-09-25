@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The Sanctuary — walker layout.
+
+  A walker theme starts from walker's built-in default and overrides only the
+  files it ships, so this directory carries layout.xml, item.xml and style.css
+  and inherits keybind.xml, preview.xml and every item_<provider>.xml.
+
+  EVERY object id below is looked up by walker at startup. Do not delete one
+  to hide it — walker fails with "failed initializing windows". Hide things in
+  style.css instead. That is why Preview, Keybinds, GlobalKeybinds,
+  ItemKeybinds and Error are all still here despite never being shown.
+
+  What is genuinely ASCII here, and what only looks it:
+    real characters  the block banner, the `[ run ]` prompt, `█`/`░` in the
+                     gutter (item.xml), and the `— nothing —` empty state
+    rendered 1px     the island border and the rule under the input
+  A `─` glyph in JetBrainsMono and a 1px CSS border are the same line to the
+  eye, so the borders are CSS. Anything wider than a hairline is a character.
+-->
+<interface>
+  <requires lib="gtk" version="4.0"></requires>
+  <object class="GtkWindow" id="Window">
+    <style>
+      <class name="window"></class>
+    </style>
+    <property name="resizable">true</property>
+    <property name="title">Walker</property>
+    <child>
+      <object class="GtkBox" id="BoxWrapper">
+        <style>
+          <class name="box-wrapper"></class>
+        </style>
+        <!-- overflow hidden is load-bearing: it clips the list to the square
+             border instead of letting a row bleed past the corner. -->
+        <property name="overflow">hidden</property>
+        <property name="orientation">horizontal</property>
+        <property name="valign">center</property>
+        <property name="halign">center</property>
+        <property name="width-request">560</property>
+        <!-- No height-request on purpose. The default theme pins 570px, which
+             leaves a tall empty box when two things match. Letting the box
+             hug its content is §2's empty-states-render-nothing applied to
+             the shape of the window itself. -->
+        <child>
+          <object class="GtkBox" id="Box">
+            <style>
+              <class name="box"></class>
+            </style>
+            <property name="orientation">vertical</property>
+            <property name="hexpand-set">true</property>
+            <property name="hexpand">true</property>
+            <property name="spacing">0</property>
+
+            <!-- ── Banner ──────────────────────────────────────────────
+                 Static text. walker reads this XML once, and as a service it
+                 reads it once per session, so the live `up`/`load` readout
+                 the terminal launcher had is not reachable here. Rather than
+                 print a number that would be a lie after five minutes, the
+                 caption is the name. -->
+            <child>
+              <object class="GtkLabel" id="SanctuaryBanner">
+                <style>
+                  <class name="banner"></class>
+                </style>
+                <property name="xalign">0</property>
+                <property name="justify">left</property>
+                <property name="label">█▀▄ █ █ █▄ █   the sanctuary
+█▀▄ █ █ █ ▀█
+▀ ▀ ▀▀▀ ▀  ▀</property>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkBox" id="SearchContainer">
+                <style>
+                  <class name="search-container"></class>
+                </style>
+                <property name="overflow">hidden</property>
+                <property name="orientation">horizontal</property>
+                <property name="halign">fill</property>
+                <property name="hexpand-set">true</property>
+                <property name="hexpand">true</property>
+                <!-- ── Prompt ──
+                     The bracketed prompt, carried over verbatim from
+                     fuzzel.ini. walker has no prompt setting, but it does not
+                     touch object ids it does not know, so a plain label in
+                     front of the entry survives untouched. -->
+                <child>
+                  <object class="GtkLabel" id="SanctuaryPrompt">
+                    <style>
+                      <class name="prompt"></class>
+                    </style>
+                    <property name="label">[ run ]</property>
+                    <property name="valign">center</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="Input">
+                    <style>
+                      <class name="input"></class>
+                    </style>
+                    <property name="halign">fill</property>
+                    <property name="hexpand-set">true</property>
+                    <property name="hexpand">true</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkBox" id="ContentContainer">
+                <style>
+                  <class name="content-container"></class>
+                </style>
+                <property name="orientation">horizontal</property>
+                <property name="spacing">0</property>
+                <child>
+                  <object class="GtkLabel" id="ElephantHint">
+                    <style>
+                      <class name="elephant-hint"></class>
+                    </style>
+                    <property name="label">— no elephant —</property>
+                    <property name="hexpand">true</property>
+                    <property name="vexpand">true</property>
+                    <property name="visible">false</property>
+                    <property name="valign">0.5</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="Placeholder">
+                    <style>
+                      <class name="placeholder"></class>
+                    </style>
+                    <!-- Overwritten at runtime from [placeholders] in
+                         config.toml; this is only the value before walker
+                         gets to it. -->
+                    <property name="label">— nothing —</property>
+                    <property name="hexpand">true</property>
+                    <property name="vexpand">true</property>
+                    <property name="valign">0.5</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkScrolledWindow" id="Scroll">
+                    <style>
+                      <class name="scroll"></class>
+                    </style>
+                    <property name="can_focus">false</property>
+                    <property name="overlay-scrolling">true</property>
+                    <property name="hexpand">true</property>
+                    <property name="vexpand">true</property>
+                    <!-- No min/max-content-width: the default theme pins 500
+                         against a 600px wrapper, which fights hexpand. Let
+                         the width come from the wrapper and only cap height. -->
+                    <property name="max-content-height">340</property>
+                    <property name="propagate-natural-height">true</property>
+                    <property name="propagate-natural-width">false</property>
+                    <property name="hscrollbar-policy">external</property>
+                    <property name="vscrollbar-policy">automatic</property>
+                    <child>
+                      <object class="GtkGridView" id="List">
+                        <style>
+                          <class name="list"></class>
+                        </style>
+                        <property name="max_columns">1</property>
+                        <property name="min_columns">1</property>
+                        <property name="can_focus">false</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox" id="Preview">
+                    <style>
+                      <class name="preview"></class>
+                    </style>
+                  </object>
+                </child>
+              </object>
+            </child>
+
+            <!-- Kept so walker can find them, hidden in style.css. -->
+            <child>
+              <object class="GtkBox" id="Keybinds">
+                <property name="hexpand">true</property>
+                <style>
+                  <class name="keybinds"></class>
+                </style>
+                <child>
+                  <object class="GtkBox" id="GlobalKeybinds">
+                    <style>
+                      <class name="global-keybinds"></class>
+                    </style>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox" id="ItemKeybinds">
+                    <property name="hexpand">true</property>
+                    <property name="halign">end</property>
+                    <style>
+                      <class name="item-keybinds"></class>
+                    </style>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="Error">
+                <style>
+                  <class name="error"></class>
+                </style>
+                <property name="xalign">0</property>
+                <property name="visible">false</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

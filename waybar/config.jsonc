@@ -21,14 +21,36 @@
   "modules-center": ["clock"],
   "modules-right":  ["custom/music", "pulseaudio#mic", "custom/sep", "tray", "custom/notification"],
 
+  // Braille cells, one per workspace: ⠶ idle · ⣿ focused · ⣶ urgent. Density of
+  // dots carries the state, colour confirms it.
+  //
+  // The font_family span is NOT optional. JetBrainsMono Nerd Font has no braille
+  // coverage at all (`fc-list 'JetBrainsMono Nerd Font:charset=28ff'` is empty),
+  // and the per-glyph fallback draws EVERY braille codepoint as the same 8-dot
+  // grid — so ⠶ and ⣿ come out identical and the indicator says nothing. Naming
+  // a braille-capable font in the markup fixes it without changing the typeface
+  // of anything else on the bar. CommitMono Nerd Font is already installed.
   "niri/workspaces": {
     "format": "{icon}",
-    "format-icons": { "active": "█", "default": "░", "urgent": "▓" }
+    "format-icons": {
+      "active":  "<span font_family='CommitMono Nerd Font'>⣿</span>",
+      "default": "<span font_family='CommitMono Nerd Font'>⠶</span>",
+      "urgent":  "<span font_family='CommitMono Nerd Font'>⣶</span>"
+    }
   },
 
   // 12-hour. %I is zero-padded and %p is fixed-width, so the island never
   // changes width and the modules beside it never shuffle.
-  "clock": { "format": "[ {:%I:%M %p  %a %d} ]", "tooltip": false },
+  //
+  // Two-tone: the time carries the peach, the meridiem and date step down, and
+  // the brackets plus the field divider drop to the frame colour. Punctuation
+  // is structure, not content — you should read 10:02 before you read "Fri".
+  // The markup lives inside the strftime spec because strftime passes anything
+  // that isn't a % escape through untouched.
+  "clock": {
+    "format": "<span color='#45475a'>[</span> {:%I:%M<span color='#6c7086'> %p</span>  <span color='#45475a'>│</span> <span color='#a6adc8'>%a %d</span>} <span color='#45475a'>]</span>",
+    "tooltip": false
+  },
 
   // Click toggles playback; scroll skips. Right-click is deliberately unbound
   // for now — a floating player TUI is the eventual answer, not a popup.
@@ -44,7 +66,7 @@
   // here anyway: right-click cuts the mic, left-click opens the real mixer as
   // a floating terminal (DESKTOP-PLAN.md §3).
   "pulseaudio#mic": {
-    "format": "[ mic {format_source} ]",
+    "format": "<span color='#45475a'>[</span> <span color='#6c7086'>mic</span> {format_source} <span color='#45475a'>]</span>",
     "format-source": "on", "format-source-muted": "--",
     "tooltip": false,
     "on-click":       "kitty --class sanctuary-mixer -e wiremix",

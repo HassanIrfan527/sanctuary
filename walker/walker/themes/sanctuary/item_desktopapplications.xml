@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The Sanctuary — walker row template for the desktopapplications provider.
+
+  THE FILENAME IS NOT OPTIONAL. walker's theme loader reads a fixed list of
+  filenames — layout.xml, keybind.xml, style.scss, style.css, preview.xml —
+  plus one `item_<provider>.xml` per provider elephant reports. A generic
+  `item.xml` in a custom theme is NEVER READ; that name only exists inside
+  walker's own embedded default. Naming this file item.xml cost a debugging
+  round: the theme loaded, the banner and colours applied, and the rows
+  silently kept walker's built-in two-line layout with no gutter.
+  Adding a provider to config.toml means adding its item_<provider>.xml too,
+  or it falls back to the built-in row.
+
+  THE GUTTER, and why it is real characters after all.
+
+  The known GTK limitation is that CSS has no `content:` property, so a
+  stylesheet cannot swap one character for another — it is the same wall the
+  swaync close button hit (DESIGN-BRIEF.md §5). That appeared to rule out the
+  bar's `█` active / `░` inactive language here, because which glyph a row
+  shows depends on whether the row is selected, and only CSS knows that.
+
+  The way around it: ship BOTH characters, stacked in a GtkOverlay so they
+  occupy the same cell, and let CSS flip their `opacity` on `child:selected`.
+  Opacity IS a GTK4 CSS property. Nothing is being faked with a background
+  tint — `█` and `░` are both really drawn, one of them just at zero alpha.
+
+  ItemImage and ItemImageFont are walker's icon slots. They are kept because
+  walker looks up every id in this file, and shrunk to nothing in style.css —
+  the same approach the notification centre takes with artwork (§5): every
+  icon-size knob at 0 rather than deleting the widget.
+-->
+<interface>
+  <requires lib="gtk" version="4.0"></requires>
+  <object class="GtkBox" id="ItemBox">
+    <style>
+      <class name="item-box"></class>
+    </style>
+    <property name="orientation">horizontal</property>
+    <property name="spacing">0</property>
+
+    <child>
+      <object class="GtkOverlay" id="SanctuaryGutter">
+        <style>
+          <class name="gutter"></class>
+        </style>
+        <property name="valign">center</property>
+        <child>
+          <object class="GtkLabel" id="SanctuaryGutterIdle">
+            <style>
+              <class name="gutter-idle"></class>
+            </style>
+            <property name="label">░</property>
+            <property name="width-chars">1</property>
+          </object>
+        </child>
+        <child type="overlay">
+          <object class="GtkLabel" id="SanctuaryGutterActive">
+            <style>
+              <class name="gutter-active"></class>
+            </style>
+            <property name="label">█</property>
+            <property name="width-chars">1</property>
+          </object>
+        </child>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkLabel" id="ItemImageFont">
+        <style>
+          <class name="item-image-text"></class>
+        </style>
+        <property name="width-chars">0</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImage" id="ItemImage">
+        <style>
+          <class name="item-image"></class>
+        </style>
+        <property name="icon-size">normal</property>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkBox" id="ItemTextBox">
+        <style>
+          <class name="item-text-box"></class>
+        </style>
+        <property name="orientation">horizontal</property>
+        <property name="vexpand">true</property>
+        <property name="hexpand">true</property>
+        <property name="vexpand-set">true</property>
+        <property name="spacing">0</property>
+        <!-- Horizontal, not the default's vertical stack. Two columns on one
+             line is what fuzzel showed and what the terminal launcher showed:
+             name, then a dim subtitle. Stacking them doubles the row height
+             and halves how much of the list is visible. -->
+        <child>
+          <object class="GtkLabel" id="ItemText">
+            <style>
+              <class name="item-text"></class>
+            </style>
+            <property name="ellipsize">end</property>
+            <property name="width-chars">22</property>
+            <property name="max-width-chars">22</property>
+            <property name="vexpand_set">true</property>
+            <property name="vexpand">true</property>
+            <property name="xalign">0</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkLabel" id="ItemSubtext">
+            <style>
+              <class name="item-subtext"></class>
+            </style>
+            <property name="ellipsize">end</property>
+            <property name="hexpand">true</property>
+            <!-- Capped so a long GenericName ("Equalizer, Compressor and
+                 Other Audio Effects") cannot widen the whole island. GTK
+                 sizes a box from its children's natural width, so without a
+                 cap the launcher changes width with whatever matched. -->
+            <property name="max-width-chars">32</property>
+            <property name="vexpand_set">true</property>
+            <property name="vexpand">true</property>
+            <property name="xalign">0</property>
+          </object>
+        </child>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkLabel" id="QuickActivation">
+        <style>
+          <class name="item-quick-activation"></class>
+        </style>
+        <property name="wrap">false</property>
+        <property name="valign">center</property>
+        <property name="xalign">0</property>
+        <property name="yalign">0.5</property>
+      </object>
+    </child>
+  </object>
+</interface>

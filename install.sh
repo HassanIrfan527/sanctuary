@@ -34,11 +34,13 @@ LINKS=(
   "swaync/swaync         : ~/.config/swaync"
   "television/television : ~/.config/television"
   "themes/themes         : ~/.config/themes"
+  "walker/walker         : ~/.config/walker"
   "waybar                : ~/.config/waybar"
   "yazi/yazi             : ~/.config/yazi"
   "niri/niri             : ~/.config/niri"
 
   # ── single-file links (config dir stays real, one file is linked) ──
+  "opencode/opencode.jsonc            : ~/.config/opencode/opencode.jsonc"
   "sheldon/plugins.toml               : ~/.config/sheldon/plugins.toml"
   "starship/themes/rose-pine-moon.toml : ~/.config/starship.toml"
 
