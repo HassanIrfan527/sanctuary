@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Start / stop / restart waybar — in whichever mode is current.
 #
-# NixOS wraps the binary, so `pkill -x waybar` matches NOTHING and you end up
-# stacking invisible instances. The real process name is `.waybar-wrapped`.
+# Match waybar by exact process name. On NixOS the binary was wrapped (comm
+# `.waybar-wrapped`); on Fedora it is plain `waybar`. Wrong name = stacked bars.
 # This cost a long debug detour once already (DESIGN-BRIEF.md §5).
 #
 # Two more things this has to get right:
@@ -34,9 +34,9 @@ case "$want" in
   *)    CFG="$HOME/.dotfiles/waybar/config.jsonc";     CSS="$HOME/.dotfiles/waybar/style.css" ;;
 esac
 
-running() { pgrep -x .waybar-wrapped >/dev/null 2>&1; }
+running() { pgrep -x waybar >/dev/null 2>&1; }
 launch()  { setsid waybar -c "$CFG" -s "$CSS" >/dev/null 2>&1 & }
-stop()    { pkill -x .waybar-wrapped; }
+stop()    { pkill -x waybar; }
 
 case "${1:-toggle}" in
   start)   [ "$autostart" = yes ] && { running || launch; } ;;

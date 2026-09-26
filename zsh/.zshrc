@@ -9,6 +9,9 @@ fi
 if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
     PATH="$HOME/bin:${PATH}"
 fi
+if [[ ":$PATH:" != *":$HOME/.cargo/bin:"* ]]; then
+    PATH="$HOME/.cargo/bin:${PATH}"
+fi
 
 export PATH
 

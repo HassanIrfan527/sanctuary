@@ -30,7 +30,9 @@ MIN=1500
 MAX=6500
 DEFAULT=4500
 
-running() { pgrep -x wl-gammarelay-rs >/dev/null 2>&1; }
+# Ask D-Bus, not pgrep: the kernel truncates comm to 15 chars, so
+# `pgrep -x wl-gammarelay-rs` can never match.
+running() { busctl --user status "$DEST" >/dev/null 2>&1; }
 
 get() {
   busctl --user get-property "$DEST" "$PATH_" "$IFACE" Temperature 2>/dev/null \

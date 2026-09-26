@@ -3,7 +3,7 @@
 // borders. See ../DESIGN-BRIEF.md before changing anything here.
 //
 // Run:  ~/.dotfiles/scripts/sanctuary/bar.sh start|stop|toggle|restart
-// Kill: pkill -x .waybar-wrapped     <- NixOS wraps the binary; plain `waybar` won't match
+// Kill: pkill -x waybar
 //
 // Layout:  [workspaces]        [clock]        [music] [mic] │ [tray] [notif]
 // The clock is centred because it is the one thing read without being looked

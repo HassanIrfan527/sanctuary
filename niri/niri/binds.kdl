@@ -4,7 +4,7 @@ binds {
     Mod+Return hotkey-overlay-title="Terminal" { spawn "kitty"; }
     Mod+E      { spawn "sh" "-c" "kitty -e superfile"; }
     Mod+Y      { spawn "nautilus"; }
-    Mod+B      { spawn "brave"; }
+    Mod+B      { spawn "brave-browser"; }
 
     //── Launcher ──
     // fsel TUI in a floating kitty. -d detaches launched apps, or they die with it.

@@ -44,8 +44,8 @@ apply() {
   [ -n "${WW:-}" ] || { echo "awww/swww not installed" >&2; return 1; }
   ensure_daemon || { echo "wallpaper daemon would not start" >&2; return 1; }
   "$WW" img "$1" \
-    --transition-type fade \
-    --transition-duration 0.4 \
+    --transition-type random \
+    --transition-duration 1.2 \
     --transition-fps 60 >/dev/null 2>&1
 }
 
