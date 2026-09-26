@@ -1,0 +1,66 @@
+/* The Sanctuary — waybar, zen mode
+
+   This is the ONE surface that does not speak the TUI language, and that is
+   deliberate: the full bar is ASCII because it reports six things at once and
+   structure is what makes six things readable. Zen reports one thing. With
+   nothing to separate it from, a drawn `[ ]` frame is just noise around a
+   number — so the clock becomes a soft light pill instead. Warm, round, quiet.
+
+   Everything else in zen mode still follows the brief; the departure is scoped
+   to this file (DESIGN-BRIEF §2's zen exception, same as the 12px windows). */
+
+/* Dark and warm. "Light" here means light *design* — less of everything — not a
+   light palette: a bright chip on a dark desk is the one thing on screen that
+   can still hurt at 2am, which is the hour this mode exists for. So: mocha ink,
+   rosewater type. Warm enough to read as cosy, dim enough to ignore.
+
+   The fill is deliberately sheer: mode.sh emits a niri layer-rule that blurs
+   what is behind the bar in zen (see modes/zen.conf, BAR_BLUR), and blur only
+   shows through alpha. Raise the 0.55 if a busy wallpaper ever fights the
+   type — that is the only knob this needs. */
+@define-color pill      rgba(24, 24, 37, 0.55);   /* mantle, sheer — niri blurs behind it */
+@define-color ink       #f2d5cf;                  /* flamingo — the time    */
+@define-color ink_soft  #6c7086;                  /* overlay0 — the date    */
+
+* {
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 13px;
+  min-height: 0;
+  text-shadow: none;
+  box-shadow: none;
+}
+window#waybar { background: transparent; }
+
+/* The pill fills its surface EXACTLY, and that is not cosmetic. niri blurs the
+   layer's rectangle — every pixel of surface, painted or not — and a layer-rule's
+   geometry-corner-radius does not round that rectangle (tested at 0 and 17:
+   pixel-identical). So any slack between surface and pill blurs as a pale halo.
+
+   Keep in step, or the halo comes back:
+       config.jsonc width  =  min-width + 2 x padding   (160 + 40 = 200)
+       config.jsonc height =  min-height                (34)
+
+   Radius is 12 to match zen's window corners — and modestly, because the blur
+   underneath keeps square corners no matter what: at 12px the overshoot is ~3px
+   of soft gradient, which is invisible. At 17 (a true pill) it reads as four
+   pale nubs. */
+#clock {
+  color: @ink;
+  background-color: @pill;
+  border: none;
+  border-radius: 12px;
+  min-width: 160px;
+  min-height: 34px;
+  padding: 0 20px;
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+
+  /* Lift, not outline: a soft drop shadow is what makes it read as sitting on
+     the wallpaper rather than being cut out of it. Overrides the `*` reset.
+     Deeper than it would be on a light pill — a dark chip needs the separation
+     more, because it has no brightness contrast to do that job. */
+  box-shadow: 0 2px 14px rgba(17, 17, 27, 0.55);
+
+  transition: background-color 160ms ease-out, color 160ms ease-out;
+}

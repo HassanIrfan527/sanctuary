@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Wallpaper: pick visually, apply through swww, remember the choice.
+# Wallpaper: pick visually, apply through awww, remember the choice.
 #
 #   wallpaper.sh pick      floating kitty + yazi over the wallpaper dir
 #   wallpaper.sh set PATH  apply and remember
@@ -8,7 +8,6 @@
 # yazi runs in --chooser-file mode: Enter writes the selection and exits, so
 # this script keeps control and does the applying. kitty's graphics protocol
 # gives yazi real image previews, which is the whole reason the picker is a
-# terminal (DESIGN-BRIEF.md §5) — hjkl and Enter, no filenames typed.
 set -uo pipefail
 
 DIR="${SANCTUARY_WALLPAPERS:-$HOME/Pictures/Wallpapers}"

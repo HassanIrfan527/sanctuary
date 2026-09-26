@@ -33,6 +33,12 @@ binds {
     Mod+Shift+W hotkey-overlay-title="Wallpaper" {
         spawn "/home/dweller/.dotfiles/scripts/sanctuary/wallpaper.sh" "pick";
     }
+    // Modes: Default / Zen / Zen — no bar. The picker is fzf in a floating kitty,
+    // same as every other panel. Adding a mode is adding a file in
+    // scripts/sanctuary/modes/ — this bind never changes.
+    Mod+Shift+Z hotkey-overlay-title="Mode (zen / default)" {
+        spawn "kitty" "--class" "sanctuary-mode" "-e" "/home/dweller/.dotfiles/scripts/sanctuary/mode.sh" "pick";
+    }
     Mod+Shift+A { spawn "/home/dweller/.dotfiles/scripts/sanctuary/bar.sh" "toggle"; }
 
     //── Audio ──  wpctl talks to pipewire directly; the bar is the readout.

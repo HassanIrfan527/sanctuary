@@ -124,6 +124,16 @@ if [[ ! -e "$seed_theme" ]]; then
   say "→ seeded: kitty current-theme.conf (dark default)"
 fi
 
+# niri's config.kdl does `include "mode.kdl"`, and that file is generated per
+# mode by scripts/sanctuary/mode.sh and git-ignored. Seed it with Default so a
+# fresh clone has a valid config before the first Mod+Shift+Z.
+seed_mode="$DOTFILES/niri/niri/mode.kdl"
+if [[ ! -e "$seed_mode" ]]; then
+  say ""
+  run "'$DOTFILES/scripts/sanctuary/mode.sh' set default"
+  say "→ seeded: niri mode.kdl (Default)"
+fi
+
 say ""
 if [[ $DRY_RUN == 0 && -d "$BACKUP_DIR" ]]; then
   say "Anything replaced was backed up to: $BACKUP_DIR"

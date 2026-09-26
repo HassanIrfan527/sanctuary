@@ -75,12 +75,20 @@ Square. Not by preference — by consequence. Box-drawing is square, terminals a
 philosophy decides it and the question stops being a question. Corner radius is **0–2px**
 everywhere. This was previously an unresolvable coin-flip; committing to TUI resolved it.
 
+**One scoped exception, added 2026-09-25: Zen mode.** Windows round to **12px** and the zen bar's
+clock is a soft pill, because zen is the mode where the screen holds *one* thing — and structure
+earns its keep by separating things. With nothing to separate, a drawn frame is decoration.
+Default mode is unchanged and still square. The exception is a *mode*, not a revision: it lives in
+`scripts/sanctuary/modes/zen.conf`, so it cannot leak into the rest of the system by accident.
+Known cost, accepted: at 12px with `clip-to-geometry true`, the corner character cell of a
+bordered TUI gets nibbled.
+
 ### Rules
 
 | Axis | Rule |
 |---|---|
 | **Structure** | Islands, not transparency. Every module is a bordered box with a fill. Visible structure *is* the craft. |
-| **Shape** | 0–2px radius. Square. No exceptions. |
+| **Shape** | 0–2px radius. Square. One exception, Zen mode — see above. |
 | **Type** | Monospace only — JetBrainsMono Nerd Font. One family, whole system. |
 | **Glyphs** | ASCII and block characters over icon fonts: `█ ░ ▓ ▒ ● ○ ▶ ‖ [ ]`. Text labels where a word fits (`mic on`, not a microphone icon). |
 | **Colour** | Per-module accent borders carry identity — you tell modules apart by border colour without reading them. |
@@ -170,6 +178,20 @@ font-size    12px  (10-11px for glyph-only modules)
 duration     160ms
 easing       ease-out
 ```
+
+Space is per **mode** as of 2026-09-25 — these are the numbers, and they live in
+`scripts/sanctuary/modes/<name>.conf`, not in any KDL file:
+
+| | Default | Zen | Zen — no bar |
+|---|---|---|---|
+| gaps | 4 | 16 | 16 |
+| struts (side / top / bottom) | 8 / 8 / 8 | 40 / 20 / 32 | 40 / 40 / 40 |
+| window radius | 2 | 12 | 12 |
+| window opacity | 1.0 | 0.97 | 0.97 |
+| centre a lone window | no | yes | yes |
+| bar | full | clock pill | none (Mod+Shift+A peeks) |
+| bar blur | no | yes | yes |
+| notifications | on | DND | DND |
 
 ---
 
@@ -505,10 +527,65 @@ Being one row out of the default cursor position is the whole safety margin.
 interpret escape sequences in copied content mangles the list at best. The brackets carry the
 affordance instead — which is the house language anyway.
 
+### Modes — BUILT · 2026-09-25
+
+`scripts/sanctuary/mode.sh` + `scripts/sanctuary/modes/*.conf`. **Mod+Shift+Z** opens the picker:
+fzf in a floating kitty (`sanctuary-mode`), same idiom as the clipboard and the mixer.
+
+**A mode is a file.** `modes/<name>.conf` is shell key/value — gaps, struts, radius, opacity,
+which bar, blur, DND. Adding a mode is adding a file; the picker lists whatever is in that
+directory, sorted by `ORDER`. The keybind never changes.
+
+| | What it is |
+|---|---|
+| **Default** | The Sanctuary as designed. Square, tight, full ASCII bar, notifications on. |
+| **Zen** | 16px gaps, 40px struts, 12px window radius, a lone window centred, clock pill only, DND on. |
+| **Zen — no bar** | Zen with no bar at all. `Mod+Shift+A` still peeks the pill back in. |
+
+**Why a rendered file and not a "zen override" include.** niri permits exactly **one** top-level
+`layout {}` block — a second one fails validation with *"duplicate node `layout`, single node
+expected"*. So a mode cannot add gaps on top of the base layout; it has to **be** the layout
+block. `mode.sh` renders `niri/templates/mode.kdl.in` into `niri/mode.kdl` with that mode's
+numbers and calls `niri msg action load-config-file`.
+
+Shape is the opposite case and worth knowing: **`window-rule` blocks are additive and the last one
+wins.** That is the only reason a mode can override the 2px radius floor in `window-rules.kdl` —
+`config.kdl` includes `mode.kdl` *after* it. Reorder those two includes and the radius silently
+stops applying, with no error anywhere.
+
+The install is reversible: the outgoing `mode.kdl` is kept, the *composed* config is run through
+`niri validate`, and a failure puts the old file back and says so in a critical toast. A bad mode
+file cannot leave the desktop with a broken config.
+
+**Three traps hit building it**, all fixed, all likely to recur:
+
+- **SIGHUP.** The picker runs inside a kitty that exits the instant you choose, so everything it
+  starts dies with it — the same trap that made the fsel launcher look broken. `bar.sh` now
+  `setsid`s waybar, and `mode.sh pick` `setsid`s the apply.
+- **strftime eats pango percentages.** `<span size='90%'>` inside a waybar clock format renders the
+  module *empty*: the whole string is a strftime spec and `%'` is not a valid conversion. Keyword
+  sizes (`smaller`) have no `%` and survive. An empty module looks exactly like a CSS bug.
+- **Bar blur is a rectangle, and it is per-mode.** A `layer-rule` matching `waybar` blurs the layer's
+  whole *surface rectangle* — every pixel of it, painted or not — so two things follow. It has to be
+  per-mode (`mode.sh` emits it only for `BAR_BLUR=yes`), because the full bar is opaque islands with
+  transparent air between them and a global rule smears a strip across the screen. And the zen bar's
+  surface has to be **exactly** the size of the pill (`width: 200` in its config, `min-width: 160` +
+  `20px` padding + `min-height: 34` in its CSS), or the leftover surface blurs as a pale halo around
+  it. A layer-rule's `geometry-corner-radius` does **not** round that rectangle — tested at 0 and 17
+  on niri 26.04, pixel-identical output — which is why the pill's radius is a modest 12px (matching
+  zen's windows): the blur's square corners overshoot by ~3px of soft gradient and disappear. At 17,
+  a true pill, they read as four pale nubs.
+
+**The zen clock is the one surface that is not TUI-native.** Dark sheer pill (mantle at 0.55,
+blurred behind), flamingo time, overlay0 date, fully rounded, soft drop shadow. Reasoning in §2:
+zen holds one thing, and a frame around one thing is decoration. `waybar/zen/{config.jsonc,style.css}`.
+
 ### Windows (niri) — BUILT
 
-`geometry-corner-radius` is now **2**. Borders stay mocha lavender focused / `overlay0`
-unfocused from `layout.kdl` — and they finally *hold*, because `noctalia.kdl` (which silently
+`geometry-corner-radius` is **2** in Default and **12** in Zen. Layout no longer lives in
+`layout.kdl` at all — that file became `niri/templates/mode.kdl.in`, rendered per mode (see Modes
+above). Borders stay mocha lavender focused / `overlay0`
+unfocused — and they finally *hold*, because `noctalia.kdl` (which silently
 overwrote them with pink `#f5c2e7`) is gone.
 
 ### Wallpaper picker — BUILT

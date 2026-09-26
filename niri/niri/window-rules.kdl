@@ -1,5 +1,7 @@
 // ── Window rules ──────────────────────────────────────────────────────
-// 2px, not 20 — the island language is square (DESIGN-BRIEF.md §2).
+// 2px, not 20 — the island language is square (DESIGN-BRIEF.md §2). This is the
+// FLOOR, not the final word: mode.kdl is included after this file and a mode may
+// raise the radius (Zen uses 12). Change it here and you change Default only.
 window-rule {
     geometry-corner-radius 2
     clip-to-geometry true
@@ -91,4 +93,13 @@ window-rule {
     open-floating true
     default-column-width { fixed 900; }
     default-window-height { fixed 600; }
+}
+
+// The mode picker (Mod+Shift+Z). Same idiom as every other panel here: fzf in a
+// floating kitty, so niri animates it and it inherits the kitty theme.
+window-rule {
+    match app-id="sanctuary-mode"
+    open-floating true
+    default-column-width { fixed 780; }
+    default-window-height { fixed 240; }
 }

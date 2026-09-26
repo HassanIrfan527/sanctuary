@@ -1,12 +1,15 @@
 // ── Startup ───────────────────────────────────────────────────────────
 // The Sanctuary. Every line here replaced something noctalia used to do.
 
-// Bar. Launched through the script because NixOS wraps the binary and a
-// bare `waybar` can stack invisible instances — see the script's comment.
-spawn-sh-at-startup "/home/dweller/.dotfiles/scripts/sanctuary/bar.sh start"
-
 // Notifications + the centre.
 spawn-at-startup "swaync"
+
+// Mode. Re-asserts the mode you were last in — which bar to bring up (the
+// script starts it; NixOS wraps the waybar binary and a bare `waybar` can stack
+// invisible instances) and whether swaync goes quiet. niri has already loaded
+// the right layout by this point, because mode.kdl persists on disk; this line
+// is for the parts of a mode that live outside the compositor.
+spawn-at-startup "/home/dweller/.dotfiles/scripts/sanctuary/mode.sh" "reapply"
 
 // Wallpaper. The script starts the daemon itself and waits for it to answer,
 // so there is no sleep-and-hope race here.

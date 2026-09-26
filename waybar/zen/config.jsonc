@@ -1,0 +1,39 @@
+// The Sanctuary — waybar, zen mode
+// One module. §1 of DESIGN-BRIEF says the clock is the one thing read without
+// being looked for, so it is the one thing that survives the cut. Everything
+// else the full bar reports has a keybind: Mod+Shift+D notifications,
+// Mod+Alt+M mixer, Mod+Tab overview.
+//
+// Run:  ~/.dotfiles/scripts/sanctuary/bar.sh start   (picks this file when the
+//       current mode's conf says BAR=zen — never launch it by hand)
+{
+  "layer": "top",
+  "position": "top",
+  // The surface is sized to the pill ON PURPOSE. niri's layer blur applies to
+  // the whole layer surface, not to the painted pixels in it — a full-width bar
+  // therefore blurs a strip across the entire screen with nothing in it. Setting
+  // an explicit `width` drops waybar's left/right anchors, so the surface shrinks
+  // to this box and centres, and the blur lands behind the pill and nowhere else.
+  // If the clock format ever gets longer, widen this or the label truncates.
+  "width": 200,
+  "height": 34,
+  "spacing": 0,
+  "margin-top": 10,
+
+  "modules-left":   [],
+  "modules-center": ["clock"],
+  "modules-right":  [],
+
+  // No brackets, no field divider, no ASCII — see style.css for why this one
+  // surface breaks the house language. Spacing carries the split and the date
+  // steps down in colour; that is the whole composition.
+  //
+  // NOTE: pango's `size='90%'` cannot be used here. The whole string is a
+  // strftime spec, and `%'` is not a valid conversion — strftime swallows it and
+  // the module renders EMPTY (an empty pill, which looks like a CSS bug and is
+  // not). Keyword sizes have no `%` in them, so they survive strftime.
+  "clock": {
+    "format": "{:%I:%M<span size='smaller'> %p</span>   <span color='#6c7086'>%a %d</span>}",
+    "tooltip": false
+  }
+}
