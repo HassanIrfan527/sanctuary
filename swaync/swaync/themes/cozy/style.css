@@ -1,0 +1,507 @@
+/* The Sanctuary — swaync, COZY theme (zen modes)
+
+   The ascii theme (themes/ascii) is the working desk: square islands, bracket
+   labels, no artwork, because it sits next to a bar reporting six things.
+   Zen reports one thing, so notifications here are allowed to be *objects*
+   rather than *readouts*: rounded, lifted, quiet type, app artwork on.
+
+   Rules for this file, so it does not drift back into the other language:
+     - No glyph decoration. No [ ], no ▸, no ░. Words and spacing do the work.
+     - One accent: flamingo, the same ink as the zen clock's time.
+     - Depth from shadow, not from borders. Borders are a 1px highlight at 6%.
+     - Motion 220ms ease-out — a touch slower than ascii's 160; cozy breathes.
+
+   mode.sh copies this over ../../style.css when a mode says SWAYNC=cozy.
+   Edit HERE, never the live copy. */
+
+:root {
+  /* ── Catppuccin Mocha (same values as ascii) ───────────────────────── */
+  --crust: rgb(17, 17, 27);
+  --mantle: rgb(24, 24, 37);
+  --base: rgb(30, 30, 46);
+  --surface0: rgb(49, 50, 68);
+  --surface1: rgb(69, 71, 90);
+  --surface2: rgb(88, 91, 112);
+  --overlay0: rgb(108, 112, 134);
+  --overlay1: rgb(127, 132, 156);
+  --subtext0: rgb(166, 173, 200);
+  --text: rgb(205, 214, 244);
+  --flamingo: rgb(242, 205, 205);
+  --red: rgb(243, 139, 168);
+
+  /* ── cozy tokens ───────────────────────────────────────────────────── */
+  --card: rgba(30, 30, 46, 0.96);          /* base, nearly solid        */
+  --card-hover: rgba(40, 40, 58, 0.97);
+  --panel: rgb(24, 24, 37);                 /* mantle, SOLID — see below */
+  --inset: rgba(49, 50, 68, 0.38);          /* surface0, cards in centre */
+  --inset-hover: rgba(49, 50, 68, 0.62);
+  --hairline: rgba(205, 214, 244, 0.06);    /* the 1px highlight edge    */
+  --accent: var(--flamingo);
+  --accent-soft: rgba(242, 205, 205, 0.16);
+  --danger-soft: rgba(243, 139, 168, 0.14);
+  --lift: 0 10px 28px rgba(8, 8, 14, 0.55), 0 2px 6px rgba(8, 8, 14, 0.35);
+
+  --r-card: 16px;
+  --r-panel: 20px;
+  --ease: 220ms ease-out;
+
+  /* ── swaync's own variables, repointed ─────────────────────────────── */
+  --cc-bg: var(--panel);
+  --noti-border-color: var(--hairline);
+  --noti-bg: 30, 30, 46;
+  --noti-bg-alpha: 0.96;
+  --noti-bg-darker: var(--mantle);
+  --noti-bg-hover: var(--card-hover);
+  --noti-bg-focus: var(--card-hover);
+  --noti-close-bg: transparent;
+  --noti-close-bg-hover: var(--surface0);
+  --text-color: var(--text);
+  --text-color-disabled: var(--surface2);
+  --bg-selected: var(--surface0);
+
+  --border-radius: var(--r-card);
+  --border: 1px solid var(--hairline);
+  --notification-shadow: var(--lift);
+
+  --notification-icon-size: 40px;
+  --notification-app-icon-size: 0px;
+  --notification-group-icon-size: 16px;
+
+  --font-size-summary: 13px;
+  --font-size-body: 12.5px;
+}
+
+/* Fallback names for swaync's pre-GTK4.16 code paths. */
+@define-color cc-bg rgba(24, 24, 37, 0.97);
+@define-color noti-bg rgba(30, 30, 46, 0.96);
+@define-color noti-bg-opaque rgb(30, 30, 46);
+@define-color noti-bg-hover rgba(40, 40, 58, 0.97);
+@define-color noti-bg-focus rgba(40, 40, 58, 0.97);
+@define-color noti-border-color rgba(205, 214, 244, 0.06);
+@define-color text-color rgb(205, 214, 244);
+@define-color text-color-disabled rgb(88, 91, 112);
+@define-color bg-selected rgb(49, 50, 68);
+
+/* Adwaita Sans (GNOME's Inter cut) for words: it is a variable font, so 500
+   and 600 are real weights. Geist was the first pick and is installed only as
+   Regular + Black here — every `font-weight: 600` silently became Black.
+   GeistMono only where digits should not jitter (the time). */
+* {
+  font-family: "Adwaita Sans", "Inter", sans-serif;
+  font-size: 12.5px;
+  text-shadow: none;
+  box-shadow: none;
+}
+
+notificationwindow,
+blankwindow,
+.blank-window {
+  background: transparent;
+}
+
+/* ── Toasts ──────────────────────────────────────────────────────────────
+   The margin is not spacing, it is room for the shadow: a GTK4 box-shadow is
+   painted inside the layer surface, so a card flush to the surface edge has
+   its lift clipped off and reads flat. */
+.floating-notifications {
+  background: transparent;
+}
+
+.floating-notifications .notification-row {
+  padding: 0;
+  margin: 0;
+}
+
+/* The shadow room lives on .notification-background, NOT on the card. The
+   close button is an overlay on .notification-background, pinned to ITS
+   top-right corner — margin on the card moves the card inward and leaves the
+   button floating outside it, over the gap. */
+.floating-notifications .notification-row .notification-background {
+  padding: 6px 12px 6px 14px;
+  margin: 0;
+}
+
+.floating-notifications .notification {
+  background: var(--card);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  box-shadow: var(--lift);
+  margin: 0;
+  transition: background var(--ease), border-color var(--ease);
+}
+
+.floating-notifications .notification:hover {
+  background: var(--card-hover);
+}
+
+.floating-notifications .notification.critical {
+  border-color: rgba(243, 139, 168, 0.40);
+}
+
+/* ── The centre ──────────────────────────────────────────────────────── */
+/* Solid, not sheer. A sheer panel only reads as glass with blur behind it,
+   and niri blurs a layer's whole surface rectangle — this surface includes
+   the shadow margin, so blur would draw a pale halo round the sheet. Without
+   blur, translucency just shows the terminal behind it as noise. */
+.control-center {
+  background: var(--panel);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-panel);
+  box-shadow: var(--lift);
+  margin: 4px 12px 16px 16px;
+  padding: 18px 14px 14px 14px;
+}
+
+.control-center .control-center-list,
+.control-center .widget-notifications,
+.control-center .notification-group,
+.control-center .notification-group .notification-row,
+.control-center .notification-row .notification-background {
+  background: transparent;
+  padding: 0;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.control-center .control-center-list-placeholder {
+  color: var(--overlay0);
+  font-size: 13px;
+  padding: 40px 0;
+  opacity: 1;
+}
+
+/* Header: "Notifications" as a real title, "Clear all" as a quiet pill. */
+.widget-title {
+  background: transparent;
+  margin: 0 2px 14px 4px;
+  padding: 0;
+  border: none;
+}
+
+.widget-title > label {
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+
+.widget-title > button {
+  background: var(--inset);
+  color: var(--subtext0);
+  border: none;
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: none;
+  transition: background var(--ease), color var(--ease);
+}
+
+.widget-title > button:hover {
+  background: var(--danger-soft);
+  color: var(--red);
+}
+
+/* Do-not-disturb: a proper rounded row, label left, soft switch right. */
+.widget-dnd {
+  background: var(--inset);
+  border-radius: 12px;
+  margin: 0 0 16px 0;
+  padding: 10px 12px 10px 14px;
+}
+
+.widget-dnd > label {
+  color: var(--subtext0);
+  font-size: 13px;
+}
+
+/* Roomy on purpose — GTK asks a too-tight slider for a negative size
+   ("GtkGizmo reported min width -13"). Same trap as in the ascii theme. */
+.widget-dnd > switch {
+  background: var(--surface1);
+  border: none;
+  border-radius: 999px;
+  min-width: 40px;
+  min-height: 22px;
+  padding: 2px;
+  transition: background var(--ease);
+}
+
+.widget-dnd > switch:checked {
+  background: var(--accent);
+}
+
+.widget-dnd > switch > slider {
+  background: var(--text);
+  border: none;
+  border-radius: 999px;
+  min-width: 18px;
+  min-height: 18px;
+  margin: 0;
+  box-shadow: 0 1px 3px rgba(8, 8, 14, 0.4);
+}
+
+.widget-dnd > switch:checked > slider {
+  background: var(--crust);
+}
+
+/* ── Cards (shared by toasts and the centre) ─────────────────────────── */
+.notification-row {
+  background: transparent;
+  outline: none;
+  padding: 0;
+  margin: 0 0 8px 0;
+}
+
+.notification-row:focus,
+.notification-row:hover {
+  background: transparent;
+}
+
+.notification-row .notification-background {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+/* In the centre the cards sit IN a sheet, so they are insets, not lifted
+   objects: no shadow, softer fill. */
+.control-center .notification-row .notification-background .notification {
+  background: var(--inset);
+  border: 1px solid transparent;
+  border-radius: 14px;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  transition: background var(--ease);
+}
+
+.control-center .notification-row .notification-background .notification:hover {
+  background: var(--inset-hover);
+}
+
+.control-center .notification-row .notification-background .notification.critical {
+  border-color: rgba(243, 139, 168, 0.30);
+}
+
+.notification-row .notification-background .notification .notification-default-action {
+  background: transparent;
+  border-radius: inherit;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-row .notification-background .notification .notification-default-action:hover {
+  background: transparent;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content {
+  background: transparent;
+  padding: 14px 14px 14px 14px;
+  margin: 0;
+}
+
+/* The artwork: a rounded tile, not a raw square. */
+.notification-row .notification-background .notification .notification-default-action .notification-content .image {
+  border-radius: 12px;
+  margin: 0 12px 0 0;
+  -gtk-icon-size: 40px;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .app-icon {
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  opacity: 0;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .body-image {
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .summary {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .body {
+  color: var(--subtext0);
+  font-size: 12.5px;
+  margin-top: 3px;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .time {
+  color: var(--overlay0);
+  font-family: "GeistMono Nerd Font", monospace;
+  font-size: 10.5px;
+  margin-right: 28px;
+}
+
+/* ── Close: a small round button that only shows up when you reach for it. */
+.close-button {
+  background: var(--surface0);
+  color: var(--subtext0);
+  border: none;
+  border-radius: 999px;
+  min-width: 22px;
+  min-height: 22px;
+  margin: 10px 10px 0 0;
+  padding: 0;
+  box-shadow: none;
+  opacity: 0;
+  transition: opacity var(--ease), background var(--ease), color var(--ease);
+}
+
+.notification-row:hover .close-button,
+.notification-group:hover .close-button {
+  opacity: 1;
+}
+
+.close-button:hover {
+  background: var(--danger-soft);
+  color: var(--red);
+}
+
+/* ── Actions: soft pills in a row under the text. */
+.notification-row .notification-background .notification .notification-action {
+  background: transparent;
+  margin: 0 4px 12px 4px;
+  padding: 0;
+}
+
+.notification-action > button {
+  background: var(--inset);
+  color: var(--text);
+  border: none;
+  border-radius: 999px;
+  margin: 0;
+  padding: 5px 12px;
+  font-weight: 500;
+  box-shadow: none;
+  transition: background var(--ease), color var(--ease);
+}
+
+.notification-action > button:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* Symmetric gutter for the action row: the row pads, each action pads 4px
+   either side, so the outer edges land on the text's 14px margin. */
+.notification-row .notification-background .notification .notification-alt-actions {
+  background: transparent;
+  padding: 0 10px 0 10px;
+}
+
+/* ── Groups ──────────────────────────────────────────────────────────── */
+.notification-group {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-group .notification-group-headers {
+  color: var(--overlay1);
+  font-size: 12px;
+  font-weight: 500;
+  margin: 2px 0 6px 6px;
+}
+
+.notification-group .notification-group-icon {
+  color: var(--overlay1);
+  margin-right: 4px;
+}
+
+.notification-group .notification-group-buttons {
+  background: transparent;
+}
+
+.notification-group .notification-group-close-button .close-button {
+  margin: 0 4px;
+  opacity: 1;
+  background: transparent;
+}
+
+.notification-group .notification-group-collapse-button {
+  background: transparent;
+  color: var(--overlay1);
+  border: none;
+  border-radius: 999px;
+}
+
+.notification-group .notification-group-collapse-button:hover {
+  background: var(--surface0);
+}
+
+/* ── Progress ────────────────────────────────────────────────────────── */
+.notification-row .notification-background .notification .notification-default-action .notification-content progressbar {
+  background: var(--surface0);
+  border-radius: 999px;
+  min-height: 4px;
+  margin-top: 8px;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content progressbar progress {
+  background: var(--accent);
+  border-radius: 999px;
+}
+
+/* ── Scrollbar: invisible until you are actually scrolling or pointing at it.
+   The centre's scrolled window spans the whole sheet (title included), so a
+   visible track reads as a stray line down the right edge. */
+scrollbar {
+  background: transparent;
+  border: none;
+  opacity: 0;
+  transition: opacity var(--ease);
+}
+
+/* GTK4 also paints undershoot/overshoot shading at a scrolled window's edges;
+   in a sheet this dark it shows as a line down the right side. */
+scrolledwindow undershoot,
+scrolledwindow overshoot {
+  background: none;
+  box-shadow: none;
+  border: none;
+}
+
+scrollbar.hovering,
+scrollbar.dragging,
+scrollbar:hover {
+  opacity: 1;
+}
+
+scrollbar slider {
+  background: rgba(205, 214, 244, 0.12);
+  border: none;
+  border-radius: 999px;
+  min-width: 6px;
+  min-height: 28px;
+  margin: 0;
+  transition: background var(--ease);
+}
+
+scrollbar slider:hover {
+  background: rgba(205, 214, 244, 0.22);
+}
+
+/* ── Inline reply ────────────────────────────────────────────────────── */
+.inline-reply-entry {
+  background: var(--base);
+  color: var(--text);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  padding: 4px 8px;
+  caret-color: var(--accent);
+}
+
+.inline-reply-button {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: none;
+  border-radius: 999px;
+  margin-left: 6px;
+}

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Modes — one keypress changes the whole desk: space, shape, bar, quiet.
 #
-#   mode.sh pick            the picker: fzf in a floating kitty  (Mod+Shift+Z)
+#   mode.sh pick            the picker: fzf in a floating kitty  (Mod+Shift+T)
 #   mode.sh set <name>      switch to modes/<name>.conf
 #   mode.sh status          print the current mode name
 #   mode.sh reapply         re-assert the saved mode (called at startup)
@@ -118,11 +118,40 @@ dnd_set() {
   esac
 }
 
+# swaync theme per mode: themes/<name>/{config.json,style.css} copied over the
+# live pair, then reloaded in place. Reload, not restart — a restart would drop
+# the notification history in the centre. `-R` re-reads config.json (labels,
+# icon visibility, margins); `-rs` re-reads the CSS. The live files are
+# gitignored: they are output, the themes/ copies are source.
+SWAYNC_DIR="$HOME/.dotfiles/swaync/swaync"
+swaync_theme() {
+  local src="$SWAYNC_DIR/themes/$1"
+  [ -r "$src/style.css" ] && [ -r "$src/config.json" ] || {
+    printf 'mode.sh: no swaync theme: %s\n' "$1" >&2; return 1; }
+  # Refuse a broken config.json. swaync reloads survive one, but the NEXT
+  # swaync start does not — no daemon, no notifications, no error you'd see.
+  # (CSS needs no guard: GTK skips bad rules and keeps going.)
+  if ! jq -e . "$src/config.json" >/dev/null 2>&1; then
+    notify-send -a sanctuary -u critical "swaync theme '$1' not applied" \
+      "themes/$1/config.json is not valid JSON — kept the current theme" 2>/dev/null
+    return 1
+  fi
+  cmp -s "$src/style.css" "$SWAYNC_DIR/style.css" \
+    && cmp -s "$src/config.json" "$SWAYNC_DIR/config.json" && return 0
+  cp -f "$src/config.json" "$SWAYNC_DIR/config.json"
+  cp -f "$src/style.css"   "$SWAYNC_DIR/style.css"
+  swaync-client -R  >/dev/null 2>&1
+  swaync-client -rs >/dev/null 2>&1
+}
+
 # The bar has no mode module, so the toast IS the readout — same reasoning as
 # nightlight.sh. A fixed replaces-id means repeated switches update one toast.
+# The title follows the notification theme it lands in: bracket readout in
+# ascii, plain words in cozy (no glyph decoration there — that is the point).
 announce() {
-  local label=$1 desc=$2
-  notify-send -a sanctuary -r 9412 -t 1600 "[ mode ▸ $label ]" "$desc" 2>/dev/null
+  local label=$1 desc=$2 theme=${3:-ascii} title
+  if [ "$theme" = cozy ]; then title="$label mode"; else title="[ mode ▸ $label ]"; fi
+  notify-send -a sanctuary -r 9412 -t 1600 "$title" "$desc" 2>/dev/null
 }
 
 apply() {
@@ -130,11 +159,12 @@ apply() {
   prev=$(current)
   [ -r "$MODES/$name.conf" ] || { printf 'mode.sh: no such mode: %s\n' "$name" >&2; return 1; }
 
-  local label desc bar dnd
+  local label desc bar dnd swaync
   label=$(. "$MODES/$name.conf"; printf '%s' "${LABEL:-$name}")
   desc=$(. "$MODES/$name.conf";  printf '%s' "${DESC:-}")
   bar=$(. "$MODES/$name.conf";   printf '%s' "${BAR:-full}")
   dnd=$(. "$MODES/$name.conf";   printf '%s' "${DND:-off}")
+  swaync=$(. "$MODES/$name.conf"; printf '%s' "${SWAYNC:-ascii}")
 
   # 1. Shape + space. Keep the outgoing file so a failed validate is reversible.
   local backup=""
@@ -159,16 +189,20 @@ apply() {
     *)    "$BAR_SH" restart ;;
   esac
 
-  # 4. Quiet, and say so. Leaving a DND mode: clear DND first, then announce, or
+  # 4. Notification theme — BEFORE the announce toast, so the toast already
+  #    wears the mode it announces.
+  swaync_theme "$swaync"
+
+  # 5. Quiet, and say so. Leaving a DND mode: clear DND first, then announce, or
   #    the toast is swallowed by the mode you are leaving. Entering one: announce
   #    first, then go quiet.
   if [ "$dnd" = on ]; then
-    announce "$label" "$desc"
+    announce "$label" "$desc" "$swaync"
     sleep 0.2
     dnd_set on
   else
     dnd_set off
-    announce "$label" "$desc"
+    announce "$label" "$desc" "$swaync"
   fi
 }
 
@@ -207,7 +241,15 @@ pick() {
   # setsid: this runs inside a kitty that exits the instant fzf returns, and
   # everything apply() starts would go down with it (the fsel SIGHUP trap,
   # DESIGN-BRIEF §5). bar.sh setsids waybar for the same reason.
-  setsid "$0" set "$sel" >/dev/null 2>&1 &
+  #
+  # setsid alone is a RACE, and it lost on Fedora/kitty 0.47 (2026-09-27): pick
+  # exits the instant it forks, kitty closes the pty and SIGHUPs everything still
+  # on it — and the child is still on it until setsid() has actually run. It died
+  # before its first line. `trap '' HUP` closes the window: an IGNORED signal
+  # stays ignored across exec, so the child is immune from its first instant.
+  # </dev/null too, so nothing holds the dying pty open.
+  trap '' HUP
+  setsid "$0" set "$sel" >/dev/null 2>&1 </dev/null &
 }
 
 case "${1:-pick}" in

@@ -13,8 +13,13 @@ kitty/kitty/current-theme.conf
 qutebrowser/qutebrowser/autoconfig.yml
 
 # Generated per mode by scripts/sanctuary/mode.sh — it changes on every mode
-# switch, so tracking it would mean a diff every time you press Mod+Shift+Z.
+# switch, so tracking it would mean a diff every time you press Mod+Shift+T.
 # install.sh seeds it (Default) on a fresh clone, where config.kdl's include
 # would otherwise dangle.
 niri/niri/mode.kdl
 niri/niri/mode.kdl.prev
+
+# Generated per mode by scripts/sanctuary/mode.sh from swaync/swaync/themes/<name>/
+# (ascii in Default, cozy in Zen). Edit the themes/ copies; these are output.
+swaync/swaync/config.json
+swaync/swaync/style.css

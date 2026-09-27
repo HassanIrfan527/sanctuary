@@ -36,7 +36,7 @@ binds {
     // Modes: Default / Zen / Zen — no bar. The picker is fzf in a floating kitty,
     // same as every other panel. Adding a mode is adding a file in
     // scripts/sanctuary/modes/ — this bind never changes.
-    Mod+Shift+Z hotkey-overlay-title="Mode (zen / default)" {
+    Mod+Shift+T hotkey-overlay-title="Theme / mode (zen / default)" {
         spawn "kitty" "--class" "sanctuary-mode" "-e" "/home/dweller/.dotfiles/scripts/sanctuary/mode.sh" "pick";
     }
     Mod+Shift+A { spawn "/home/dweller/.dotfiles/scripts/sanctuary/bar.sh" "toggle"; }
@@ -161,6 +161,12 @@ binds {
     // swaylock. Same path as idle-lock and suspend-lock, so there is one
     // locker and one look.
     Mod+Escape hotkey-overlay-title="Lock" { spawn "loginctl" "lock-session"; }
+    // Power menu: lock / suspend / log out / reboot / shut down. fzf in a
+    // floating kitty; acts immediately, no confirm — `lock` is the top row, so
+    // a stray Enter is the harmless one. Sits next to Mod+Escape on purpose.
+    Mod+Shift+Escape hotkey-overlay-title="Power menu" {
+        spawn "kitty" "--class" "sanctuary-power" "-e" "/home/dweller/.dotfiles/scripts/sanctuary/power.sh";
+    }
 
     //── Media / volume
     Mod+Shift+M { spawn "playerctl" "play-pause"; }

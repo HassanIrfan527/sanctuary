@@ -18,13 +18,18 @@
    what is behind the bar in zen (see modes/zen.conf, BAR_BLUR), and blur only
    shows through alpha. Raise the 0.55 if a busy wallpaper ever fights the
    type — that is the only knob this needs. */
-@define-color pill      rgba(24, 24, 37, 0.55);   /* mantle, sheer — niri blurs behind it */
+@define-color pill      rgba(24, 24, 37, 0.62);   /* mantle, sheer — niri blurs behind it */
+@define-color edge      rgba(205, 214, 244, 0.07); /* the cozy 1px highlight, same as the notification cards */
 @define-color ink       #f2d5cf;                  /* flamingo — the time    */
 @define-color ink_soft  #6c7086;                  /* overlay0 — the date    */
 
+/* Adwaita Sans, same as the cozy notifications (swaync/themes/cozy): one
+   voice for everything zen puts on screen. tnum = tabular digits, so the pill
+   does not twitch sideways when 1:11 becomes 1:12. */
 * {
-  font-family: "JetBrainsMono Nerd Font";
-  font-size: 13px;
+  font-family: "Adwaita Sans", "Inter", sans-serif;
+  font-size: 13.5px;
+  font-feature-settings: "tnum";
   min-height: 0;
   text-shadow: none;
   box-shadow: none;
@@ -37,8 +42,8 @@ window#waybar { background: transparent; }
    pixel-identical). So any slack between surface and pill blurs as a pale halo.
 
    Keep in step, or the halo comes back:
-       config.jsonc width  =  min-width + 2 x padding   (160 + 40 = 200)
-       config.jsonc height =  min-height                (34)
+       config.jsonc width  =  min-width + 2 x padding + 2 x border   (186 + 44 + 2 = 232)
+       config.jsonc height =  min-height + 2 x border                (34 + 2 = 36)
 
    Radius is 12 to match zen's window corners — and modestly, because the blur
    underneath keeps square corners no matter what: at 12px the overshoot is ~3px
@@ -47,14 +52,14 @@ window#waybar { background: transparent; }
 #clock {
   color: @ink;
   background-color: @pill;
-  border: none;
+  border: 1px solid @edge;
   border-radius: 12px;
-  min-width: 160px;
+  min-width: 186px;
   min-height: 34px;
-  padding: 0 20px;
+  padding: 0 22px;
   margin: 0;
-  font-weight: 500;
-  letter-spacing: 0.4px;
+  font-weight: 400;
+  letter-spacing: 0.2px;
 
   /* Lift, not outline: a soft drop shadow is what makes it read as sitting on
      the wallpaper rather than being cut out of it. Overrides the `*` reset.

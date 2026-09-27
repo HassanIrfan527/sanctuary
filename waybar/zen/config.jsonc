@@ -15,8 +15,8 @@
   // an explicit `width` drops waybar's left/right anchors, so the surface shrinks
   // to this box and centres, and the blur lands behind the pill and nowhere else.
   // If the clock format ever gets longer, widen this or the label truncates.
-  "width": 200,
-  "height": 34,
+  "width": 232,
+  "height": 36,
   "spacing": 0,
   "margin-top": 10,
 
@@ -32,8 +32,13 @@
   // strftime spec, and `%'` is not a valid conversion — strftime swallows it and
   // the module renders EMPTY (an empty pill, which looks like a CSS bug and is
   // not). Keyword sizes have no `%` in them, so they survive strftime.
+  //
+  // Two more traps in the same family (both blank the module):
+  //  - the chrono spec after `{:` must START with `%`. So the time's weight span
+  //    opens OUTSIDE the braces and closes inside them — odd-looking, valid pango.
+  //  - no glibc padding flags: `%-I` / `%-d` are not understood. Plain %I / %d.
   "clock": {
-    "format": "{:%I:%M<span size='smaller'> %p</span>   <span color='#6c7086'>%a %d</span>}",
+    "format": "<span weight='600'>{:%I:%M</span><span size='small' color='#9399b2'> %p</span>    <span color='#7f849c'>%a, %b %d</span>}",
     "tooltip": false
   }
 }

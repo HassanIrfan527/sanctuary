@@ -1,27 +1,12 @@
 // ── Startup ───────────────────────────────────────────────────────────
-// The Sanctuary. Every line here replaced something noctalia used to do.
-
-// Notifications + the centre.
 spawn-at-startup "swaync"
 
-// Mode. Re-asserts the mode you were last in — which bar to bring up (the
-// script starts it; NixOS wraps the waybar binary and a bare `waybar` can stack
-// invisible instances) and whether swaync goes quiet. niri has already loaded
-// the right layout by this point, because mode.kdl persists on disk; this line
-// is for the parts of a mode that live outside the compositor.
 spawn-at-startup "/home/dweller/.dotfiles/scripts/sanctuary/mode.sh" "reapply"
 
-// Wallpaper. The script starts the daemon itself and waits for it to answer,
-// so there is no sleep-and-hope race here.
 spawn-at-startup "/home/dweller/.dotfiles/scripts/sanctuary/wallpaper.sh" "restore"
 
-// Night light. Manual, always on: the daemon just holds a temperature and the
-// keybinds move it. No scheduling, no geoclue, no sunrise maths. The last value
-// you set is restored here.
 spawn-at-startup "/home/dweller/.dotfiles/scripts/sanctuary/nightlight.sh" "start"
 
-// Idle -> lock -> screens off. `lock` catches `loginctl lock-session`, so
-// Mod+Escape, suspend and idle all end up in the same locker.
 spawn-at-startup "/home/dweller/.dotfiles/scripts/sanctuary/idle.sh"
 
 spawn-sh-at-startup "bash /home/$USER/.dotfiles/scripts/keysounds.sh toggle"

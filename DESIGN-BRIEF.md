@@ -10,7 +10,7 @@ Companion to `DESKTOP-PLAN.md` (what we're building, in what order). This file i
 Launcher is **walker** as of 2026-09-22 (a terminal launcher was built the same day and turned
 down — §3). fuzzel kept installed as the fallback. noctalia removed from every config. SDDM
 theming unstarted.
-**Updated:** 2026-09-25
+**Updated:** 2026-09-27
 
 ---
 
@@ -82,6 +82,12 @@ Default mode is unchanged and still square. The exception is a *mode*, not a rev
 `scripts/sanctuary/modes/zen.conf`, so it cannot leak into the rest of the system by accident.
 Known cost, accepted: at 12px with `clip-to-geometry true`, the corner character cell of a
 bordered TUI gets nibbled.
+
+**Zen's language has a name, added 2026-09-27: cozy.** If Default is *ascii*, zen is *cozy*: rounded,
+lifted by soft shadow rather than bordered, Adwaita Sans (variable weights) rather than monospace, a
+1px 6–7% highlight edge instead of an accent border, one accent (flamingo), and **no glyph
+decoration** — no `[ ]`, `▸`, `░`. Words and spacing carry it. It covers the zen clock pill and
+swaync (toasts + centre); anything else that appears in zen should follow it.
 
 ### Rules
 
@@ -191,7 +197,8 @@ Space is per **mode** as of 2026-09-25 — these are the numbers, and they live 
 | centre a lone window | no | yes | yes |
 | bar | full | clock pill | none (Mod+Shift+A peeks) |
 | bar blur | no | yes | yes |
-| notifications | on | DND | DND |
+| notifications | on | on | on |
+| notification theme | ascii | cozy | cozy |
 
 ---
 
@@ -287,9 +294,12 @@ than the rest at 0.45.
 - A `#workspaces button` keeps the GTK theme's corner radius unless you set `border-radius: 0`
   on it explicitly — an inverse-video active cell comes out rounded otherwise.
 
-### Notifications + centre (swaync) — BUILT, not yet switched on
+### Notifications + centre (swaync) — BUILT
 
-`~/.dotfiles/swaync/swaync/{config.json,style.css}`, symlinked to `~/.config/swaync`.
+`~/.config/swaync` → `~/.dotfiles/swaync/swaync`. **Source lives in `themes/ascii/` and
+`themes/cozy/`**; the live `config.json`/`style.css` beside them are copies `mode.sh` writes per mode
+(git-ignored). Everything below describes the **ascii** theme; cozy is under *Modes*. (The
+"still inactive" note further down is historical — swaync owns notifications now.)
 
 **Why swaync and not mako.** mako physically cannot host a centre — it is a toast daemon with a
 small `restore` ring buffer and no panel surface of any kind. swaync is a notification centre by
@@ -529,17 +539,17 @@ affordance instead — which is the house language anyway.
 
 ### Modes — BUILT · 2026-09-25
 
-`scripts/sanctuary/mode.sh` + `scripts/sanctuary/modes/*.conf`. **Mod+Shift+Z** opens the picker:
+`scripts/sanctuary/mode.sh` + `scripts/sanctuary/modes/*.conf`. **Mod+Shift+T** opens the picker:
 fzf in a floating kitty (`sanctuary-mode`), same idiom as the clipboard and the mixer.
 
 **A mode is a file.** `modes/<name>.conf` is shell key/value — gaps, struts, radius, opacity,
-which bar, blur, DND. Adding a mode is adding a file; the picker lists whatever is in that
+which bar, blur, DND, swaync theme. Adding a mode is adding a file; the picker lists whatever is in that
 directory, sorted by `ORDER`. The keybind never changes.
 
 | | What it is |
 |---|---|
 | **Default** | The Sanctuary as designed. Square, tight, full ASCII bar, notifications on. |
-| **Zen** | 16px gaps, 40px struts, 12px window radius, a lone window centred, clock pill only, DND on. |
+| **Zen** | 16px gaps, 40px struts, 12px window radius, a lone window centred, clock pill only, cozy notifications (DND off since 2026-09-27 — Harry works in zen and wants them). |
 | **Zen — no bar** | Zen with no bar at all. `Mod+Shift+A` still peeks the pill back in. |
 
 **Why a rendered file and not a "zen override" include.** niri permits exactly **one** top-level
@@ -576,9 +586,35 @@ file cannot leave the desktop with a broken config.
   zen's windows): the blur's square corners overshoot by ~3px of soft gradient and disappear. At 17,
   a true pill, they read as four pale nubs.
 
-**The zen clock is the one surface that is not TUI-native.** Dark sheer pill (mantle at 0.55,
-blurred behind), flamingo time, overlay0 date, fully rounded, soft drop shadow. Reasoning in §2:
-zen holds one thing, and a frame around one thing is decoration. `waybar/zen/{config.jsonc,style.css}`.
+**The zen clock is cozy, not TUI-native.** Dark sheer pill (mantle at 0.62, blurred behind), 1px
+highlight edge, Adwaita Sans with tabular digits, semibold flamingo time, small overlay2 AM/PM,
+overlay1 `Sun, Sep 27`. No click action, deliberately. Reasoning in §2: zen holds one thing, and a
+frame around one thing is decoration. `waybar/zen/{config.jsonc,style.css}`. Surface = pill:
+`width 232 = min-width 186 + 2x22 padding + 2x1 border`, `height 36 = 34 + 2`.
+Two more ways to blank the clock (2026-09-27): the chrono spec after `{:` must *start* with `%`
+(so a leading span opens outside the braces), and glibc flags like `%-I` are not supported.
+
+**swaync is themed per mode.** Source pairs live in `swaync/swaync/themes/{ascii,cozy}/`; `mode.sh`
+copies the mode's `SWAYNC=` pair over the live `config.json`/`style.css` (git-ignored, seeded ascii
+by `install.sh`) and reloads with `swaync-client -R` + `-rs` — reload, never restart, so the
+centre keeps its history. Cozy traps:
+- The close button is an overlay on `.notification-background`, pinned to *its* corner. Shadow room
+  must be padding on `.notification-background`; margin on the card leaves the × outside the card.
+- The cozy centre is **solid**. Its surface includes the shadow margin, so niri blur would halo it,
+  and translucency without blur just shows the window behind as noise.
+- Geist is installed only as Regular + Black here — `font-weight: 600` silently renders Black.
+  Adwaita Sans is variable, so it is the zen face.
+- The centre's scrolled window spans the whole sheet; its scrollbar and undershoot are hidden until
+  hovered, or they draw a stray line down the right edge.
+
+### Power menu — BUILT · 2026-09-27
+
+`scripts/sanctuary/power.sh`, **Mod+Shift+Escape** (next to Mod+Escape lock). fzf in a floating kitty
+(`sanctuary-power`, 560x220): lock / suspend / log out / reboot / shut down. **Acts immediately — no
+confirm, no countdown**, by Harry's call. The safety margin is order: `lock` is the top row, so a
+stray Enter locks. No pointer glyph; the surface0 row highlight is the cursor.
+Failures surface as a critical toast (the likely one: an app's shutdown *block* inhibitor — overriding
+it needs admin auth, and no polkit agent runs on this desktop to ask).
 
 ### Windows (niri) — BUILT
 

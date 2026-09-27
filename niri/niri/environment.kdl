@@ -9,6 +9,13 @@ environment {
     GDK_BACKEND "wayland,x11,*"
     MOZ_ENABLE_WAYLAND "1"
     ELECTRON_OZONE_PLATFORM_HINT "auto"
-    XCURSOR_THEME "Drop-Purple"
+    XCURSOR_THEME "Bibata-Modern-Classic"
     XCURSOR_SIZE "24"
+
+    // Were NixOS environment.variables / home.sessionVariables.
+    TERMINAL "kitty"
+    BROWSER "brave-browser"
+    GTK_THEME "Graphite-Dark"
+    // i5-6500 (Skylake): intel-media-driver (iHD) handles VA-API video decode.
+    LIBVA_DRIVER_NAME "iHD"
 }

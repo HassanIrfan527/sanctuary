@@ -1,0 +1,64 @@
+{
+  "$schema": "/etc/xdg/swaync/configSchema.json",
+
+  "//": "The Sanctuary — swaync, COZY theme (zen modes). mode.sh copies this over ../../config.json.",
+  "//shape": "Rounded, soft, words not glyphs. App icons ON — the ascii theme hides artwork; cozy lets it carry identity.",
+
+  "ignore-gtk-theme": true,
+  "cssPriority": "user",
+
+  "positionX": "right",
+  "positionY": "top",
+  "layer": "overlay",
+  "control-center-layer": "top",
+  "layer-shell": true,
+  "layer-shell-cover-screen": false,
+
+  "control-center-margin-top": 20,
+  "control-center-margin-right": 20,
+  "control-center-margin-bottom": 20,
+  "control-center-margin-left": 0,
+  "control-center-width": 420,
+  "control-center-height": 680,
+  "notification-window-width": 400,
+  "fit-to-screen": false,
+
+  "timeout": 6,
+  "timeout-low": 4,
+  "timeout-critical": 0,
+
+  "image-visibility": "when-available",
+  "notification-icon-size": 40,
+  "notification-body-image-height": 120,
+  "notification-body-image-width": 240,
+
+  "notification-grouping": true,
+  "relative-timestamps": true,
+  "keyboard-shortcuts": true,
+  "hide-on-clear": true,
+  "hide-on-action": true,
+  "transition-time": 220,
+
+  "text-empty": "All quiet",
+  "script-fail-notify": true,
+
+  "widgets": [
+    "title",
+    "dnd",
+    "notifications"
+  ],
+
+  "widget-config": {
+    "title": {
+      "text": "Notifications",
+      "clear-all-button": true,
+      "button-text": "Clear all"
+    },
+    "dnd": {
+      "text": "Do not disturb"
+    },
+    "notifications": {
+      "vexpand": true
+    }
+  }
+}

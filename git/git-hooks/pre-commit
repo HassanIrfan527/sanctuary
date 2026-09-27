@@ -6,7 +6,6 @@ REPO_DIR="$(git rev-parse --show-toplevel)"
 CURRENT_EMAIL="$(git config user.email)"
 
 WORK_DIRS=(
-  "$HOME/Development/pixiecode"
   "$HOME/Development/app-aie"
 )
 

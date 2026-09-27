@@ -126,12 +126,22 @@ fi
 
 # niri's config.kdl does `include "mode.kdl"`, and that file is generated per
 # mode by scripts/sanctuary/mode.sh and git-ignored. Seed it with Default so a
-# fresh clone has a valid config before the first Mod+Shift+Z.
+# fresh clone has a valid config before the first Mod+Shift+T.
 seed_mode="$DOTFILES/niri/niri/mode.kdl"
 if [[ ! -e "$seed_mode" ]]; then
   say ""
   run "'$DOTFILES/scripts/sanctuary/mode.sh' set default"
   say "→ seeded: niri mode.kdl (Default)"
+fi
+
+# swaync's live config.json/style.css are generated per mode too (git-ignored;
+# source is swaync/swaync/themes/<name>/). Seed the ascii pair so swaync starts
+# themed even before mode.sh has run.
+seed_swaync="$DOTFILES/swaync/swaync"
+if [[ ! -e "$seed_swaync/config.json" || ! -e "$seed_swaync/style.css" ]]; then
+  say ""
+  run "cp '$seed_swaync/themes/ascii/config.json' '$seed_swaync/themes/ascii/style.css' '$seed_swaync/'"
+  say "→ seeded: swaync config.json + style.css (ascii)"
 fi
 
 say ""
