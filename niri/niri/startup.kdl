@@ -10,3 +10,9 @@ spawn-at-startup "/home/dweller/.dotfiles/scripts/sanctuary/nightlight.sh" "star
 spawn-at-startup "/home/dweller/.dotfiles/scripts/sanctuary/idle.sh"
 
 spawn-sh-at-startup "bash /home/$USER/.dotfiles/scripts/keysounds.sh toggle"
+
+// Clipboard history. Nothing stores history on its own: this watcher feeds
+// every copy into cliphist, which Mod+V (scripts/sanctuary/clipboard.sh) reads.
+// On NixOS this came from the system config and was lost in the Fedora move.
+spawn-at-startup "wl-paste" "--type" "text" "--watch" "cliphist" "store"
+spawn-at-startup "wl-paste" "--type" "image" "--watch" "cliphist" "store"
