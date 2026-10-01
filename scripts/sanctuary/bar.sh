@@ -36,7 +36,9 @@ esac
 
 running() { pgrep -x waybar >/dev/null 2>&1; }
 launch()  { setsid waybar -c "$CFG" -s "$CSS" >/dev/null 2>&1 & }
-stop()    { pkill -x waybar; }
+# The full bar's notification module runs `swaync-client -swb`, and killing
+# waybar orphans it — one stray process per Default→Zen switch. Reap it too.
+stop()    { pkill -x waybar; pkill -f '^swaync-client -swb$'; }
 
 case "${1:-toggle}" in
   start)   [ "$autostart" = yes ] && { running || launch; } ;;

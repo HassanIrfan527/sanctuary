@@ -167,9 +167,19 @@ apply() {
   swaync=$(. "$MODES/$name.conf"; printf '%s' "${SWAYNC:-ascii}")
 
   # 1. Shape + space. Keep the outgoing file so a failed validate is reversible.
-  local backup=""
+  # Render to a temp file first: a mode file missing a key (set -u) makes render
+  # fail half-way, and writing that straight into mode.kdl left an EMPTY file —
+  # which validates fine, so niri silently fell back to its own defaults.
+  local backup="" tmp
   if [ -f "$TARGET" ]; then backup="$TARGET.prev"; cp -f "$TARGET" "$backup"; fi
-  render "$name" > "$TARGET" || return 1
+  tmp=$(mktemp "$TARGET.XXXXXX") || return 1
+  if ! render "$name" > "$tmp" || [ ! -s "$tmp" ]; then
+    rm -f "$tmp"
+    notify-send -a sanctuary -u critical -r 9412 \
+      "[ mode ✗ $label ]" "modes/$name.conf is missing a setting — kept $prev" 2>/dev/null
+    return 1
+  fi
+  mv -f "$tmp" "$TARGET"
   if ! niri validate -c "$NIRI/config.kdl" >/dev/null 2>&1; then
     [ -n "$backup" ] && mv -f "$backup" "$TARGET"
     notify-send -a sanctuary -u critical -r 9412 \
