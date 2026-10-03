@@ -34,11 +34,16 @@ Mod+Shift+T ─► Quickshell's picker ─► shell.sh set <style>   (remembered
 ```
 
 **Styles:** `signal` (instrument strip), `ink` (dark manga, only ever dark),
-`paper` (light manga). A switch restarts Quickshell only.
+`paper` (light manga). A switch re-points the window layout and restarts Quickshell.
 
-**Nothing rewrites niri config or keybinds.** niri's layout is the hand-kept
-`niri/niri/layout.kdl` (Signal's numbers: square, tight, 2px green border). The
-old per-mode renderer is in `archive/mode-system/`.
+**Windows follow the style, and nothing rewrites niri config.** Each style has a
+hand-kept layout file — `niri/niri/layout-signal.kdl` (square, tight, 2px green
+border), `layout-ink.kdl` (3px light outline + hard mauve shadow),
+`layout-paper.kdl` (starts as Ink's). `layout.kdl` is a git-ignored symlink to
+the active one; a style switch re-points it (after `niri validate` passes — a
+broken file is refused and the old link kept) and reloads niri. Edit those files
+by hand to change how windows look in a style. The old per-mode renderer is in
+`archive/mode-system/`.
 
 **Fallback** = `waybar/config.jsonc` + `style.css`, and swaync started with
 `-c/-s swaync/swaync/themes/ascii/…` — your previous setup, exactly. A critical

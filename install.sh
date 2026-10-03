@@ -125,6 +125,15 @@ if [[ ! -e "$seed_theme" ]]; then
   say "→ seeded: kitty current-theme.conf (dark default)"
 fi
 
+# niri's config.kdl includes `layout.kdl`, a git-ignored symlink to the active
+# hand-kept layout. Seed it with Signal's so a fresh clone has a valid config.
+seed_layout="$DOTFILES/niri/niri/layout.kdl"
+if [[ ! -e "$seed_layout" ]]; then
+  say ""
+  run "ln -sfn layout-signal.kdl '$seed_layout'"
+  say "→ seeded: niri layout.kdl -> layout-signal.kdl"
+fi
+
 # swaync's live config.json/style.css are git-ignored copies of a theme. The
 # fallback doesn't need them (shell.sh passes themes/ascii via -c/-s), but a
 # bare `swaync` started by hand reads them, so seed the ascii pair.

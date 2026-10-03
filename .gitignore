@@ -17,3 +17,9 @@ qutebrowser/qutebrowser/autoconfig.yml
 # them — shell.sh starts swaync with -c/-s pointing at themes/ascii directly.
 swaync/swaync/config.json
 swaync/swaync/style.css
+
+# Which hand-kept layout is active — a symlink shell.sh re-points on every style
+# switch (layout.kdl -> layout-<style>.kdl). Tracking it would dirty the tree on
+# each Mod+Shift+T. install.sh seeds it (-> layout-signal.kdl) on a fresh clone,
+# where config.kdl's include would otherwise dangle.
+niri/niri/layout.kdl

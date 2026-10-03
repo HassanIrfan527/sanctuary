@@ -1,0 +1,59 @@
+// ── Layout + shape · INK ──────────────────────────────────────────────
+// Hand-maintained. Edit this file directly — nothing generates it. See
+// layout-signal.kdl for how the three layout files and the `layout.kdl`
+// symlink fit together.
+//
+// Ink: manga panels — a 3px light "ink" outline and a hard mauve offset
+// shadow, cut square. Numbers restored from the retired ink-qs.conf.
+
+layout {
+    gaps 14                         // room for each window's shadow to land between columns
+    struts {
+        left 16
+        right 16
+        top 6                       // the bar's own exclusive zone sits on top of this
+        bottom 18
+    }
+    center-focused-column "never"   // columns stay put; never auto-recenter
+    // Widths cycled by Mod+R. This IS niri's "resize" idiom.
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+    default-column-width { proportion 0.5; }
+
+    border {
+        on
+        width 3                     // ink weight — same 3px as the bar's panel outlines
+        active-color "#cdd6f4"      // the focused window is outlined in "ink" (light on a dark desk)
+        inactive-color "#45475a"
+    }
+    focus-ring { off; }
+
+    // The manga panel's hard shadow: softness 0 = a solid offset block, not a glow.
+    shadow {
+        on
+        softness 0
+        spread 0
+        offset x=7 y=7
+        // false: drawn only OUTSIDE the window. true also fills behind it, and a
+        // translucent window (kitty at 0.70) shows the block through as a tint.
+        draw-behind-window false
+        color "#cba6f7"             // focused: mauve, like the workspaces panel
+        inactive-color "#11111b"    // unfocused: a plain dark block
+    }
+}
+
+// ── Overview ──────────────────────────────────────────────────────────
+overview {
+    backdrop-color "#1e1e2e"
+}
+
+// ── Shape ─────────────────────────────────────────────────────────────
+// window-rule blocks are additive and the LAST one wins; config.kdl includes
+// this file after window-rules.kdl, so 0 here overrides the 2px floor there.
+window-rule {
+    geometry-corner-radius 0        // panels are cut, not rounded
+    clip-to-geometry true
+}

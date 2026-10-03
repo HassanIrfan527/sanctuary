@@ -9,9 +9,11 @@
 #   shell.sh status         "quickshell <style>" or "fallback"
 #
 # ── The rule ──────────────────────────────────────────────────────────
-# Nothing here writes niri config or keybinds (2026-10-03). niri's layout is the
-# hand-kept niri/layout.kdl; a style switch only restarts Quickshell. The old
-# mode system that rendered niri config per mode is in archive/mode-system/.
+# Nothing here writes niri config or keybinds (2026-10-03). Window styling lives
+# in three HAND-KEPT files, niri/niri/layout-{signal,ink,paper}.kdl; config.kdl
+# includes `layout.kdl`, a symlink to the active one. A style switch re-points
+# that symlink (validated first) and restarts Quickshell — it never writes a
+# byte of config. The old per-mode renderer is in archive/mode-system/.
 #
 # ── When the fallback happens ─────────────────────────────────────────
 #   1. Quickshell is missing, or does not answer within ~4s of starting.
@@ -39,6 +41,25 @@ saved_style() {
   [ -s "$STYLE_FILE" ] && s=$(cat "$STYLE_FILE")
   "$QS" has "$s" || s=signal     # a stale / hand-edited file can't strand the desk
   printf '%s' "$s"
+}
+
+# ── window styling: point layout.kdl at the style's hand-kept file ────
+NIRI_DIR="$HOME/.dotfiles/niri/niri"
+point_layout() {                             # $1 = style
+  local want="layout-$1.kdl" link="$NIRI_DIR/layout.kdl" prev
+  [ -r "$NIRI_DIR/$want" ] || want="layout-signal.kdl"   # a style without its own file looks like Signal
+  prev=$(readlink "$link" 2>/dev/null)
+  [ "$prev" = "$want" ] && return 0
+  ln -sfn "$want" "$link"
+  # Validate the COMPOSED config before niri sees it; on failure put the old
+  # link back (or Signal's, if there was none) and say so.
+  if ! niri validate -c "$NIRI_DIR/config.kdl" >/dev/null 2>&1; then
+    ln -sfn "${prev:-layout-signal.kdl}" "$link"
+    notify-send -a sanctuary -u critical "[ layout ✗ $1 ]" \
+      "niri/niri/$want failed niri validate — kept ${prev:-layout-signal.kdl}" 2>/dev/null
+    return 1
+  fi
+  niri msg action load-config-file >/dev/null 2>&1
 }
 
 # ── the classic stack ─────────────────────────────────────────────────
@@ -101,6 +122,7 @@ start_watch() {
 }
 
 up() {                                       # $1 = style
+  point_layout "$1"                          # windows first: instant, and independent of Quickshell
   touch "$SWITCHING"
   classic_down                               # no-op unless we are leaving the fallback
   if "$QS" start "$1"; then

@@ -1,17 +1,16 @@
-// ── Layout + shape ────────────────────────────────────────────────────
-// Hand-maintained. Edit this file directly — nothing generates or rewrites it.
+// ── Layout + shape · SIGNAL ───────────────────────────────────────────
+// Hand-maintained. Edit this file directly — nothing generates it.
 //
-// History: 2026-09-25 → 2026-10-03 this was `mode.kdl`, rendered per mode by
-// scripts/sanctuary/mode.sh from a template. Retired 2026-10-03: the desk is
-// Signal (Quickshell) now, and no script rewrites niri config any more. The old
-// system is in archive/mode-system/ if it is ever wanted back.
+// One of three hand-kept layout files: layout-signal.kdl, layout-ink.kdl,
+// layout-paper.kdl. config.kdl includes `layout.kdl`, a symlink to the active
+// one. Picking a style (Mod+Shift+T → shell.sh set) only re-points that
+// symlink and reloads niri — no script ever writes config text (the
+// 2026-10-03 rule; the old per-mode renderer is in archive/mode-system/).
 //
-// These are Signal's numbers: square, tight, a 2px border with the focused
-// window in the trace green. The Quickshell style picker (Mod+Shift+T) changes
-// only the bar / toasts / centre — never this file.
+// Signal: square, tight, a 2px border with the focused window in the trace green.
 //
 // niri permits exactly ONE top-level layout block ("duplicate node layout"), so
-// this file is the only place layout lives.
+// each layout file holds the whole layout.
 
 layout {
     gaps 6                          // inner gap BETWEEN windows

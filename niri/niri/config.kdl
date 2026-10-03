@@ -3,7 +3,9 @@ include "environment.kdl"
 include "startup.kdl"
 include "window-rules.kdl"
 
-// Layout and shape. Hand-maintained (nothing rewrites it). It sits AFTER
+// Layout and shape: `layout.kdl` is a symlink to one of the hand-kept
+// layout-{signal,ink,paper}.kdl, re-pointed by scripts/sanctuary/shell.sh when
+// you pick a style (no script writes config text). It sits AFTER
 // window-rules.kdl deliberately: window-rule blocks are additive and the last
 // one wins, which is the only reason it can override the 2px corner radius set
 // there. Reorder these two and the radius silently stops applying.
