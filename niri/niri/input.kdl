@@ -9,7 +9,11 @@ input {
     }
 
 
-    mouse {}
+    mouse {
+        // -1.0 (slowest) .. 1.0 (fastest), 0 = default. Lower = slower pointer.
+        // Default (adaptive) acceleration kept: small moves precise, quick flicks travel further.
+        accel-speed -0.2
+    }
 
     // Hover-to-focus (like Hyprland). max-scroll-amount="0%" is the key part:
     // it lets the pointer focus the window under it, but NEVER scrolls the view

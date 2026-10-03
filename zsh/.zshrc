@@ -91,3 +91,8 @@ export PATH="$HOME/go/bin:$PATH"
 
 # Atuin (shell history) Initialization
 eval "$(atuin init zsh)"
+
+# Flutter / Android toolchain
+export JAVA_HOME="$HOME/development/jdk-21"
+export ANDROID_HOME="$HOME/Android/Sdk"
+export PATH="$HOME/development/flutter/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
