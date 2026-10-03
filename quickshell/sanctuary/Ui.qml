@@ -8,6 +8,9 @@ Singleton {
     property bool barShown: true    // Mod+Shift+A
     property bool centreOpen: false // Mod+Shift+D
     property bool pickerOpen: false // Mod+Shift+T
+    property bool launcherOpen: false // Mod+Space
+    signal launcherType(string text)  // debug hooks — see shell.qml `debug`
+    signal launcherEnter()
     property bool playerOpen: false // right-click the music module
     property real playerX: 0        // screen x of that module's centre — the card hangs from it
 }

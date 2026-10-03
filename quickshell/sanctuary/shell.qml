@@ -71,6 +71,10 @@ ShellRoot {
         active: true
         Picker {}
     }
+    LazyLoader {
+        active: true
+        Launcher {}
+    }
 
     // ── IPC — what the keybinds call (scripts/sanctuary/notif.sh, bar.sh) ──
     //   qs ipc -p ~/.dotfiles/quickshell/sanctuary call notifs toggle
@@ -87,6 +91,12 @@ ShellRoot {
         // qs.sh polls this after a start: an answer means the shell, and so the
         // notification server, is up — safe to send the mode toast.
         function ping(): string { return "pong " + Theme.style; }
+    }
+
+    IpcHandler {
+        target: "launcher"
+        function toggle(): void { Ui.launcherOpen = !Ui.launcherOpen; }
+        function close(): void { Ui.launcherOpen = false; }
     }
 
     IpcHandler {
@@ -112,6 +122,9 @@ ShellRoot {
     IpcHandler {
         target: "debug"
         function fakeTemp(c: real): void { Sys.tempOverride = c; }
+        //   qs.sh call debug launcherType fir · qs.sh call debug launcherEnter
+        function launcherType(text: string): void { Ui.launcherType(text); }
+        function launcherEnter(): void { Ui.launcherEnter(); }
     }
 
     IpcHandler {

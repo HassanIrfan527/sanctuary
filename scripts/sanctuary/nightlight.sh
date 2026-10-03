@@ -49,8 +49,13 @@ set_temp() {
 }
 
 # The bar has no night-light module, so the notification IS the readout.
-# A fixed replaces-id means repeated presses update one toast instead of
-# stacking a column of them.
+# Repeated presses must update ONE toast instead of stacking a column of them,
+# so each send replaces the previous one by id. The id is the one the daemon
+# handed back last time (notify-send -p), kept in a state file — NOT a made-up
+# fixed number: swaync tolerated `-r 9411`, but Quickshell (correctly, per the
+# spec) treats an id it never issued as a brand-new notification. A stale id
+# (daemon restarted) just starts a fresh toast.
+NID="${XDG_STATE_HOME:-$HOME/.local/state}/sanctuary/nightlight.nid"
 announce() {
   local t=$1 cells=7 filled
   filled=$(( ((t - MIN) * cells + (MAX - MIN) / 2) / (MAX - MIN) ))
@@ -60,8 +65,10 @@ announce() {
   for ((i = 0; i < cells; i++)); do
     if [ "$i" -lt "$filled" ]; then meter+="░"; else meter+="█"; fi
   done
-  notify-send -a nightlight -r 9411 -t 1200 \
-    "[ night $meter ]" "${t}K" 2>/dev/null
+  local prev=0 id
+  [ -s "$NID" ] && prev=$(cat "$NID")
+  id=$(notify-send -p -a nightlight -r "$prev" -t 1200 \
+    "[ night $meter ]" "${t}K" 2>/dev/null) && { mkdir -p "${NID%/*}"; printf '%s\n' "$id" > "$NID"; }
 }
 
 case "${1:-start}" in

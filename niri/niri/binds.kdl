@@ -7,9 +7,10 @@ binds {
     Mod+B      { spawn "brave-browser"; }
 
     //── Launcher ──
-    // fsel TUI in a floating kitty. -d detaches launched apps, or they die with it.
+    // Quickshell's launcher, in the current style. In the waybar fallback the
+    // same key opens fsel in a floating kitty (the backup) — see launcher.sh.
     Mod+Space hotkey-overlay-title="Launcher" {
-        spawn "kitty" "--class" "sanctuary-run" "-e" "fsel" "-d";
+        spawn "/home/dweller/.dotfiles/scripts/sanctuary/launcher.sh";
     }
     // The way back, one keypress rather than a config edit.
     Mod+Shift+Space hotkey-overlay-title="Launcher (fuzzel fallback)" {
