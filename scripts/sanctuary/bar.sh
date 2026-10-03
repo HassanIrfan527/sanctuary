@@ -1,48 +1,29 @@
 #!/usr/bin/env bash
-# Start / stop / restart waybar — in whichever mode is current.
+# Mod+Shift+A — hide / show the bar, whichever bar is up.
 #
-# Match waybar by exact process name. On NixOS the binary was wrapped (comm
-# `.waybar-wrapped`); on Fedora it is plain `waybar`. Wrong name = stacked bars.
-# This cost a long debug detour once already (DESIGN-BRIEF.md §5).
+#   Quickshell running  → its bar, over IPC (the shell keeps running)
+#   fallback (waybar)   → waybar itself, started / stopped
 #
-# Two more things this has to get right:
+# Starting and stopping the stacks is shell.sh's job; this only toggles.
 #
-#  1. The mode. `modes/<name>.conf` sets BAR=full|zen|none, so the same
-#     `bar.sh start` brings up the full bar in Default and the clock-only bar in
-#     Zen. BAR=none means "don't autostart", NOT "refuse to run": Mod+Shift+A
-#     still peeks the zen bar back in, so the clock is never a mode switch away.
-#
-#  2. SIGHUP. mode.sh's picker runs inside a kitty that exits the moment you
-#     choose, and a waybar started as its descendant dies with it — the same trap
-#     that made the fsel launcher look broken (DESIGN-BRIEF.md §5). `setsid` puts
-#     waybar in its own session so it survives whatever launched it.
+# Two things the waybar half still has to get right:
+#  1. Match waybar by exact process name. On NixOS the binary was wrapped (comm
+#     `.waybar-wrapped`); on Fedora it is plain `waybar`. Wrong name = stacked bars.
+#  2. SIGHUP: setsid, so a waybar started from a short-lived parent survives it.
 set -uo pipefail
 
-STATE="${XDG_STATE_HOME:-$HOME/.local/state}/sanctuary"
-MODES="$HOME/.dotfiles/scripts/sanctuary/modes"
+QS="$HOME/.dotfiles/scripts/sanctuary/qs.sh"
+CFG="$HOME/.dotfiles/waybar/config.jsonc"
+CSS="$HOME/.dotfiles/waybar/style.css"
 
-mode=default
-[ -s "$STATE/mode" ] && mode=$(cat "$STATE/mode")
-want=full
-[ -r "$MODES/$mode.conf" ] && want=$(. "$MODES/$mode.conf"; printf '%s' "${BAR:-full}")
+if "$QS" running; then
+  "$QS" call bar toggle >/dev/null
+  exit 0
+fi
 
-autostart=yes
-case "$want" in
-  zen)  CFG="$HOME/.dotfiles/waybar/zen/config.jsonc"; CSS="$HOME/.dotfiles/waybar/zen/style.css" ;;
-  none) CFG="$HOME/.dotfiles/waybar/zen/config.jsonc"; CSS="$HOME/.dotfiles/waybar/zen/style.css"
-        autostart=no ;;
-  *)    CFG="$HOME/.dotfiles/waybar/config.jsonc";     CSS="$HOME/.dotfiles/waybar/style.css" ;;
-esac
-
-running() { pgrep -x waybar >/dev/null 2>&1; }
-launch()  { setsid waybar -c "$CFG" -s "$CSS" >/dev/null 2>&1 & }
-# The full bar's notification module runs `swaync-client -swb`, and killing
-# waybar orphans it — one stray process per Default→Zen switch. Reap it too.
-stop()    { pkill -x waybar; pkill -f '^swaync-client -swb$'; }
-
-case "${1:-toggle}" in
-  start)   [ "$autostart" = yes ] && { running || launch; } ;;
-  stop)    stop ;;
-  restart) stop; sleep 0.2; [ "$autostart" = yes ] && launch ;;
-  toggle)  if running; then stop; else launch; fi ;;   # deliberately ignores autostart
-esac
+if pgrep -x waybar >/dev/null 2>&1; then
+  pkill -x waybar
+  pkill -f '^swaync-client -swb$'   # the notification module's stream, orphaned by the kill
+else
+  setsid waybar -c "$CFG" -s "$CSS" >/dev/null 2>&1 </dev/null &
+fi

@@ -29,10 +29,26 @@ layout {
     border {
         on
         width @BORDER@
-        active-color "#b4befe"      // focused —  mocha lavender accent
-        inactive-color "#6c7086"    // unfocused —  $inactive
+        active-color "@BORDER_ACTIVE@"      // focused   (mode default: mocha lavender #b4befe)
+        inactive-color "@BORDER_INACTIVE@"    // unfocused (mode default: overlay0 #6c7086)
     }
     focus-ring { off; }
+
+    // Window shadow, per mode. Off in Default and Zen. Ink turns it on with
+    // softness 0, so the shadow is a solid offset block (a manga panel's hard
+    // shadow) instead of a soft glow.
+    shadow {
+        @SHADOW@
+        softness @SHADOW_SOFTNESS@
+        spread 0
+        offset x=@SHADOW_X@ y=@SHADOW_Y@
+        // false: the shadow is drawn only OUTSIDE the window. With true it also
+        // fills the area behind it, and a translucent window (kitty at 0.70)
+        // shows the solid block through its background as a coloured tint.
+        draw-behind-window false
+        color "@SHADOW_COLOR@"
+        inactive-color "@SHADOW_INACTIVE@"
+    }
 }
 
 // ── Overview ──────────────────────────────────────────────────────────

@@ -16,10 +16,10 @@ binds {
         spawn-sh "fuzzel --config=$HOME/.dotfiles/fuzzel/fuzzel/fuzzel.ini";
     }
 
-    //── Notifications (swaync) ──
-    Mod+Shift+D hotkey-overlay-title="Notification centre" { spawn "swaync-client" "-t"; }
-    Mod+Ctrl+D  { spawn "swaync-client" "-C"; }   // close all
-    Mod+Alt+D   { spawn "swaync-client" "-d"; }   // do-not-disturb toggle
+    //── Notifications — swaync or Quickshell, whichever the mode runs (notif.sh) ──
+    Mod+Shift+D hotkey-overlay-title="Notification centre" { spawn "/home/dweller/.dotfiles/scripts/sanctuary/notif.sh" "centre"; }
+    Mod+Ctrl+D  { spawn "/home/dweller/.dotfiles/scripts/sanctuary/notif.sh" "clear"; }   // close all
+    Mod+Alt+D   { spawn "/home/dweller/.dotfiles/scripts/sanctuary/notif.sh" "dnd"; }     // do-not-disturb toggle
 
     //── Panels that are really terminals ──
     // The panel-free answer to every GUI popup: a TUI in a floating kitty with
@@ -33,13 +33,13 @@ binds {
     Mod+Shift+W hotkey-overlay-title="Wallpaper" {
         spawn "/home/dweller/.dotfiles/scripts/sanctuary/wallpaper.sh" "pick";
     }
-    // Modes: Default / Zen / Zen — no bar. The picker is fzf in a floating kitty,
-    // same as every other panel. Adding a mode is adding a file in
-    // scripts/sanctuary/modes/ — this bind never changes.
-    Mod+Shift+T hotkey-overlay-title="Theme / mode (zen / default)" {
-        spawn "kitty" "--class" "sanctuary-mode" "-e" "/home/dweller/.dotfiles/scripts/sanctuary/mode.sh" "pick";
+    // Style picker: Signal / Ink / Paper, drawn by Quickshell. Changes the bar,
+    // toasts and centre only — niri's layout is fixed (layout.kdl). In the
+    // waybar fallback the same key retries Quickshell.
+    Mod+Shift+T hotkey-overlay-title="Style (Signal / Ink / Paper)" {
+        spawn "/home/dweller/.dotfiles/scripts/sanctuary/shell.sh" "pick";
     }
-    Mod+Shift+A { spawn "/home/dweller/.dotfiles/scripts/sanctuary/bar.sh" "toggle"; }
+    Mod+Shift+A hotkey-overlay-title="Hide / show the bar" { spawn "/home/dweller/.dotfiles/scripts/sanctuary/bar.sh"; }
 
     //── Audio ──  wpctl talks to pipewire directly; the bar is the readout.
     XF86AudioRaiseVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+" "-l" "1.0"; }

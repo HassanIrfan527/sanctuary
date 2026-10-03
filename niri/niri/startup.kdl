@@ -1,7 +1,9 @@
 // ── Startup ───────────────────────────────────────────────────────────
-spawn-at-startup "swaync"
-
-spawn-at-startup "/home/dweller/.dotfiles/scripts/sanctuary/mode.sh" "reapply"
+// The shell: Quickshell (bar + toasts + notification centre), in the saved
+// style — Signal by default. If it won't start, or crashes later, shell.sh
+// brings up the old waybar + swaync instead. swaync is never spawned here: it
+// and Quickshell race for org.freedesktop.Notifications, so shell.sh owns both.
+spawn-at-startup "/home/dweller/.dotfiles/scripts/sanctuary/shell.sh" "start"
 
 spawn-at-startup "/home/dweller/.dotfiles/scripts/sanctuary/wallpaper.sh" "restore"
 

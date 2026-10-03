@@ -89,6 +89,38 @@ lifted by soft shadow rather than bordered, Adwaita Sans (variable weights) rath
 decoration** — no `[ ]`, `▸`, `░`. Words and spacing carry it. It covers the zen clock pill and
 swaync (toasts + centre); anything else that appears in zen should follow it.
 
+**2026-10-03 — Signal is the desk.** Quickshell (Signal) starts at login; Default/Zen are
+retired as modes. The waybar + swaync configs stay, untouched, as the **automatic fallback**
+(`scripts/sanctuary/shell.sh`). **No script rewrites niri config or keybinds any more**: the
+layout is the hand-kept `niri/niri/layout.kdl`, and the mode renderer (`mode.sh`, the template,
+the mode files) is in `archive/mode-system/`. Sections below that describe modes, `mode.sh` or
+`mode.kdl` are history. Mod+Shift+T is now a Quickshell style picker (Signal / Ink / Paper) that
+changes the bar and notifications only.
+
+**Two more languages, added 2026-10-03: Ink and Signal — the QS modes.** Both are drawn by
+Quickshell (`quickshell/sanctuary/`), which replaces waybar *and* swaync while either is active;
+the mode file's `BAR=` word picks the stack (`full|zen|none` → classic, `ink|paper|signal` → Quickshell).
+Like zen, each is scoped to its mode and cannot leak.
+
+- **Ink / Paper** — manga panels, one style printed two ways: **Ink is only ever dark** (Mocha
+  `#1e1e2e` panels, light `#cdd6f4` outlines), **Paper** is the light printing (Latte `#eff1f5`
+  panels, black outlines). Palette lives in Theme.qml only. 3px outline, **hard offset shadow**
+  (softness 0) in the module's accent: identity moved from border to shadow, because the outline
+  is always ink. Square. Clock panel tilted −2° with a screentone. Workspaces are page panels
+  that widen with their window count. Toasts are speech bubbles with a tail up to the bar;
+  critical ones are zigzag "shout" balloons with a red shadow. Lettering: Bangers (fallback
+  Geist Black) for display, Geist Black caps for labels. Motion: a 120ms slam (scale 1.14→1,
+  ease-out, no bounce). Windows get the same hard shadow via niri (`SHADOW=on`).
+- **Signal** — instrument panel. One hairline strip with registration marks at the corners,
+  cells cut by 1px rules, small-caps labels dimmer than their values, every readout fixed-width.
+  Live traces for net/cpu/mem; mic as LIVE/MUTE plus five gain cells. Colour is spent on state
+  only: trace green, yellow ≥65%, red ≥85%. Toasts are log entries with an urgency stripe and a
+  draining time rule. Monospace throughout. Strip 35px (was 30), window border 2px.
+- **All QS styles share three behaviours** (2026-10-03): *Master Caution* — one light that
+  means "something needs you", acknowledged by a click and re-armed only by a new reason;
+  *exception cells* — TEMP/DISK readouts that exist only while abnormal (§2 empty states,
+  applied to alarms); a *volume pop-up* that is a readout, never a control (no input).
+
 ### Rules
 
 | Axis | Rule |

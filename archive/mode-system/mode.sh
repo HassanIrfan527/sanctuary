@@ -9,6 +9,17 @@
 # A mode is a file: scripts/sanctuary/modes/<name>.conf. Adding one is adding a
 # file — the picker lists whatever is in that directory, sorted by ORDER.
 #
+# ── Two stacks, one word ──────────────────────────────────────────────
+# A mode's `BAR=` decides which set of services runs the desk:
+#
+#   BAR=full | zen | none    classic: waybar + swaync (Default, Zen)
+#   BAR=ink  | signal | …    Quickshell: one process is bar + toasts + centre,
+#                            drawing that style (quickshell/sanctuary/<Style>Bar.qml)
+#
+# Switching across stacks stops one and starts the other — swaync and
+# Quickshell cannot run together, both want org.freedesktop.Notifications. So
+# turning any mode into any other look is changing that one word.
+#
 # ── How a switch works, and why it works this way ─────────────────────────
 # niri allows exactly ONE top-level `layout {}` block (a second one fails with
 # `duplicate node 'layout', single node expected`), so a mode cannot be a small
@@ -29,6 +40,7 @@ TEMPLATE="$NIRI/templates/mode.kdl.in"
 TARGET="$NIRI/mode.kdl"
 MODES="$HOME/.dotfiles/scripts/sanctuary/modes"
 BAR_SH="$HOME/.dotfiles/scripts/sanctuary/bar.sh"
+QS_SH="$HOME/.dotfiles/scripts/sanctuary/qs.sh"
 
 STATE="${XDG_STATE_HOME:-$HOME/.local/state}/sanctuary"
 SAVED="$STATE/mode"
@@ -65,6 +77,14 @@ render() {                       # $1 = mode name  ->  rendered KDL on stdout
         -e "s|@RADIUS@|${RADIUS}|g" \
         -e "s|@WINDOW_OPACITY@|${WINDOW_OPACITY:-1.0}|g" \
         -e "s|@CENTER_SINGLE@|${center}|g" \
+        -e "s|@BORDER_ACTIVE@|${BORDER_ACTIVE:-#b4befe}|g" \
+        -e "s|@BORDER_INACTIVE@|${BORDER_INACTIVE:-#6c7086}|g" \
+        -e "s|@SHADOW@|${SHADOW:-off}|g" \
+        -e "s|@SHADOW_SOFTNESS@|${SHADOW_SOFTNESS:-0}|g" \
+        -e "s|@SHADOW_X@|${SHADOW_X:-0}|g" \
+        -e "s|@SHADOW_Y@|${SHADOW_Y:-0}|g" \
+        -e "s|@SHADOW_COLOR@|${SHADOW_COLOR:-#00000070}|g" \
+        -e "s|@SHADOW_INACTIVE@|${SHADOW_INACTIVE:-${SHADOW_COLOR:-#00000070}}|g" \
         "$TEMPLATE"
     # Blur behind the bar, per mode. Two things to know:
     #
@@ -140,9 +160,37 @@ swaync_theme() {
     && cmp -s "$src/config.json" "$SWAYNC_DIR/config.json" && return 0
   cp -f "$src/config.json" "$SWAYNC_DIR/config.json"
   cp -f "$src/style.css"   "$SWAYNC_DIR/style.css"
-  swaync-client -R  >/dev/null 2>&1
-  swaync-client -rs >/dev/null 2>&1
+  # Not running yet (coming back from a QS mode)? Then there is nothing to
+  # reload — swaync_up starts it on the files just copied. `timeout`, because a
+  # client with no daemon to talk to can hang (waybar/scripts/notifications.sh).
+  pgrep -x swaync >/dev/null 2>&1 || return 0
+  timeout 2 swaync-client -R  >/dev/null 2>&1
+  timeout 2 swaync-client -rs >/dev/null 2>&1
 }
+
+# swaync's lifecycle, now that a mode can stop it. It used to be a plain
+# spawn-at-startup in niri; it moved here so the startup path and the switch
+# path are the same code — a QS mode saved across a reboot must never race a
+# startup swaync for the notification bus name.
+swaync_up() {
+  pgrep -x swaync >/dev/null 2>&1 && return 0
+  trap '' HUP
+  setsid swaync >/dev/null 2>&1 </dev/null &
+}
+swaync_down() {
+  pgrep -x swaync >/dev/null 2>&1 || return 0
+  pkill -x swaync
+  local i
+  for i in $(seq 1 30); do          # ≤3s: the bus name is only free once it has exited
+    pgrep -x swaync >/dev/null 2>&1 || return 0
+    sleep 0.1
+  done
+  pkill -9 -x swaync
+}
+
+# BAR= → the Quickshell style it names, or nothing for the classic waybar bars.
+qs_style() { case "$1" in full|zen|none) ;; *) printf '%s' "$1" ;; esac; }
+bar_of()   { (. "$MODES/$1.conf" 2>/dev/null; printf '%s' "${BAR:-full}"); }
 
 # The bar has no mode module, so the toast IS the readout — same reasoning as
 # nightlight.sh. A fixed replaces-id means repeated switches update one toast.
@@ -150,7 +198,10 @@ swaync_theme() {
 # ascii, plain words in cozy (no glyph decoration there — that is the point).
 announce() {
   local label=$1 desc=$2 theme=${3:-ascii} title
-  if [ "$theme" = cozy ]; then title="$label mode"; else title="[ mode ▸ $label ]"; fi
+  case "$theme" in
+    cozy|ink|paper) title="$label mode" ;;          # no glyph decoration in these languages
+    *)        title="[ mode ▸ $label ]" ;;
+  esac
   notify-send -a sanctuary -r 9412 -t 1600 "$title" "$desc" 2>/dev/null
 }
 
@@ -166,6 +217,15 @@ apply() {
   dnd=$(. "$MODES/$name.conf";   printf '%s' "${DND:-off}")
   swaync=$(. "$MODES/$name.conf"; printf '%s' "${SWAYNC:-ascii}")
 
+  local style
+  style=$(qs_style "$bar")
+  # A typo in BAR= must not tear down the working bar first and find out after.
+  if [ -n "$style" ] && ! "$QS_SH" has "$style"; then
+    notify-send -a sanctuary -u critical -r 9412 "[ mode ✗ $label ]" \
+      "BAR=$style: no such Quickshell style ($("$QS_SH" styles | paste -sd' ')) — kept $prev" 2>/dev/null
+    return 1
+  fi
+
   # 1. Shape + space. Keep the outgoing file so a failed validate is reversible.
   # Render to a temp file first: a mode file missing a key (set -u) makes render
   # fail half-way, and writing that straight into mode.kdl left an EMPTY file —
@@ -173,39 +233,76 @@ apply() {
   local backup="" tmp
   if [ -f "$TARGET" ]; then backup="$TARGET.prev"; cp -f "$TARGET" "$backup"; fi
   tmp=$(mktemp "$TARGET.XXXXXX") || return 1
+  # On a failure the layout is left as it was. A SWITCH then stops there; a
+  # REAPPLY (startup: name == prev) carries on, because swaync / the bar are
+  # started below and a bad layout must not also cost the notifications.
+  local layout_ok=yes
   if ! render "$name" > "$tmp" || [ ! -s "$tmp" ]; then
     rm -f "$tmp"
     notify-send -a sanctuary -u critical -r 9412 \
       "[ mode ✗ $label ]" "modes/$name.conf is missing a setting — kept $prev" 2>/dev/null
-    return 1
+    layout_ok=no
+  else
+    mv -f "$tmp" "$TARGET"
+    if ! niri validate -c "$NIRI/config.kdl" >/dev/null 2>&1; then
+      [ -n "$backup" ] && mv -f "$backup" "$TARGET"
+      notify-send -a sanctuary -u critical -r 9412 \
+        "[ mode ✗ $label ]" "config failed validation — kept $prev" 2>/dev/null
+      printf 'mode.sh: %s produced an invalid config; rolled back\n' "$name" >&2
+      layout_ok=no
+    fi
   fi
-  mv -f "$tmp" "$TARGET"
-  if ! niri validate -c "$NIRI/config.kdl" >/dev/null 2>&1; then
-    [ -n "$backup" ] && mv -f "$backup" "$TARGET"
-    notify-send -a sanctuary -u critical -r 9412 \
-      "[ mode ✗ $label ]" "config failed validation — kept $prev" 2>/dev/null
-    printf 'mode.sh: %s produced an invalid config; rolled back\n' "$name" >&2
-    return 1
+  if [ "$layout_ok" = no ]; then
+    [ "$name" = "$prev" ] || return 1
+  else
+    niri msg action load-config-file >/dev/null 2>&1
   fi
-  niri msg action load-config-file >/dev/null 2>&1
 
   # 2. Remember it BEFORE touching the bar: bar.sh reads this file to decide
   #    which config to launch, so the order here is load-bearing.
   printf '%s\n' "$name" > "$SAVED"
 
-  # 3. Bar.
+  # 3. The stack: Quickshell, or waybar + swaync.
+  if [ -n "$style" ]; then
+    "$BAR_SH" stop                  # waybar, and its orphan swaync-client
+    swaync_down                     # frees org.freedesktop.Notifications
+    if ! "$QS_SH" start "$style"; then
+      # Never leave the desk with no bar and nothing to show notifications.
+      # Fall back to the mode we came from (or Default, if that was a QS mode
+      # too) and say why.
+      "$QS_SH" stop
+      local back=$prev
+      if [ -n "$(qs_style "$(bar_of "$back")")" ] || [ "$back" = "$name" ]; then back=default; fi
+      apply "$back"
+      notify-send -a sanctuary -u critical -r 9413 "[ mode ✗ $label ]" \
+        "Quickshell did not start — back to $back. Log: ~/.local/state/sanctuary/qs.log" 2>/dev/null
+      return 1
+    fi
+
+    # 4. Quiet, and say so — same ordering rule as the classic branch below.
+    if [ "$dnd" = on ]; then
+      announce "$label" "$desc" "$style"
+      sleep 0.2
+      "$QS_SH" call notifs setDnd true >/dev/null
+    else
+      "$QS_SH" call notifs setDnd false >/dev/null
+      announce "$label" "$desc" "$style"
+    fi
+    return 0
+  fi
+
+  "$QS_SH" stop                     # no-op unless we are leaving a QS mode
+  # Theme files BEFORE starting swaync, so a fresh daemon reads the right ones.
+  swaync_theme "$swaync"
+  swaync_up
   case "$bar" in
     none) "$BAR_SH" stop ;;
     *)    "$BAR_SH" restart ;;
   esac
 
-  # 4. Notification theme — BEFORE the announce toast, so the toast already
-  #    wears the mode it announces.
-  swaync_theme "$swaync"
-
-  # 5. Quiet, and say so. Leaving a DND mode: clear DND first, then announce, or
+  # 4. Quiet, and say so. Leaving a DND mode: clear DND first, then announce, or
   #    the toast is swallowed by the mode you are leaving. Entering one: announce
-  #    first, then go quiet.
+  #    first, then go quiet. (dnd_set waits for a swaync that is still starting.)
   if [ "$dnd" = on ]; then
     announce "$label" "$desc" "$swaync"
     sleep 0.2

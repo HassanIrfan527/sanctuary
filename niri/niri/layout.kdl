@@ -1,0 +1,55 @@
+// ── Layout + shape ────────────────────────────────────────────────────
+// Hand-maintained. Edit this file directly — nothing generates or rewrites it.
+//
+// History: 2026-09-25 → 2026-10-03 this was `mode.kdl`, rendered per mode by
+// scripts/sanctuary/mode.sh from a template. Retired 2026-10-03: the desk is
+// Signal (Quickshell) now, and no script rewrites niri config any more. The old
+// system is in archive/mode-system/ if it is ever wanted back.
+//
+// These are Signal's numbers: square, tight, a 2px border with the focused
+// window in the trace green. The Quickshell style picker (Mod+Shift+T) changes
+// only the bar / toasts / centre — never this file.
+//
+// niri permits exactly ONE top-level layout block ("duplicate node layout"), so
+// this file is the only place layout lives.
+
+layout {
+    gaps 6                          // inner gap BETWEEN windows
+    struts {
+        left 8
+        right 8
+        top 4                       // the bar's own exclusive zone sits on top of this
+        bottom 8
+    }
+    center-focused-column "never"   // columns stay put; never auto-recenter
+    // Widths cycled by Mod+R. This IS niri's "resize" idiom.
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+    default-column-width { proportion 0.5; }
+
+    border {
+        on
+        width 2                     // a hair heavier than the bar's 1px rules: windows are the subject
+        active-color "#a6e3a1"      // focused — mocha green, Signal's trace colour
+        inactive-color "#313244"    // unfocused — surface0, same as the bar's rules
+    }
+    focus-ring { off; }
+}
+
+// ── Overview ──────────────────────────────────────────────────────────
+overview {
+    backdrop-color "#1e1e2e"
+}
+
+// ── Shape ─────────────────────────────────────────────────────────────
+// `window-rule` blocks are additive and the LAST one wins, so this overrides the
+// 2px floor in window-rules.kdl. That only holds because config.kdl includes
+// this file *after* it — reorder the includes and the radius silently stops
+// applying.
+window-rule {
+    geometry-corner-radius 0
+    clip-to-geometry true
+}

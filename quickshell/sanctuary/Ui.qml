@@ -1,0 +1,13 @@
+pragma Singleton
+import QtQuick
+import Quickshell
+
+// Shell-wide UI state. Flipped by the IPC handlers in shell.qml (keybinds) and
+// by clicks on the bar.
+Singleton {
+    property bool barShown: true    // Mod+Shift+A
+    property bool centreOpen: false // Mod+Shift+D
+    property bool pickerOpen: false // Mod+Shift+T
+    property bool playerOpen: false // right-click the music module
+    property real playerX: 0        // screen x of that module's centre — the card hangs from it
+}
