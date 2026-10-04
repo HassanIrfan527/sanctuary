@@ -31,8 +31,10 @@ binds {
     Mod+Alt+M hotkey-overlay-title="Audio mixer" {
         spawn "kitty" "--class" "sanctuary-mixer" "-e" "wiremix";
     }
+    // Wallpaper: Quickshell's thumbnail picker (stills + live videos), drawn
+    // in the current style. Fallback (Quickshell down): yazi in a kitty.
     Mod+Shift+W hotkey-overlay-title="Wallpaper" {
-        spawn "/home/dweller/.dotfiles/scripts/sanctuary/wallpaper.sh" "pick";
+        spawn "/home/dweller/.dotfiles/scripts/sanctuary/wallpaper.sh" "open";
     }
     // Style picker: Signal / Ink / Paper, drawn by Quickshell. Changes the bar,
     // toasts and centre only — niri's layout is fixed (layout.kdl). In the
@@ -162,11 +164,12 @@ binds {
     // swaylock. Same path as idle-lock and suspend-lock, so there is one
     // locker and one look.
     Mod+Escape hotkey-overlay-title="Lock" { spawn "loginctl" "lock-session"; }
-    // Power menu: lock / suspend / log out / reboot / shut down. fzf in a
-    // floating kitty; acts immediately, no confirm — `lock` is the top row, so
-    // a stray Enter is the harmless one. Sits next to Mod+Escape on purpose.
+    // Power menu: lock / suspend / log out / reboot / shut down. Quickshell's
+    // menu in the current style (fallback: fzf in a floating kitty); acts
+    // immediately, no confirm — `lock` is the top row, so a stray Enter is the
+    // harmless one. Sits next to Mod+Escape on purpose.
     Mod+Shift+Escape hotkey-overlay-title="Power menu" {
-        spawn "kitty" "--class" "sanctuary-power" "-e" "/home/dweller/.dotfiles/scripts/sanctuary/power.sh";
+        spawn "/home/dweller/.dotfiles/scripts/sanctuary/power.sh" "open";
     }
 
     //── Media / volume

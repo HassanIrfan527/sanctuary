@@ -2,6 +2,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.SystemTray
 
 // The Sanctuary in Quickshell — one process that is the bar, the toasts and the
 // notification centre, for the QS modes (Ink, Signal).
@@ -75,6 +76,18 @@ ShellRoot {
         active: true
         Launcher {}
     }
+    LazyLoader {
+        active: true
+        PowerMenu {}
+    }
+    LazyLoader {
+        active: true
+        WallPicker {}
+    }
+    LazyLoader {
+        active: true
+        TrayMenu {}
+    }
 
     // ── IPC — what the keybinds call (scripts/sanctuary/notif.sh, bar.sh) ──
     //   qs ipc -p ~/.dotfiles/quickshell/sanctuary call notifs toggle
@@ -97,6 +110,18 @@ ShellRoot {
         target: "launcher"
         function toggle(): void { Ui.launcherOpen = !Ui.launcherOpen; }
         function close(): void { Ui.launcherOpen = false; }
+    }
+
+    IpcHandler {
+        target: "power"
+        function toggle(): void { Ui.powerOpen = !Ui.powerOpen; }
+        function close(): void { Ui.powerOpen = false; }
+    }
+
+    IpcHandler {
+        target: "wallpaper"
+        function toggle(): void { Ui.wallOpen = !Ui.wallOpen; }
+        function close(): void { Ui.wallOpen = false; }
     }
 
     IpcHandler {
@@ -125,6 +150,15 @@ ShellRoot {
         //   qs.sh call debug launcherType fir · qs.sh call debug launcherEnter
         function launcherType(text: string): void { Ui.launcherType(text); }
         function launcherEnter(): void { Ui.launcherEnter(); }
+        //   qs.sh call debug trayMenu 0   open tray item 0's menu (as a right-click would)
+        function trayMenu(i: int): string {
+            const item = SystemTray.items.values[i];
+            if (!item || !item.hasMenu)
+                return "no menu";
+            Ui.trayX = 1800;
+            Ui.trayMenu = item.menu;
+            return item.id;
+        }
     }
 
     IpcHandler {

@@ -64,12 +64,15 @@ toast says why it happened. `shell.sh status` prints which one is up.
 | `sanctuary/Ink*.qml` | Ink: bar, panel, halftone, speech bubble, toast, centre. |
 | `sanctuary/Signal*.qml`, `Sparkline.qml` | Signal: bar, cell, ticks, toast, centre. |
 | `sanctuary/Toasts.qml`, `Tray.qml` | Shared: the toast column window, the system tray. |
-
+| `sanctuary/TrayMenu.qml` | A tray app's right-click menu, drawn in the current style (not Qt's native white QMenu). |
 | `sanctuary/Picker.qml` | Mod+Shift+T style picker. |
 | `sanctuary/Launcher.qml` | Mod+Space app launcher (all styles); fsel is the fallback. |
+| `sanctuary/PowerMenu.qml` | Mod+Shift+Escape power menu (all styles); fzf in kitty is the fallback. |
+| `sanctuary/WallPicker.qml`, `Thumb.qml` | Mod+Shift+W wallpaper picker — stills + live videos as thumbnails; yazi is the fallback. |
 
 Scripts: `scripts/sanctuary/shell.sh` (startup, style switch, fallback, crash
 watch), `launcher.sh` (Mod+Space → Quickshell launcher, or fsel in fallback),
+`power.sh open` / `wallpaper.sh open` (same idea: Quickshell, or the kitty TUI),
 `qs.sh` (start/stop/IPC), `notif.sh` (notification keys → Quickshell or
 swaync), `bar.sh` (Mod+Shift+A).
 
@@ -91,6 +94,8 @@ survives it (`keepOnReload`).
 |---|---|
 | `Mod+Space` | launcher — type to filter · `enter` launch · `↑↓`/`ctrl-j k`/`ctrl-n p` move · `esc` close (in fallback: fsel) |
 | `Mod+Shift+T` | style picker — `j`/`k` move · `enter` or `1`-`3` pick · `esc` close (in fallback: retry Quickshell) |
+| `Mod+Shift+W` | wallpaper — type to filter · arrows/`ctrl-h j k l` move · `tab` still/live · `enter` set · `shift-enter` set and stay open · `esc` close (in fallback: yazi) |
+| `Mod+Shift+Escape` | power — `j`/`k` move · `enter` or `1`-`5` act (no confirm; opens on lock) · `esc` close (in fallback: fzf) |
 | `Mod+Shift+A` | hide / show the bar |
 | `Mod+Shift+D` | notification centre — inside it: `c` clear all · `d` DND · `esc` close |
 | `Mod+Ctrl+D` | clear all notifications |

@@ -648,6 +648,12 @@ stray Enter locks. No pointer glyph; the surface0 row highlight is the cursor.
 Failures surface as a critical toast (the likely one: an app's shutdown *block* inhibitor — overriding
 it needs admin auth, and no polkit agent runs on this desktop to ask).
 
+**2026-10-04: moved into Quickshell** (`quickshell/sanctuary/PowerMenu.qml`), drawn per style; the
+key now runs `power.sh open`, which falls back to the fzf kitty above when Quickshell is down. Same
+rows, same no-confirm rule, cursor always opens on `lock`. Rows that end the session (log out,
+reboot, shut down) turn **red** under the cursor — Signal's alarm colour, Ink's shadow — so the last
+look before Enter says what it is. The actions still run in `power.sh do VERB` (failure toast kept).
+
 ### Windows (niri) — BUILT
 
 `geometry-corner-radius` is **2** in Default and **12** in Zen. Layout no longer lives in
@@ -663,6 +669,16 @@ overwrote them with pink `#f5c2e7`) is gone.
 via `awww`. yazi runs in `--chooser-file` mode, so Enter writes the selection and exits and the
 script keeps control to do the applying and remember it in
 `~/.local/state/sanctuary/wallpaper`. `wallpaper.sh restore` re-applies at startup.
+
+**2026-10-04: a Quickshell picker in front** (`quickshell/sanctuary/WallPicker.qml`); the key runs
+`wallpaper.sh open`, and yazi above is the fallback when Quickshell is down. Why not keep yazi: it is
+a file browser, so you see one preview at a time and navigate by name. The picker is a contact sheet
+— 12 thumbnails at a glance, drawn in the current style, opening on the wallpaper you have now — and
+it has a second shelf, **LIVE**, for the mpvpaper videos (`livewall.sh`), which yazi never had.
+Thumbnails are 480x270 JPEGs in `~/.cache/sanctuary/wallthumbs` (named by the md5 of the path),
+made by `wallpaper.sh thumbs` (parallel, niced) at startup and on every open; a tile with no
+thumbnail yet shows its name rather than decoding a 4K original. Setting a still stops a running
+live wallpaper — mpvpaper is a layer above awww and would hide the change.
 
 The wallpaper fade is **0.4s**, the one deliberate exception to the 160ms rule — nothing is
 waiting on it, so a longer fade reads as calm rather than sluggish.

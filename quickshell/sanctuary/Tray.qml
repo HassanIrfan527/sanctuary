@@ -4,7 +4,9 @@ import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 
 // The system tray, shared by both styles. Left click activates, middle is the
-// secondary action, right opens the app's own menu.
+// secondary action, right opens the app's own menu — drawn by TrayMenu.qml in
+// the current style. (Not `modelData.display()`: that hands the menu to Qt's
+// native QMenu, which ignores our styles and renders as a white box.)
 Row {
     id: root
     property int iconSize: 14
@@ -30,9 +32,8 @@ Row {
                 } else if (mouse.button === Qt.MiddleButton) {
                     modelData.secondaryActivate();
                 } else if (modelData.hasMenu) {
-                    const win = QsWindow.window;
-                    const p = cell.mapToItem(win.contentItem, 0, cell.height + 8);
-                    modelData.display(win, p.x, p.y);
+                    Ui.trayX = cell.mapToItem(null, cell.width / 2, 0).x;
+                    Ui.trayMenu = modelData.menu;
                 }
             }
 

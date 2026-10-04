@@ -13,4 +13,9 @@ Singleton {
     signal launcherEnter()
     property bool playerOpen: false // right-click the music module
     property real playerX: 0        // screen x of that module's centre — the card hangs from it
+    property bool powerOpen: false  // Mod+Shift+Escape
+    property bool wallOpen: false   // Mod+Shift+W
+    // Right-click a tray icon: that app's menu, drawn by TrayMenu.qml.
+    property var trayMenu: null     // the item's QsMenuHandle; null = closed
+    property real trayX: 0          // screen x of the icon's centre — the menu hangs from it
 }
