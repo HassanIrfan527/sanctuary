@@ -34,9 +34,96 @@ PanelWindow {
     // number of windows in it — busy workspaces literally take more of the page.
     //   focused  solid ink        occupied  screentone
     //   empty    bare outline     urgent    red
+    // ── far left: the recorders ──────────────────────────────────────
+    // ◉ opens RIG. While recording it becomes the REC panels instead: SCR has a
+    // red shadow and a framed square (the screen), AUD a peach shadow and a
+    // wave (sound). Left-click stops, right-click = RIG.
+    Row {
+        id: recRow
+        x: 10
+        y: 8
+        spacing: 10 + Theme.inkShadow
+
+        InkPanel {
+            visible: !Rec.any
+            accent: Ui.rigOpen ? Theme.teal : Theme.surface1
+            padX: 8
+            interactive: true
+            onClicked: Ui.rigOpen = !Ui.rigOpen
+            Text {
+                text: "◉"
+                font.family: Theme.sans
+                font.weight: Font.Black
+                font.pixelSize: 12
+                color: Theme.inkLine
+            }
+        }
+
+        InkPanel {
+            visible: Rec.scrActive
+            accent: Rec.scrPaused || Rec.scrSaving ? Theme.yellow : Theme.red
+            hot: !Rec.scrPaused
+            padX: 10
+            interactive: true
+            onClicked: mouse => {
+                if (mouse.button === Qt.RightButton)
+                    Ui.rigOpen = !Ui.rigOpen;
+                else if (!Rec.scrSaving)
+                    Rec.screen(["stop"]);
+            }
+            Row {
+                spacing: 6
+                Text {
+                    text: "▣"
+                    font.family: Theme.sans
+                    font.weight: Font.Black
+                    font.pixelSize: 11
+                    color: Theme.red
+                }
+                Text {
+                    text: Rec.scrSaving ? "SAVING" : (Rec.scrPaused ? "PAUSED " : "SCR ") + Rec.clock(Rec.scrMs)
+                    font.family: Theme.sans
+                    font.weight: Font.Black
+                    font.pixelSize: 10
+                    color: Theme.inkLine
+                }
+            }
+        }
+
+        InkPanel {
+            visible: Rec.audActive
+            accent: Rec.audPaused ? Theme.yellow : Theme.peach
+            padX: 10
+            interactive: true
+            onClicked: mouse => {
+                if (mouse.button === Qt.RightButton)
+                    Ui.rigOpen = !Ui.rigOpen;
+                else
+                    Rec.audio(["stop"]);
+            }
+            Row {
+                spacing: 6
+                Text {
+                    text: "∿"
+                    font.family: Theme.sans
+                    font.weight: Font.Black
+                    font.pixelSize: 12
+                    color: Theme.inkLine
+                }
+                Text {
+                    text: (Rec.audPaused ? "PAUSED " : Rec.audSolo ? "SOLO " : "AUD ") + Rec.clock(Rec.audMs)
+                    font.family: Theme.sans
+                    font.weight: Font.Black
+                    font.pixelSize: 10
+                    color: Theme.inkLine
+                }
+            }
+        }
+    }
+
     InkPanel {
         id: wsPanel
-        x: 10
+        x: recRow.x + recRow.width + 10 + Theme.inkShadow
         y: 8
         accent: Theme.mauve
         padX: 8

@@ -54,8 +54,8 @@ fi
 #
 # Failures are NOT silent. The realistic one: an app holds a logind "shutdown"
 # block inhibitor (check with `systemd-inhibit --list`) — systemctl then refuses,
-# overriding it needs admin auth, and there is no polkit agent running to ask
-# for a password. Without this, "shut down" would just... not, with no trace.
+# overriding it needs admin auth (Polkit.qml asks since 2026-10-05; before that
+# nothing did). Without this, "shut down" would just... not, with no trace.
 # trap '' HUP: same race mode.sh pick lost — kitty SIGHUPs the pty the moment
 # this script exits, and a child that has not reached setsid() yet dies with it.
 # An ignored signal survives exec, so the child is immune from its first instant.

@@ -88,6 +88,19 @@ ShellRoot {
         active: true
         TrayMenu {}
     }
+    LazyLoader {
+        active: true
+        Rig {}
+    }
+    LazyLoader {
+        active: true
+        Capture {}
+    }
+    // The polkit agent registers when this loads — at startup, every style.
+    LazyLoader {
+        active: true
+        Polkit {}
+    }
 
     // ── IPC — what the keybinds call (scripts/sanctuary/notif.sh, bar.sh) ──
     //   qs ipc -p ~/.dotfiles/quickshell/sanctuary call notifs toggle
@@ -124,6 +137,19 @@ ShellRoot {
         function close(): void { Ui.wallOpen = false; }
     }
 
+    // Recorders: scripts/sanctuary/screenrec.sh calls `rec select`; Mod+U `rig toggle`.
+    IpcHandler {
+        target: "rig"
+        function toggle(): void { Ui.rigOpen = !Ui.rigOpen; }
+        function close(): void { Ui.rigOpen = false; }
+    }
+
+    IpcHandler {
+        target: "rec"
+        function select(): void { Ui.rigOpen = false; Ui.captureOpen = true; }
+        function cancel(): void { Ui.captureOpen = false; }
+    }
+
     IpcHandler {
         target: "picker"
         function toggle(): void { Ui.pickerOpen = !Ui.pickerOpen; }
@@ -150,6 +176,20 @@ ShellRoot {
         //   qs.sh call debug launcherType fir · qs.sh call debug launcherEnter
         function launcherType(text: string): void { Ui.launcherType(text); }
         function launcherEnter(): void { Ui.launcherEnter(); }
+        //   qs.sh call debug fakeRec scr|scr-paused|scr-full|aud|aud-solo|both|off
+        // Draws the REC cells / capture strip with nothing actually recording.
+        function fakeRec(what: string): string {
+            const t = Date.now() - 192000;
+            const scr = { state: "recording", mode: "region", geom: "460,240 1000x560", mic: true, sys: false, acc_ms: 0, seg_started_ms: t };
+            const aud = { state: "recording", solo: false, acc_ms: 0, seg_started_ms: t - 2280000 };
+            Rec.fakeScr = what.startsWith("scr") || what === "both" ? scr : null;
+            Rec.fakeAud = what.startsWith("aud") || what === "both" ? aud : null;
+            if (what === "scr-paused") { scr.state = "paused"; scr.acc_ms = 192000; scr.seg_started_ms = 0; }
+            if (what === "scr-full") { scr.mode = "full"; scr.geom = ""; }
+            if (what === "aud-solo") aud.solo = true;
+            Rec.poll();
+            return what;
+        }
         //   qs.sh call debug trayMenu 0   open tray item 0's menu (as a right-click would)
         function trayMenu(i: int): string {
             const item = SystemTray.items.values[i];

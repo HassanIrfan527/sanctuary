@@ -4,7 +4,7 @@ import Quickshell.Wayland
 
 // Signal — the bar as an instrument strip.
 //
-//   WS 1 2 3 4 │ WIN kitty · nvim      10:41:07 PM      NET ↓1.2M ↑40K ╱╲ │ CPU 12% ╱╲ │ MEM 41% ╱╲ │ MIC LIVE ▮▮▮▯▯ │ ♪ … │ tray │ MSG 03
+//   ◉ │ WS 1 2 3 4 │ WIN kitty · nvim      10:41:07 PM      NET ↓1.2M ↑40K ╱╲ │ CPU 12% ╱╲ │ MEM 41% ╱╲ │ MIC LIVE ▮▮▮▯▯ │ ♪ … │ tray │ MSG 03
 //
 // One panel, cut into cells by hairlines, with registration marks at the
 // corners. Every value is fixed-width so nothing shuffles as numbers change.
@@ -63,6 +63,70 @@ PanelWindow {
             id: left
             height: parent.height
 
+            // ── recorders: ◉ opens RIG; while recording it becomes the REC
+            // cells instead. SCR is red (the screen), AUD is peach (sound),
+            // and the words say which. Left-click stops, right-click = RIG.
+            Row {
+                id: recRow
+                height: parent.height
+
+                SignalCell {
+                    visible: !Rec.any
+                    interactive: true
+                    onClicked: Ui.rigOpen = !Ui.rigOpen
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: "◉"
+                        font.family: Theme.mono
+                        font.pixelSize: 12
+                        color: Ui.rigOpen ? Theme.sigHot : Theme.surface2
+                    }
+                }
+
+                SignalCell {
+                    visible: Rec.scrActive
+                    label: "SCR"
+                    labelColor: Rec.scrPaused ? Theme.sigWarn : Theme.sigAlarm
+                    interactive: true
+                    onClicked: mouse => {
+                        if (mouse.button === Qt.RightButton)
+                            Ui.rigOpen = !Ui.rigOpen;
+                        else if (!Rec.scrSaving)
+                            Rec.screen(["stop"]);
+                    }
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: Rec.scrSaving ? "SAVING"
+                            : (Rec.scrPaused ? "‖ " : "● ") + Rec.clock(Rec.scrMs)
+                        font.family: Theme.mono
+                        font.pixelSize: 11
+                        font.weight: Font.Bold
+                        color: Rec.scrPaused || Rec.scrSaving ? Theme.sigWarn : Theme.sigAlarm
+                    }
+                }
+
+                SignalCell {
+                    visible: Rec.audActive
+                    label: Rec.audSolo ? "AUD·1" : "AUD·2"
+                    labelColor: Rec.audPaused ? Theme.sigWarn : Theme.peach
+                    interactive: true
+                    onClicked: mouse => {
+                        if (mouse.button === Qt.RightButton)
+                            Ui.rigOpen = !Ui.rigOpen;
+                        else
+                            Rec.audio(["stop"]);
+                    }
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: (Rec.audPaused ? "‖ " : "● ") + Rec.clock(Rec.audMs)
+                        font.family: Theme.mono
+                        font.pixelSize: 11
+                        font.weight: Font.Bold
+                        color: Rec.audPaused ? Theme.sigWarn : Theme.peach
+                    }
+                }
+            }
+
             SignalCell {
                 id: wsCell
                 label: "WS"
@@ -111,7 +175,7 @@ PanelWindow {
                 Text {
                     // Yields to the alert row: never closer than 24px to it.
                     width: Math.max(0, Math.min(implicitWidth, 260,
-                                                alertRow.x - left.x - wsCell.width - 70))
+                                                alertRow.x - left.x - recRow.width - wsCell.width - 70))
                     elide: Text.ElideRight
                     text: Niri.focusedWindow
                           ? (Niri.focusedWindow.app_id || "?") + "  " + (Niri.focusedWindow.title || "")

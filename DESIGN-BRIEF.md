@@ -646,7 +646,7 @@ centre keeps its history. Cozy traps:
 confirm, no countdown**, by Harry's call. The safety margin is order: `lock` is the top row, so a
 stray Enter locks. No pointer glyph; the surface0 row highlight is the cursor.
 Failures surface as a critical toast (the likely one: an app's shutdown *block* inhibitor — overriding
-it needs admin auth, and no polkit agent runs on this desktop to ask).
+it needs admin auth — asked for by Polkit.qml since 2026-10-05; mate-polkit in the fallback).
 
 **2026-10-04: moved into Quickshell** (`quickshell/sanctuary/PowerMenu.qml`), drawn per style; the
 key now runs `power.sh open`, which falls back to the fzf kitty above when Quickshell is down. Same

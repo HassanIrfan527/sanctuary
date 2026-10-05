@@ -36,6 +36,12 @@ WAYBAR_CFG="$HOME/.dotfiles/waybar/config.jsonc"
 WAYBAR_CSS="$HOME/.dotfiles/waybar/style.css"
 SWAYNC_THEME="$HOME/.dotfiles/swaync/swaync/themes/ascii"
 
+# The password prompt (polkit agent). Quickshell is the agent while it runs
+# (Polkit.qml); in the fallback, mate-polkit is. Only ONE agent may hold the
+# session, so the swap happens with the rest of the stack: classic_down kills
+# mate before Quickshell starts, classic_up starts it once Quickshell is gone.
+POLKIT_MATE=/usr/libexec/polkit-mate-authentication-agent-1
+
 saved_style() {
   local s=signal
   [ -s "$STYLE_FILE" ] && s=$(cat "$STYLE_FILE")
@@ -64,6 +70,7 @@ point_layout() {                             # $1 = style
 
 # ── the classic stack ─────────────────────────────────────────────────
 classic_down() {
+  pkill -f "^$POLKIT_MATE" 2>/dev/null
   pkill -x waybar
   pkill -f '^swaync-client -swb$'           # waybar's notification module, orphaned
   pgrep -x swaync >/dev/null 2>&1 || return 0
@@ -83,6 +90,9 @@ classic_up() {
          >/dev/null 2>&1 </dev/null &
   pgrep -x waybar >/dev/null 2>&1 \
     || setsid waybar -c "$WAYBAR_CFG" -s "$WAYBAR_CSS" >/dev/null 2>&1 </dev/null &
+  if [ -x "$POLKIT_MATE" ] && ! pgrep -f "^$POLKIT_MATE" >/dev/null 2>&1; then
+    setsid "$POLKIT_MATE" >/dev/null 2>&1 </dev/null &
+  fi
 }
 
 fallback() {

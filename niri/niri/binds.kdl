@@ -71,6 +71,19 @@ binds {
         spawn "/home/dweller/.dotfiles/scripts/sanctuary/meeting-rec.sh" "toggle" "--solo";
     }
 
+    //── RIG — the recorders (Quickshell). Screen: drag a region, the rest dims,
+    //   MIC on / SYS off, pause, stop. Audio: the meeting recorder above. ──
+    Mod+U hotkey-overlay-title="RIG (recorders)" {
+        spawn "/home/dweller/.dotfiles/scripts/sanctuary/qs.sh" "call" "rig" "toggle";
+    }
+    // Same key starts (opens the region overlay) and stops (saves).
+    Ctrl+Print hotkey-overlay-title="Record screen (start / stop)" {
+        spawn "/home/dweller/.dotfiles/scripts/sanctuary/screenrec.sh" "key";
+    }
+    Ctrl+Alt+Print hotkey-overlay-title="Pause / resume screen recording" {
+        spawn "/home/dweller/.dotfiles/scripts/sanctuary/screenrec.sh" "pause-toggle";
+    }
+
     //── Night light ──  manual, always on. Warmer = more filter.
     //   Clamped to 1500-6500K; 6500 is neutral daylight, i.e. off.
     Mod+Ctrl+Minus hotkey-overlay-title="Night light warmer" {
@@ -80,6 +93,9 @@ binds {
         spawn "/home/dweller/.dotfiles/scripts/sanctuary/nightlight.sh" "cooler";
     }
     Mod+Ctrl+0 { spawn "/home/dweller/.dotfiles/scripts/sanctuary/nightlight.sh" "reset"; }
+
+    //── Cheat sheet ──  a custom binds block drops all of niri's defaults, this one too
+    Mod+Shift+Slash { show-hotkey-overlay; }
 
     //── Overview ──  zoomed-out view of all workspaces/columns; drag windows around
     Mod+Tab { toggle-overview; }

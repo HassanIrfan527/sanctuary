@@ -68,6 +68,10 @@ toast says why it happened. `shell.sh status` prints which one is up.
 | `sanctuary/Picker.qml` | Mod+Shift+T style picker. |
 | `sanctuary/Launcher.qml` | Mod+Space app launcher (all styles); fsel is the fallback. |
 | `sanctuary/PowerMenu.qml` | Mod+Shift+Escape power menu (all styles); fzf in kitty is the fallback. |
+| `sanctuary/Rec.qml` | Both recorders' state (reads `$XDG_RUNTIME_DIR/{screenrec,meeting-rec}/state.json` once a second) + commands. |
+| `sanctuary/Rig.qml` | Mod+U RIG card: SCREEN / MEETING / PRACTICE, or stop / pause whatever runs. |
+| `sanctuary/Capture.qml`, `CapButton.qml` | Ctrl+Print screen-record overlay: drag a region, the rest dims, strip with MIC/SYS/PAUSE/STOP. Fallback: `slurp`, no strip. |
+| `sanctuary/Polkit.qml` | The polkit agent (admin password prompt). Fallback: mate-polkit, swapped by `shell.sh`. |
 | `sanctuary/WallPicker.qml`, `Thumb.qml` | Mod+Shift+W wallpaper picker — stills + live videos as thumbnails; yazi is the fallback. |
 
 Scripts: `scripts/sanctuary/shell.sh` (startup, style switch, fallback, crash
@@ -96,6 +100,10 @@ survives it (`keepOnReload`).
 | `Mod+Shift+T` | style picker — `j`/`k` move · `enter` or `1`-`3` pick · `esc` close (in fallback: retry Quickshell) |
 | `Mod+Shift+W` | wallpaper — type to filter · arrows/`ctrl-h j k l` move · `tab` still/live · `enter` set · `shift-enter` set and stay open · `esc` close (in fallback: yazi) |
 | `Mod+Shift+Escape` | power — `j`/`k` move · `enter` or `1`-`5` act (no confirm; opens on lock) · `esc` close (in fallback: fzf) |
+| `Mod+U` | RIG — `s` screen · `m` meeting · `p` practice; while recording: `s`/`m` stop, `d`/`p` pause · `esc` close |
+| `Ctrl+Print` | screen recording: idle → overlay (drag · `enter`/`r` record · `f` full · `m` mic · `s` sys · `esc` cancel); recording → stop + save |
+| `Ctrl+Alt+Print` | pause / resume the screen recording |
+| `Mod+Shift+/` | niri's keybind cheat sheet |
 | `Mod+Shift+A` | hide / show the bar |
 | `Mod+Shift+D` | notification centre — inside it: `c` clear all · `d` DND · `esc` close |
 | `Mod+Ctrl+D` | clear all notifications |
@@ -125,3 +133,23 @@ Test the warning states without heating anything:
 scripts/sanctuary/qs.sh call debug fakeTemp 95   # TEMP cell + caution
 scripts/sanctuary/qs.sh call debug fakeTemp -1   # back to the real sensor
 ```
+
+## Recorders (2026-10-05)
+
+- **Bar:** a `◉` cell at the far left opens RIG. While something records it becomes
+  `SCR ● 03:12` (red — the screen) and/or `AUD·2 ● 41:05` (peach — sound; `·1` =
+  practice, mic only). Paused shows `‖` in yellow. Left-click stops (saves), right-click
+  opens RIG. Ink/Paper: the same as panels — `▣ SCR` with a red shadow, `∿ AUD` peach.
+- **Screen** (`scripts/sanctuary/screenrec.sh`): wf-recorder, H.264 on the iGPU (VAAPI),
+  mic + system audio each captured by `pw-record`. MIC/SYS only log *when* you flipped
+  them; the silence is applied when saving — PipeWire is never touched, so your calls
+  hear nothing different. Pause = new segment; stop joins them into
+  `~/Videos/Recordings/Recording <date>.mp4` and toasts Open / Show folder. While
+  recording an IdleInhibitor stops the screen locking (it would be recorded), and DND goes on
+  (toasts would be recorded too; critical ones still pop) — back off after, unless it was
+  already on. FULL draws
+  no strip — control it from the bar cell, RIG or the keys.
+- **Audio** (`meeting-rec.sh`): gained `pause | resume | pause-toggle` (parts joined back
+  into one `me.wav` / `them.wav` on stop) and a `state.json` for the bar.
+- **Debug:** `qs.sh call debug fakeRec scr|scr-paused|scr-full|aud|aud-solo|both|off`
+  draws the cells and strip with nothing recording. `qs.sh call polkit registered`.
