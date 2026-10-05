@@ -114,6 +114,11 @@ watch() {
   while :; do
     sleep 2
     if "$QS" running; then misses=0; continue; fi
+    # Down WHILE LOCKED (Lock.qml's flag is up): niri is showing its red locked
+    # screen. Hand the lock to swaylock at once — don't wait for a second miss.
+    if [ -e "${XDG_RUNTIME_DIR:-/tmp}/sanctuary-lock" ] && ! pgrep -x swaylock >/dev/null 2>&1; then
+      ( trap '' HUP; setsid "$DIR/lock.sh" takeover >/dev/null 2>&1 </dev/null & )
+    fi
     # Down. Expected if a switch is mid-restart (flag younger than 15s).
     if [ -e "$SWITCHING" ] && [ $(( $(date +%s) - $(stat -c %Y "$SWITCHING") )) -lt 15 ]; then
       continue

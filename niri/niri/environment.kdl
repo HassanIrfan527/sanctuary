@@ -15,7 +15,6 @@ environment {
     // Were NixOS environment.variables / home.sessionVariables.
     TERMINAL "kitty"
     BROWSER "brave-browser"
-    GTK_THEME "Graphite-Dark"
     // i5-6500 (Skylake): intel-media-driver (iHD) handles VA-API video decode.
     LIBVA_DRIVER_NAME "iHD"
 }

@@ -31,6 +31,10 @@ binds {
     Mod+Alt+M hotkey-overlay-title="Audio mixer" {
         spawn "kitty" "--class" "sanctuary-mixer" "-e" "wiremix";
     }
+    // PATCH: pick the default output / input (Quickshell card; fallback wiremix).
+    Mod+O hotkey-overlay-title="Audio in / out" {
+        spawn "/home/dweller/.dotfiles/scripts/sanctuary/patch.sh";
+    }
     // Wallpaper: Quickshell's thumbnail picker (stills + live videos), drawn
     // in the current style. Fallback (Quickshell down): yazi in a kitty.
     Mod+Shift+W hotkey-overlay-title="Wallpaper" {
@@ -180,6 +184,12 @@ binds {
     // swaylock. Same path as idle-lock and suspend-lock, so there is one
     // locker and one look.
     Mod+Escape hotkey-overlay-title="Lock" { spawn "loginctl" "lock-session"; }
+    // Rescue, and it works ON the lock screen: if the Quickshell lock is broken
+    // or niri shows its red "locker died" screen, this stops Quickshell and
+    // swaylock takes the lock over. It swaps lockers; it cannot unlock anything.
+    Mod+Alt+Escape allow-when-locked=true hotkey-overlay-title="Lock rescue (swaylock)" {
+        spawn "/home/dweller/.dotfiles/scripts/sanctuary/lock.sh" "rescue";
+    }
     // Power menu: lock / suspend / log out / reboot / shut down. Quickshell's
     // menu in the current style (fallback: fzf in a floating kitty); acts
     // immediately, no confirm — `lock` is the top row, so a stray Enter is the

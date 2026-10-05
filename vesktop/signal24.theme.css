@@ -1,0 +1,417 @@
+/**
+ * @name signal24
+ * @description system24, tuned to the Sanctuary desk's Signal style: an instrument panel. Quiet, with a few toys.
+ * @author Harry
+ * @version 1.1.0
+ * @source ~/.dotfiles/vesktop/signal24.theme.css
+*/
+
+/*
+ * system24 does everything structural (panels, labels, unrounding, ascii titles,
+ * the chat bar) and keeps up with Discord's class names. This file
+ *   1. sets system24's own options and colours to Signal's
+ *   2. adds Signal habits — small, and showing only what Discord already knows:
+ *        HUD strip        the top bar: SIGNAL // COMMS + a scope trace · the server
+ *                         you're in · a voice lamp (LINK / SYNC / LIVE / FAULT)
+ *        live labels      CHANNELS · 03 NEW counts unread channels; NAV ● goes red
+ *                         when a server has a mention badge. Nothing to say = say nothing.
+ *        marks            a 7px L at each panel corner, lavender on the panel you're over
+ *        readouts         timestamps in caps
+ *        selected         a 2px green bar, like the launcher's cursor row
+ *        caution          a message that mentions you gets Master Caution's red
+ *        new              the "new messages" line is peach
+ *        home button      Clyde blinks now and then; hover = a tiny colour-split glitch
+ *        typing           "x is typing" ends in a blinking block cursor
+ *        loader           "signal" instead of "system24"
+ *
+ * Colour is spent on state: green = live / selected, lavender = what you're
+ * touching, peach = new, yellow = waiting, red = needs you. Everything else grey.
+ * Palette: Catppuccin Mocha, as quickshell/sanctuary/Theme.qml.
+ * Motion follows system24's --animations and the system's reduce-motion setting.
+ */
+
+@import url('https://refact0r.github.io/system24/build/system24.css');
+
+body {
+    /* system24's own type, as it was */
+    --font: 'DM Mono';
+    --code-font: 'DM Mono';
+    font-weight: 300;
+    letter-spacing: -0.05ch;
+
+    --gap: 12px;
+    --divider-thickness: 2px;    /* the urgency stripe on Signal's toasts */
+    --border-thickness: 1px;     /* hairlines, like the bar's cell rules */
+    --border-hover-transition: 0.16s ease-out;   /* the desk's 160ms, nothing bounces */
+
+    --animations: on;
+    --list-item-transition: 0.16s ease-out;
+    --dms-icon-svg-transition: 0.3s ease-out;
+
+    --top-bar-height: 24px;      /* room for the HUD strip (system24's default is 12px) */
+    --top-bar-button-position: titlebar;
+    --top-bar-title-position: off;
+    --subtle-top-bar-title: off;
+
+    --custom-window-controls: off;
+    --window-control-size: 14px;
+
+    --custom-dms-icon: off;
+    --dms-icon-svg-url: url('');
+    --dms-icon-svg-size: 90%;
+    --dms-icon-color-before: var(--icon-subtle);
+    --dms-icon-color-after: var(--text-1);
+    --custom-dms-background: off;
+    --dms-background-image-url: url('');
+    --dms-background-image-size: cover;
+    --dms-background-color: var(--bg-2);
+
+    --background-image: off;
+    --background-image-url: url('');
+
+    --transparency-tweaks: off;
+    --remove-bg-layer: off;
+    --panel-blur: off;
+    --blur-amount: 12px;
+    --bg-floating: var(--bg-3);
+
+    --small-user-panel: on;
+
+    --unrounding: on;
+    --round-pfp: off;
+    --remove-pfp-decor: off;
+
+    --custom-spotify-bar: on;
+    --ascii-titles: on;
+    --ascii-loader: system24;    /* redrawn below as "signal" */
+
+    --panel-labels: on;
+    --label-color: var(--text-5);
+    --label-font-weight: 500;
+
+    /* signal24's own */
+    --tick: #45475a;             /* registration marks, at rest */
+    --tick-hot: #b4befe;         /* ...on the panel you're over */
+    --tick-len: 7px;
+    --hud-trace: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='12' viewBox='0 0 96 12'%3E%3Cdefs%3E%3ClinearGradient id='f'%3E%3Cstop offset='0' stop-color='white' stop-opacity='0'/%3E%3Cstop offset='.25' stop-color='white'/%3E%3Cstop offset='.75' stop-color='white'/%3E%3Cstop offset='1' stop-color='white' stop-opacity='0'/%3E%3C/linearGradient%3E%3Cmask id='m'%3E%3Crect width='96' height='12' fill='url%28%23f%29'/%3E%3C/mask%3E%3C/defs%3E%3Cg mask='url%28%23m%29'%3E%3Cpath d='M0,6.00 L1,7.41 L2,8.49 L3,9.03 L4,9.05 L5,8.75 L6,8.40 L7,8.22 L8,8.24 L9,8.33 L10,8.24 L11,7.73 L12,6.73 L13,5.38 L14,3.99 L15,2.91 L16,2.37 L17,2.44 L18,2.94 L19,3.59 L20,4.13 L21,4.42 L22,4.54 L23,4.70 L24,5.14 L25,6.00 L26,7.19 L27,8.47 L28,9.50 L29,9.99 L30,9.84 L31,9.16 L32,8.24 L33,7.39 L34,6.80 L35,6.48 L36,6.28 L37,5.94 L38,5.29 L39,4.32 L40,3.23 L41,2.32 L42,1.91 L43,2.14 L44,2.95 L45,4.08 L46,5.20 L47,6.05 L48,6.53 L49,6.76 L50,6.96 L51,7.37 L52,8.04 L53,8.88 L54,9.61 L55,9.92 L56,9.63 L57,8.73 L58,7.46 L59,6.14 L60,5.10 L61,4.49 L62,4.26 L63,4.21 L64,4.08 L65,3.74 L66,3.21 L67,2.70 L68,2.50 L69,2.84 L70,3.76 L71,5.10 L72,6.53 L73,7.70 L74,8.40 L75,8.61 L76,8.49 L77,8.32 L78,8.31 L79,8.51 L80,8.77 L81,8.85 L82,8.49 L83,7.60 L84,6.28 L85,4.83 L86,3.60 L87,2.86 L88,2.70 L89,2.98 L90,3.44 L91,3.81 L92,3.96 L93,3.95 L94,3.99 L95,4.34 L96,5.14 L97,6.36 L98,7.74 L99,8.95 L100,9.67 L101,9.78 L102,9.34 L103,8.62 L104,7.92 L105,7.43 L106,7.19 L107,7.04 L108,6.73 L109,6.07 L110,5.04 L111,3.81 L112,2.70 L113,2.03 L114,2.00 L115,2.56 L116,3.51 L117,4.50 L118,5.29 L119,5.76 L120,6.00' fill='none' stroke='%23a6e3a1' stroke-opacity='.55' stroke-width='1'%3E%3CanimateTransform attributeName='transform' type='translate' from='0 0' to='-24 0' dur='2.4s' repeatCount='indefinite'/%3E%3C/path%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ── colour: Signal ───────────────────────────────────────────────── */
+:root {
+    --colors: on;
+
+    /* text: values bright, labels dim — you read the value, the label only says which */
+    --text-0: #11111b;           /* on a coloured fill */
+    --text-1: #cdd6f4;
+    --text-2: #cdd6f4;
+    --text-3: #bac2de;           /* body */
+    --text-4: #7f849c;           /* icons, channels */
+    --text-5: #6c7086;           /* timestamps, muted, labels */
+
+    /* one flat dark, structure drawn by hairlines (system24's way, and Signal's) */
+    --bg-1: #45475a;
+    --bg-2: #313244;
+    --bg-3: #181825;
+    --bg-4: #11111b;
+    --hover: rgb(205 214 244 / 0.04);
+    --active: rgb(205 214 244 / 0.07);
+    --active-2: rgb(205 214 244 / 0.11);
+    --message-hover: rgb(205 214 244 / 0.025);
+
+    /* what you touch is lavender; links are blue */
+    --accent-1: #89b4fa;
+    --accent-2: #b4befe;
+    --accent-3: #b4befe;         /* accent buttons (crust text on them) */
+    --accent-4: #c5cdff;
+    --accent-5: #a3aef5;
+    --accent-new: #f38ba8;       /* mute / deafen */
+
+    /* caution: a message that wants YOU */
+    --mention: linear-gradient(to right, rgb(243 139 168 / 0.09) 40%, transparent);
+    --mention-hover: linear-gradient(to right, rgb(243 139 168 / 0.13) 40%, transparent);
+    --reply: linear-gradient(to right, rgb(205 214 244 / 0.05) 40%, transparent);
+    --reply-hover: linear-gradient(to right, rgb(205 214 244 / 0.08) 40%, transparent);
+
+    --online: #a6e3a1;
+    --dnd: #f38ba8;
+    --idle: #f9e2af;
+    --streaming: #cba6f7;
+    --offline: #585b70;
+
+    --border-light: #1e1e2e;
+    --border: #313244;
+    --border-hover: color-mix(in srgb, #b4befe 40%, #313244);
+    --button-border: rgb(205 214 244 / 0.08);
+
+    --red-1: #f38ba8; --red-2: #f38ba8; --red-3: #e8809d; --red-4: #dc7592; --red-5: #d06a87;
+    --green-1: #a6e3a1; --green-2: #a6e3a1; --green-3: #99d994; --green-4: #8ccf87; --green-5: #7fc57a;
+    --blue-1: #89dceb; --blue-2: #89b4fa; --blue-3: #7ea8f0; --blue-4: #739ce6; --blue-5: #6890dc;
+    --yellow-1: #f9e2af; --yellow-2: #f9e2af; --yellow-3: #eed6a2; --yellow-4: #e3ca95; --yellow-5: #d8be88;
+    --purple-1: #cba6f7; --purple-2: #cba6f7; --purple-3: #c09aef; --purple-4: #b58ee7; --purple-5: #aa82df;
+}
+
+::selection {
+    background: #45475a;
+}
+#app-mount [contenteditable='true'],
+#app-mount textarea,
+#app-mount input {
+    caret-color: #b4befe;
+}
+
+/* ── HUD strip: the top bar ───────────────────────────────────────────
+   Left: the station and its trace. Middle: where you are (Discord's own title,
+   which system24 hides in this layout — brought back as a readout). Right: the
+   voice lamp, read off Discord's own connection status in the user panel. */
+#app-mount .bar_c38106 {
+    &::before,
+    &::after {
+        position: absolute;
+        top: 0;
+        height: var(--top-bar-height);
+        line-height: var(--top-bar-height);
+        font-family: var(--font), monospace;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        white-space: pre;
+        color: var(--text-5);
+        pointer-events: none;
+        z-index: 2;
+    }
+    &::before {
+        content: 'SIGNAL // COMMS';
+        left: calc(var(--gap) + 2px);
+        padding-right: 108px;
+        background: var(--hud-trace) right center / 96px 12px no-repeat;
+    }
+    &::after {
+        --lamp: '○';
+        --state: 'LINK';
+        content: var(--state) ' ' var(--lamp);
+        right: calc(var(--gap) + 2px);
+    }
+}
+#app-mount .bar_c38106 .title_c38106 {
+    display: flex !important;
+    pointer-events: none;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-4);
+    & :is(svg, img) {
+        width: 12px;
+        height: 12px;
+        opacity: 0.6;
+    }
+}
+/* the lamp */
+body:has(.rtcConnectionStatusConnecting__06d62) #app-mount .bar_c38106::after {
+    --state: 'VOICE SYNC';
+    --lamp: '◌';
+    color: var(--yellow-2);
+}
+body:has(.rtcConnectionStatusConnected__06d62) #app-mount .bar_c38106::after {
+    --state: 'VOICE LIVE';
+    --lamp: '●';
+    color: var(--green-2);
+}
+body:has(:is(.rtcConnectionStatusError__06d62, .rtcConnectionQualityBad__06d62)) #app-mount .bar_c38106::after {
+    --state: 'VOICE FAULT';
+    --lamp: '●';
+    color: var(--red-2);
+}
+
+/* ── live labels ──────────────────────────────────────────────────────
+   A counter over the rendered channel rows (Discord only draws what's near the
+   view, so in a huge server it's "new channels you can see"). */
+#app-mount .sidebarList__5e434 {
+    counter-reset: sig-new;
+}
+#app-mount .sidebarList__5e434 .modeUnreadImportant__2ea32 {
+    counter-increment: sig-new;
+}
+@container body style(--panel-labels: on) {
+    #app-mount :is(
+        .guilds__5e434,
+        .panels__5e434,
+        .sidebarList__5e434,
+        .subtitleContainer_f75fb0,
+        .messagesWrapper__36d07,
+        .channelTextArea_f75fb0,
+        .content_f75fb0 > .membersWrap_c8ffbb,
+        .container_c8ffbb,
+        .container__133bf > .container__9293f,
+        .peopleColumn__133bf,
+        .nowPlayingColumn__133bf,
+        .container__01ae2 > .container__9293f,
+        .callContainer_cb9592
+    )::after {
+        font-size: 10px;
+        line-height: 12px;
+        top: -6px;
+        left: 10px;
+        padding: 0 5px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        background-color: var(--bg-4);
+    }
+    #app-mount .sidebarList__5e434:has(.modeUnreadImportant__2ea32)::after {
+        content: 'channels · ' counter(sig-new, decimal-leading-zero) ' new';
+    }
+    #app-mount .guilds__5e434:has(.lowerBadge_cc5dd2)::after {
+        content: 'nav ●';
+        color: var(--red-2);
+    }
+}
+
+/* ── registration marks ───────────────────────────────────────────────
+   Background layers just inside each panel's hairline: no space taken, and no
+   pseudo-element (system24 uses ::after for the labels). */
+#app-mount :is(
+    .guilds__5e434,
+    .sidebarList__5e434,
+    .panels__5e434,
+    .subtitleContainer_f75fb0,
+    .messagesWrapper__36d07,
+    .channelTextArea_f75fb0,
+    .container_c8ffbb,
+    .content_f75fb0 > .membersWrap_c8ffbb,
+    .container__133bf > .container__9293f,
+    .peopleColumn__133bf,
+    .nowPlayingColumn__133bf,
+    .container__01ae2 > .container__9293f,
+    .callContainer_cb9592
+) {
+    --t: var(--tick);
+    background-image:
+        linear-gradient(var(--t), var(--t)), linear-gradient(var(--t), var(--t)),
+        linear-gradient(var(--t), var(--t)), linear-gradient(var(--t), var(--t)),
+        linear-gradient(var(--t), var(--t)), linear-gradient(var(--t), var(--t)),
+        linear-gradient(var(--t), var(--t)), linear-gradient(var(--t), var(--t));
+    background-size:
+        var(--tick-len) 1px, 1px var(--tick-len),
+        var(--tick-len) 1px, 1px var(--tick-len),
+        var(--tick-len) 1px, 1px var(--tick-len),
+        var(--tick-len) 1px, 1px var(--tick-len);
+    background-position:
+        left top, left top,
+        right top, right top,
+        left bottom, left bottom,
+        right bottom, right bottom;
+    background-repeat: no-repeat;
+
+    &:hover {
+        --t: var(--tick-hot);
+    }
+}
+
+/* ── readouts: timestamps are figures, so they read like the bar's ── */
+#app-mount .timestamp_c19a55 {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-5);
+}
+
+/* ── selected: the launcher's cursor row — a 2px green bar and a cell wash ── */
+#app-mount .modeSelected__2ea32 .link__2ea32,
+#app-mount .interactive__972a0.interactiveSelected__972a0 {
+    background-color: var(--bg-3);
+    box-shadow: inset 2px 0 0 var(--green-2);
+}
+
+/* ── caution: mentions get Master Caution's red edge ── */
+#app-mount .message__5126c.mentioned__5126c::before {
+    background-color: var(--red-2) !important;
+}
+
+/* ── new: the unread line is peach ── */
+#app-mount .divider__908e2.isUnread__908e2 {
+    --divider-color: #fab387;
+}
+#app-mount .divider__908e2.isUnread__908e2 .endCap__908e2 {
+    color: var(--text-0);
+    letter-spacing: 0.1em;
+}
+
+/* ── scrollbars: a hairline that lights up when you grab it ── */
+#app-mount ::-webkit-scrollbar-thumb {
+    background-color: #313244 !important;
+}
+#app-mount ::-webkit-scrollbar-thumb:hover {
+    background-color: #6c7086 !important;
+}
+
+/* ── motion: all of it optional ─────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+    @container body style(--animations: on) {
+        /* the home button: Clyde blinks every ~9s… */
+        #app-mount .wrapper__6e9f8[data-list-item-id='guildsnav___home'] > .childWrapper__6e9f8 > svg {
+            transform-origin: 50% 55%;
+            animation: sig-blink 9s ease-in-out infinite;
+        }
+        /* …and glitches once when you point at it */
+        #app-mount .wrapper__6e9f8[data-list-item-id='guildsnav___home']:hover > .childWrapper__6e9f8 > svg {
+            animation: sig-glitch 0.36s steps(1) 1;
+        }
+
+        /* "x is typing" ends in a cursor */
+        #app-mount .typing_b88801 .text_b88801::after {
+            content: '▌';
+            margin-left: 3px;
+            color: var(--text-4);
+            animation: sig-cursor 1.06s steps(1) infinite;
+        }
+
+        /* a live call: the lamp breathes */
+        body:has(.rtcConnectionStatusConnected__06d62) #app-mount .bar_c38106::after {
+            animation: sig-breathe 2.8s ease-in-out infinite;
+        }
+    }
+}
+
+@keyframes sig-blink {
+    0%, 95.5%, 100% { transform: scaleY(1); }
+    96.5%           { transform: scaleY(0.12); }
+    97.5%           { transform: scaleY(1); }
+}
+@keyframes sig-glitch {
+    0%   { transform: translate(1px, 0);    filter: drop-shadow(-1.5px 0 rgb(243 139 168 / 0.8)) drop-shadow(1.5px 0 rgb(137 180 250 / 0.8)); }
+    25%  { transform: translate(-1px, 1px); filter: drop-shadow(1.5px 0 rgb(243 139 168 / 0.8)) drop-shadow(-1.5px 0 rgb(137 180 250 / 0.8)); }
+    50%  { transform: translate(0, -1px);   filter: drop-shadow(-1px 0 rgb(166 227 161 / 0.7)); }
+    75%  { transform: translate(1px, 0);    filter: none; }
+    100% { transform: none;                 filter: none; }
+}
+@keyframes sig-cursor {
+    0%   { opacity: 1; }
+    50%  { opacity: 0; }
+}
+@keyframes sig-breathe {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.45; }
+}
+
+/* ── loader: "signal", swept by the trace, over a console line ── */
+@container body style(--ascii-loader: system24) {
+    .content_a2f514::before {
+        content: '         _                   __\A   _____(_)___ _____  ____ _/ /\A  / ___/ / __ `/ __ \\/ __ `/ / \A (__  ) / /_/ / / / / /_/ / /  \A/____/_/\\__, /_/ /_/\\__,_/_/   \A       /____/                  ';
+        order: -2;
+        background: linear-gradient(90deg, #45475a 0%, #45475a 42%, #a6e3a1 50%, #45475a 58%, #45475a 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        background-size: 200% auto;
+        animation: textShine 2.4s linear infinite reverse;
+    }
+    .content_a2f514::after {
+        content: 'SANCTUARY // COMMS';
+        order: -1;
+        display: block;
+        font-family: var(--font), monospace;
+        font-size: 11px;
+        letter-spacing: 0.3em;
+        color: var(--text-5);
+    }
+}

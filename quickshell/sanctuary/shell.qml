@@ -94,8 +94,16 @@ ShellRoot {
     }
     LazyLoader {
         active: true
+        Patch {}
+    }
+    LazyLoader {
+        active: true
         Capture {}
     }
+    // The lock screen (all styles draw LockSignal for now). Lock.qml is a Scope
+    // with its own IpcHandler `lock`.
+    Lock {}
+
     // The polkit agent registers when this loads — at startup, every style.
     LazyLoader {
         active: true
@@ -142,6 +150,13 @@ ShellRoot {
         target: "rig"
         function toggle(): void { Ui.rigOpen = !Ui.rigOpen; }
         function close(): void { Ui.rigOpen = false; }
+    }
+
+    // Mod+O → scripts/sanctuary/patch.sh → `patch toggle`
+    IpcHandler {
+        target: "patch"
+        function toggle(): void { Ui.patchOpen = !Ui.patchOpen; }
+        function close(): void { Ui.patchOpen = false; }
     }
 
     IpcHandler {

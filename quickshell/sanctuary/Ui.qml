@@ -15,6 +15,7 @@ Singleton {
     property real playerX: 0        // screen x of that module's centre — the card hangs from it
     property bool powerOpen: false  // Mod+Shift+Escape
     property bool wallOpen: false   // Mod+Shift+W
+    property bool patchOpen: false  // Mod+O — audio in/out switcher (Patch.qml)
     property bool rigOpen: false    // Mod+U, or click the ◉ cell — the recorders card
     property bool captureOpen: false // Ctrl+Print, or SCREEN in RIG — the region overlay
     // Right-click a tray icon: that app's menu, drawn by TrayMenu.qml.

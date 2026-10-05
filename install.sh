@@ -58,6 +58,8 @@ LINKS=(
   "fastfetch/fastfetch     : ~/.config/fastfetch"
   "qutebrowser/qutebrowser : ~/.config/qutebrowser"
   "kotofetch/kotofetch     : ~/.config/kotofetch"
+  "nautilus/scripts/Pin to launcher : ~/.local/share/nautilus/scripts/Pin to launcher"
+  "vesktop/signal24.theme.css       : ~/.config/vesktop/themes/signal24.theme.css"
 
   # ── still a real dir, not adopted. Uncomment to adopt (backs up first). ──
   # "matugen/matugen : ~/.config/matugen"

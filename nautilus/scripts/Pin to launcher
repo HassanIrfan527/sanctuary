@@ -1,0 +1,11 @@
+#!/bin/sh
+# Nautilus: right-click → Scripts → Pin to launcher. Pins what's selected (or
+# unpins it, if it already was) — it shows up in the launcher (Mod+Space):
+# on top of APPS, and in FILES ( / ). Nothing selected = the folder you're in.
+# Linked into ~/.local/share/nautilus/scripts/ (see install.sh).
+FILES=$HOME/.dotfiles/scripts/sanctuary/files.py
+if [ -n "$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS" ]; then
+  printf '%s' "$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS" | tr '\n' '\0' | xargs -0 "$FILES" toggle
+else
+  "$FILES" toggle "$PWD"
+fi

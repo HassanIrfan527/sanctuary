@@ -689,6 +689,11 @@ rebuild silently skipped swww" for a while. The script and the niri layer-rule a
 
 ### Lock — BUILT · SDDM (SilentSDDM) — NOT BUILT
 
+**2026-10-05 — Quickshell lock (Signal face), swaylock demoted to fallback/rescue.**
+SDDM is the login greeter, not a locker: niri locks through ext-session-lock, which
+SDDM does not speak. See quickshell/README.md "Lock screen". The swaylock notes below
+still describe the fallback.
+
 `scripts/sanctuary/lock.sh` — swaylock-effects, Mocha ring, JetBrainsMono, blurred screenshot,
 0.16s fade in.
 

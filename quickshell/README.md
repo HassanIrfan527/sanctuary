@@ -66,16 +66,19 @@ toast says why it happened. `shell.sh status` prints which one is up.
 | `sanctuary/Toasts.qml`, `Tray.qml` | Shared: the toast column window, the system tray. |
 | `sanctuary/TrayMenu.qml` | A tray app's right-click menu, drawn in the current style (not Qt's native white QMenu). |
 | `sanctuary/Picker.qml` | Mod+Shift+T style picker. |
-| `sanctuary/Launcher.qml` | Mod+Space app launcher (all styles); fsel is the fallback. |
+| `sanctuary/Launcher.qml` | Mod+Space launcher (all styles): style masthead + modes APPS / `>` RUN / `=` CALC / `:` DESK / `?` WEB / `/` FILES (pins); fsel is the fallback. |
+| `sanctuary/Patch.qml` | Mod+O PATCH: default audio output / input, per-device volume + mute (all styles); wiremix is the fallback. |
 | `sanctuary/PowerMenu.qml` | Mod+Shift+Escape power menu (all styles); fzf in kitty is the fallback. |
 | `sanctuary/Rec.qml` | Both recorders' state (reads `$XDG_RUNTIME_DIR/{screenrec,meeting-rec}/state.json` once a second) + commands. |
 | `sanctuary/Rig.qml` | Mod+U RIG card: SCREEN / MEETING / PRACTICE, or stop / pause whatever runs. |
 | `sanctuary/Capture.qml`, `CapButton.qml` | Ctrl+Print screen-record overlay: drag a region, the rest dims, strip with MIC/SYS/PAUSE/STOP. Fallback: `slurp`, no strip. |
+| `sanctuary/Lock.qml`, `LockSignal.qml` | The lock screen: ext-session-lock + PAM (`swaylock` service). Signal face for every style for now. Fallback / rescue: swaylock. |
 | `sanctuary/Polkit.qml` | The polkit agent (admin password prompt). Fallback: mate-polkit, swapped by `shell.sh`. |
 | `sanctuary/WallPicker.qml`, `Thumb.qml` | Mod+Shift+W wallpaper picker — stills + live videos as thumbnails; yazi is the fallback. |
 
 Scripts: `scripts/sanctuary/shell.sh` (startup, style switch, fallback, crash
 watch), `launcher.sh` (Mod+Space → Quickshell launcher, or fsel in fallback),
+`patch.sh` (Mod+O → PATCH, or wiremix in fallback),
 `power.sh open` / `wallpaper.sh open` (same idea: Quickshell, or the kitty TUI),
 `qs.sh` (start/stop/IPC), `notif.sh` (notification keys → Quickshell or
 swaync), `bar.sh` (Mod+Shift+A).
@@ -96,13 +99,16 @@ survives it (`keepOnReload`).
 
 | Key | Action |
 |---|---|
-| `Mod+Space` | launcher — type to filter · `enter` launch · `↑↓`/`ctrl-j k`/`ctrl-n p` move · `esc` close (in fallback: fsel) |
+| `Mod+Space` | launcher — type to filter · first char `>` `=` `:` `?` `/` switches mode · `tab`/`shift-tab` mode · `enter` go (`shift-enter` in RUN: keep a kitty) · `↑↓`/`ctrl-j k`/`ctrl-n p` move · `backspace` on empty → APPS · `esc` close (in fallback: fsel) |
+| `Mod+O` | PATCH (audio in / out) — `j`/`k` move · `enter`/`space` make default · `m` mute · `h`/`l` volume ±5 · `tab` OUT⇄IN · `x` full mixer · `esc`/`q` close (in fallback: wiremix) |
 | `Mod+Shift+T` | style picker — `j`/`k` move · `enter` or `1`-`3` pick · `esc` close (in fallback: retry Quickshell) |
 | `Mod+Shift+W` | wallpaper — type to filter · arrows/`ctrl-h j k l` move · `tab` still/live · `enter` set · `shift-enter` set and stay open · `esc` close (in fallback: yazi) |
 | `Mod+Shift+Escape` | power — `j`/`k` move · `enter` or `1`-`5` act (no confirm; opens on lock) · `esc` close (in fallback: fzf) |
 | `Mod+U` | RIG — `s` screen · `m` meeting · `p` practice; while recording: `s`/`m` stop, `d`/`p` pause · `esc` close |
 | `Ctrl+Print` | screen recording: idle → overlay (drag · `enter`/`r` record · `f` full · `m` mic · `s` sys · `esc` cancel); recording → stop + save |
 | `Ctrl+Alt+Print` | pause / resume the screen recording |
+| `Mod+Escape` | lock (Quickshell's; swaylock if Quickshell is down) — type · `enter` · `esc`/`ctrl+u` clear |
+| `Mod+Alt+Escape` | **on the lock screen**: rescue — stop Quickshell, swaylock takes the lock over |
 | `Mod+Shift+/` | niri's keybind cheat sheet |
 | `Mod+Shift+A` | hide / show the bar |
 | `Mod+Shift+D` | notification centre — inside it: `c` clear all · `d` DND · `esc` close |
@@ -153,3 +159,49 @@ scripts/sanctuary/qs.sh call debug fakeTemp -1   # back to the real sensor
   into one `me.wav` / `them.wav` on stop) and a `state.json` for the bar.
 - **Debug:** `qs.sh call debug fakeRec scr|scr-paused|scr-full|aud|aud-solo|both|off`
   draws the cells and strip with nothing recording. `qs.sh call polkit registered`.
+
+## Lock screen (2026-10-05)
+
+`lock.sh` (via `loginctl lock-session` → swayidle) asks Quickshell to lock and
+returns once niri confirms it; Quickshell down or the lock not confirmed in 3s →
+swaylock. The face is the instrument panel at rest: big clock with the minute as a
+filling hairline, a KEY panel with one cell per character (green typing, a yellow
+runner while PAM checks, red + shake on a wrong key, attempts + inferred CAPS LOCK),
+the CPU trace screen-wide and faint, and the bar's readouts at the bottom (MIC,
+REC cells, now playing, MSG = what arrived since locking). The right key collapses
+the screen to a line, CRT-style, then unlocks. Background = the current still,
+blurred under crust — never a screenshot. Dims to the clock after 20s idle.
+
+**If the lock ever breaks:** niri never falls open — a dead locker leaves its red
+locked screen. Quickshell dying while locked → the watcher hands the lock to
+swaylock on its own. Anything else (frozen face, red screen) → `Mod+Alt+Escape`.
+Last resort: Ctrl+Alt+F3, log in, `WAYLAND_DISPLAY=wayland-1 swaylock`.
+
+`qs.sh call lock preview` shows the face WITHOUT locking (no PAM — any key is
+"denied"); `esc` closes it.
+
+## Launcher modes + PATCH (2026-10-05)
+
+- **Masthead:** the style's name — Signal: `SIGNAL` in scanlined mono with a live
+  scope trace that jumps as you type, clock, host, uptime. Ink/Paper: `INK!` / `PAPER!`
+  lettered with an offset peach print on halftone.
+- **Modes** (type the prefix first, or `tab`):
+  APPS (apps + matching desk actions + a calculator row when you type a sum) ·
+  `>` RUN (shell command; history in `~/.local/state/sanctuary/run-history.json`) ·
+  `=` CALC (numbers, `+ - * / % ^ ( )`, `sqrt sin cos tan log ln abs round floor ceil
+  min max pow exp pi e` — nothing else reaches the evaluator; `enter` copies) ·
+  `:` DESK (audio, recorders, wallpaper, style, power, lock, DND, night light, keybinds…) ·
+  `?` WEB (DuckDuckGo / YouTube / GitHub / Wikipedia, or a URL).
+  To add a desk action: one row in `desk` + one line in `doDesk()` in `Launcher.qml`.
+- **Pins** (`/` FILES, and on top of APPS): only files/folders you pin — no recent-files
+  list. Pin from Nautilus (right-click → Scripts → Pin to launcher; again = unpin) or
+  `scripts/sanctuary/files.py pin|unpin <path>`; `ctrl-s` in the launcher unpins.
+  enter = default app (`xdg-open`), shift-enter = the folder it's in (a folder: kitty
+  there). List: `~/.local/state/sanctuary/pins.json`. Rows: Signal 13, Ink/Paper 9.
+- **Vesktop**: `vesktop/signal24.theme.css` — system24 with Signal's palette, JetBrains Mono,
+  registration marks, caps labels/timestamps, red mentions. Linked into
+  `~/.config/vesktop/themes/` (install.sh); does not change with the style.
+- **PATCH** (Mod+O, or `:audio` in the launcher): every output and input; `●` = the
+  default. Picking one moves what is playing/recording to it (WirePlumber follows the
+  default). Outputs cap at 100%, inputs at 150%. Bus tag from the node name:
+  `BT` `USB` `HDMI` `INT` `VIRT`.
