@@ -100,6 +100,18 @@ ShellRoot {
         active: true
         Capture {}
     }
+    LazyLoader {
+        active: true
+        Columns {}
+    }
+    LazyLoader {
+        active: true
+        KeySheet {}
+    }
+    LazyLoader {
+        active: true
+        CommsCard {}
+    }
     // The lock screen (all styles draw LockSignal for now). Lock.qml is a Scope
     // with its own IpcHandler `lock`.
     Lock {}
@@ -157,6 +169,28 @@ ShellRoot {
         target: "patch"
         function toggle(): void { Ui.patchOpen = !Ui.patchOpen; }
         function close(): void { Ui.patchOpen = false; }
+    }
+
+    // Mod+Grave → scripts/sanctuary/columns.sh → `columns toggle`
+    IpcHandler {
+        target: "columns"
+        function toggle(): void { Ui.columnsOpen = !Ui.columnsOpen; }
+        function close(): void { Ui.columnsOpen = false; }
+    }
+
+    // Mod+C → scripts/sanctuary/comms.sh → `comms toggle`
+    IpcHandler {
+        target: "comms"
+        function toggle(): void { Ui.commsOpen = !Ui.commsOpen; }
+        function close(): void { Ui.commsOpen = false; }
+        function state(): string { return Comms.linked ? (Comms.inCall ? "call " + Comms.count : "idle") : "unlinked"; }
+    }
+
+    // Mod+/ → scripts/sanctuary/keys.sh → `keys toggle`
+    IpcHandler {
+        target: "keys"
+        function toggle(): void { Ui.keysOpen = !Ui.keysOpen; }
+        function close(): void { Ui.keysOpen = false; }
     }
 
     IpcHandler {

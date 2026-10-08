@@ -58,7 +58,7 @@ toast says why it happened. `shell.sh status` prints which one is up.
 | `sanctuary/Notifs.qml` | **The notification daemon** (Quickshell's `NotificationServer`), DND, history. |
 | `sanctuary/Niri.qml` | Workspaces + windows from `niri msg --json event-stream`. |
 | `sanctuary/Media.qml` | MPRIS now-playing, PipeWire mic. |
-| `sanctuary/Sys.qml` | CPU / mem / net / temp / disk, history, thresholds, exceptions. |
+| `sanctuary/Sys.qml` | CPU / mem / temp / disk, history, thresholds, exceptions. |
 | `sanctuary/Caution.qml` | Master Caution: reasons + acknowledge. |
 | `sanctuary/Osd.qml`, `Player.qml` | Volume pop-up, music player card (all styles). |
 | `sanctuary/Ink*.qml` | Ink: bar, panel, halftone, speech bubble, toast, centre. |
@@ -66,11 +66,13 @@ toast says why it happened. `shell.sh status` prints which one is up.
 | `sanctuary/Toasts.qml`, `Tray.qml` | Shared: the toast column window, the system tray. |
 | `sanctuary/TrayMenu.qml` | A tray app's right-click menu, drawn in the current style (not Qt's native white QMenu). |
 | `sanctuary/Picker.qml` | Mod+Shift+T style picker. |
-| `sanctuary/Launcher.qml` | Mod+Space launcher (all styles): style masthead + modes APPS / `>` RUN / `=` CALC / `:` DESK / `?` WEB / `/` FILES (pins); fsel is the fallback. |
+| `sanctuary/Launcher.qml` | Mod+Space launcher (all styles): style masthead + modes APPS / `*` PINNED (apps + files) / `=` CALC / `:` DESK / `?` WEB; fsel is the fallback. |
 | `sanctuary/Patch.qml` | Mod+O PATCH: default audio output / input, per-device volume + mute (all styles); wiremix is the fallback. |
 | `sanctuary/PowerMenu.qml` | Mod+Shift+Escape power menu (all styles); fzf in kitty is the fallback. |
 | `sanctuary/Rec.qml` | Both recorders' state (reads `$XDG_RUNTIME_DIR/{screenrec,meeting-rec}/state.json` once a second) + commands. |
 | `sanctuary/Rig.qml` | Mod+U RIG card: SCREEN / MEETING / PRACTICE, or stop / pause whatever runs. |
+| `sanctuary/Keymap.qml`, `KeySheet.qml` | Mod+/ KEYS cheat sheet (all styles). Keymap.qml is **hand-written** — every binds.kdl change updates it. Fallback: niri's hotkey overlay. |
+| `sanctuary/Comms.qml`, `CommsCard.qml` | Discord voice: reads `$XDG_RUNTIME_DIR/sanctuary-comms.sock` from the SanctuaryComms Vencord plugin (`vesktop/sanctuaryComms`, built by `scripts/sanctuary/vencord.sh`). VC bar cell (only in a call) + Mod+C COMMS card. |
 | `sanctuary/Capture.qml`, `CapButton.qml` | Ctrl+Print screen-record overlay: drag a region, the rest dims, strip with MIC/SYS/PAUSE/STOP. Fallback: `slurp`, no strip. |
 | `sanctuary/Lock.qml`, `LockSignal.qml` | The lock screen: ext-session-lock + PAM (`swaylock` service). Signal face for every style for now. Fallback / rescue: swaylock. |
 | `sanctuary/Polkit.qml` | The polkit agent (admin password prompt). Fallback: mate-polkit, swapped by `shell.sh`. |
@@ -78,7 +80,9 @@ toast says why it happened. `shell.sh status` prints which one is up.
 
 Scripts: `scripts/sanctuary/shell.sh` (startup, style switch, fallback, crash
 watch), `launcher.sh` (Mod+Space → Quickshell launcher, or fsel in fallback),
-`patch.sh` (Mod+O → PATCH, or wiremix in fallback),
+`patch.sh` (Mod+O → PATCH, or wiremix in fallback), `keys.sh` (Mod+/ → KEYS, or niri's
+overlay), `comms.sh` (Mod+C → COMMS, or focus Vesktop), `vencord.sh` (build/update the
+Vencord that carries SanctuaryComms),
 `power.sh open` / `wallpaper.sh open` (same idea: Quickshell, or the kitty TUI),
 `qs.sh` (start/stop/IPC), `notif.sh` (notification keys → Quickshell or
 swaync), `bar.sh` (Mod+Shift+A).
@@ -99,7 +103,7 @@ survives it (`keepOnReload`).
 
 | Key | Action |
 |---|---|
-| `Mod+Space` | launcher — type to filter · first char `>` `=` `:` `?` `/` switches mode · `tab`/`shift-tab` mode · `enter` go (`shift-enter` in RUN: keep a kitty) · `↑↓`/`ctrl-j k`/`ctrl-n p` move · `backspace` on empty → APPS · `esc` close (in fallback: fsel) |
+| `Mod+Space` | launcher — type to filter · first char `*` `=` `:` `?` switches mode · `tab`/`shift-tab` mode · `enter` go · `ctrl-s` pin app (APPS) / unpin (PINNED) · `↑↓`/`ctrl-j k`/`ctrl-n p` move · `backspace` on empty → APPS · `esc` close (in fallback: fsel) |
 | `Mod+O` | PATCH (audio in / out) — `j`/`k` move · `enter`/`space` make default · `m` mute · `h`/`l` volume ±5 · `tab` OUT⇄IN · `x` full mixer · `esc`/`q` close (in fallback: wiremix) |
 | `Mod+Shift+T` | style picker — `j`/`k` move · `enter` or `1`-`3` pick · `esc` close (in fallback: retry Quickshell) |
 | `Mod+Shift+W` | wallpaper — type to filter · arrows/`ctrl-h j k l` move · `tab` still/live · `enter` set · `shift-enter` set and stay open · `esc` close (in fallback: yazi) |
@@ -109,7 +113,8 @@ survives it (`keepOnReload`).
 | `Ctrl+Alt+Print` | pause / resume the screen recording |
 | `Mod+Escape` | lock (Quickshell's; swaylock if Quickshell is down) — type · `enter` · `esc`/`ctrl+u` clear |
 | `Mod+Alt+Escape` | **on the lock screen**: rescue — stop Quickshell, swaylock takes the lock over |
-| `Mod+Shift+/` | niri's keybind cheat sheet |
+| `Mod+/` | KEYS cheat sheet — type to filter (non-matches dim) · `backspace` · `esc` close (in fallback: niri's overlay) |
+| `Mod+C` | COMMS (Discord voice) — `m` Discord mute · `d` deafen · `x` leave · `f` Vesktop · `j`/`k` move · `esc` close. `Mod+M` stays the system mic. |
 | `Mod+Shift+A` | hide / show the bar |
 | `Mod+Shift+D` | notification centre — inside it: `c` clear all · `d` DND · `esc` close |
 | `Mod+Ctrl+D` | clear all notifications |
@@ -186,16 +191,19 @@ Last resort: Ctrl+Alt+F3, log in, `WAYLAND_DISPLAY=wayland-1 swaylock`.
   scope trace that jumps as you type, clock, host, uptime. Ink/Paper: `INK!` / `PAPER!`
   lettered with an offset peach print on halftone.
 - **Modes** (type the prefix first, or `tab`):
-  APPS (apps + matching desk actions + a calculator row when you type a sum) ·
-  `>` RUN (shell command; history in `~/.local/state/sanctuary/run-history.json`) ·
+  APPS (apps you haven't pinned + matching desk actions + a calculator row when you type a sum) ·
+  `*` PINNED (pinned apps, then pinned files) ·
   `=` CALC (numbers, `+ - * / % ^ ( )`, `sqrt sin cos tan log ln abs round floor ceil
   min max pow exp pi e` — nothing else reaches the evaluator; `enter` copies) ·
   `:` DESK (audio, recorders, wallpaper, style, power, lock, DND, night light, keybinds…) ·
   `?` WEB (DuckDuckGo / YouTube / GitHub / Wikipedia, or a URL).
   To add a desk action: one row in `desk` + one line in `doDesk()` in `Launcher.qml`.
-- **Pins** (`/` FILES, and on top of APPS): only files/folders you pin — no recent-files
-  list. Pin from Nautilus (right-click → Scripts → Pin to launcher; again = unpin) or
-  `scripts/sanctuary/files.py pin|unpin <path>`; `ctrl-s` in the launcher unpins.
+- **Pins** (`*` PINNED — 2026-10-06: `>` RUN removed, `/` FILES folded in here): pinned
+  apps and pinned files/folders live ONLY here, never in APPS. Pin an app: `ctrl-s` on it
+  in APPS (list: `~/.local/state/sanctuary/pinned-apps.json`, desktop ids). Pin a file:
+  in PINNED type a path (`~/…` or `/…`) + enter, or Nautilus (right-click a file →
+  Scripts → Pin to launcher; again = unpin), or `scripts/sanctuary/files.py pin|unpin
+  <path>`. `ctrl-s` in PINNED unpins either kind.
   enter = default app (`xdg-open`), shift-enter = the folder it's in (a folder: kitty
   there). List: `~/.local/state/sanctuary/pins.json`. Rows: Signal 13, Ink/Paper 9.
 - **Vesktop**: `vesktop/signal24.theme.css` — system24 with Signal's palette, JetBrains Mono,

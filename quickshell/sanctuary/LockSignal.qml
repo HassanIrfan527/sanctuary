@@ -14,7 +14,7 @@ import Quickshell.Io
 //   │            ┌ KEY ▮▮▮▮▮▮▮▯▯▯▯▯▯▯▯▯▯▯▯▯              INPUT ┐          │
 //   │                       attempts · caps                               │
 //   │  ╱╲╱‾‾╲__╱╲ (the CPU trace, scope-sized, very faint)                │
-//   └ CPU 12% ╱╲ │ MEM 41% ╱╲ │ NET ↓1.2M ↑40K │ MIC LIVE │ SCR ● │ MSG +3 ┘
+//   └ CPU 12% ╱╲ │ MEM 41% ╱╲ │ MIC LIVE │ SCR ● │ MSG +3 ┘
 //
 // Colour is state, as everywhere in Signal: green listening, yellow verifying,
 // red denied. Wrong key shakes the panel; the right one collapses the screen to
@@ -585,16 +585,6 @@ Item {
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         text: Sys.pct(Sys.mem)
-                        font.family: Theme.mono
-                        font.pixelSize: 11
-                        color: Theme.sigValue
-                    }
-                }
-                SignalCell {
-                    label: "NET"
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: "↓" + Theme.pad(Sys.rate(Sys.rx), 4, " ") + " ↑" + Theme.pad(Sys.rate(Sys.tx), 4, " ")
                         font.family: Theme.mono
                         font.pixelSize: 11
                         color: Theme.sigValue

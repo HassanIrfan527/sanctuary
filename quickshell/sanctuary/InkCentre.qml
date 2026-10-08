@@ -9,6 +9,11 @@ import Quickshell.Services.Notifications
 //
 //   Mod+Shift+D  open / close      c  clear all     d  DND     esc  close
 //   click an entry: its default action · right click: dismiss it
+//   click anywhere outside the panel: close
+//
+// The window spans the whole screen (below the bar — Normal exclusion keeps the
+// bar clickable) and is see-through; the panel sits at its right edge. That way
+// a click outside the panel lands on our scrim instead of the app underneath.
 PanelWindow {
     id: win
 
@@ -16,28 +21,35 @@ PanelWindow {
     color: "transparent"
     anchors {
         top: true
+        left: true
         right: true
         bottom: true
     }
-    margins {
-        top: 6
-        right: 12
-        bottom: 12
-    }
     exclusionMode: ExclusionMode.Normal
     exclusiveZone: 0
-    implicitWidth: 420
 
     WlrLayershell.namespace: "sanctuary-centre"
     WlrLayershell.layer: WlrLayer.Overlay
     // Grab the keyboard while open, so esc / c / d work without a click first.
     WlrLayershell.keyboardFocus: Ui.centreOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
+    MouseArea {   // scrim: click outside = close
+        anchors.fill: parent
+        acceptedButtons: Qt.AllButtons
+        onClicked: Ui.centreOpen = false
+    }
+
     Item {
         id: frame
-        width: parent.width - 6     // the 6 is room for the hard shadow
-        height: parent.height - 6
+        width: 420 - 6              // the 6 is room for the hard shadow
+        height: parent.height - 6 - 12 - 6
+        y: 6
         focus: true
+
+        MouseArea {   // swallow clicks on the panel's empty parts
+            anchors.fill: parent
+            acceptedButtons: Qt.AllButtons
+        }
 
         Keys.onEscapePressed: Ui.centreOpen = false
         Keys.onPressed: event => {
@@ -54,9 +66,13 @@ PanelWindow {
         }
 
         // Slide in from the right, ease-out.
-        x: Ui.centreOpen ? 0 : 40
+        // Only the slide offset animates — never x itself. The window's width is
+        // 0 for a moment when it's shown, then becomes the screen width; if x
+        // were animated, the panel would glide across from the left edge.
+        property real slide: Ui.centreOpen ? 0 : 40
+        x: parent.width - 420 - 12 + slide
         opacity: Ui.centreOpen ? 1 : 0
-        Behavior on x { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
+        Behavior on slide { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
         Behavior on opacity { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
 
         Rectangle {   // hard shadow

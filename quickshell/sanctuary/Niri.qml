@@ -32,6 +32,31 @@ Singleton {
         return n;
     }
 
+    readonly property var focusedWorkspace: workspaces.find(w => w.is_focused) ?? null
+
+    // The scrolling layout of one workspace, left to right: one entry per
+    // column, its windows top to bottom. Index 0 is what Mod+1 focuses.
+    // Floating windows have no column (pos_in_scrolling_layout is null) and
+    // are left out.
+    function columnsOf(wsId) {
+        const cols = {};
+        for (const id in windows) {
+            const w = windows[id];
+            const pos = w.layout ? w.layout.pos_in_scrolling_layout : null;
+            if (w.workspace_id !== wsId || !pos)
+                continue;
+            (cols[pos[0]] = cols[pos[0]] || []).push(w);
+        }
+        return Object.keys(cols).map(Number).sort((a, b) => a - b).map(c => ({
+            index: c,
+            windows: cols[c].sort((a, b) => a.layout.pos_in_scrolling_layout[1] - b.layout.pos_in_scrolling_layout[1])
+        }));
+    }
+
+    function focusColumn(n) {
+        Quickshell.execDetached(["niri", "msg", "action", "focus-column", String(n)]);
+    }
+
     function focusWorkspace(idx) {
         Quickshell.execDetached(["niri", "msg", "action", "focus-workspace", String(idx)]);
     }
@@ -112,6 +137,15 @@ Singleton {
             windows = m;
             if (focusedId === id)
                 focusedId = -1;
+        } else if (ev.WindowLayoutsChanged) {
+            // Columns moved (Mod+Shift+N, a window opened or closed beside
+            // them): each change is an [id, layout] pair.
+            const m = Object.assign({}, windows);
+            for (const c of ev.WindowLayoutsChanged.changes) {
+                if (m[c[0]])
+                    m[c[0]] = Object.assign({}, m[c[0]], { layout: c[1] });
+            }
+            windows = m;
         } else if (ev.WindowFocusChanged) {
             focusedId = ev.WindowFocusChanged.id ?? -1;
         } else if (ev.WindowUrgencyChanged) {

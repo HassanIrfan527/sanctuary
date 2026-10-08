@@ -4,7 +4,7 @@ import Quickshell.Wayland
 
 // Signal — the bar as an instrument strip.
 //
-//   ◉ │ WS 1 2 3 4 │ WIN kitty · nvim      10:41:07 PM      NET ↓1.2M ↑40K ╱╲ │ CPU 12% ╱╲ │ MEM 41% ╱╲ │ MIC LIVE ▮▮▮▯▯ │ ♪ … │ tray │ MSG 03
+//   ◉ │ WS 1 2 3 4 │ WIN kitty · nvim      10:41:07 PM      VC 04 LIVE │ CPU 12% ╱╲ │ MEM 41% ╱╲ │ MIC LIVE ▮▮▮▯▯ │ ♪ … │ tray │ MSG 03
 //
 // One panel, cut into cells by hairlines, with registration marks at the
 // corners. Every value is fixed-width so nothing shuffles as numbers change.
@@ -296,20 +296,29 @@ PanelWindow {
             anchors.right: parent.right
             height: parent.height
 
+            // Discord voice (Comms.qml): only while you're in a call. People in
+            // the room, then YOUR Discord mic — red when muted or deafened.
+            // Click: the COMMS card. Not the system mic; that's MIC below.
             SignalCell {
-                label: "NET"
+                label: "VC"
+                visible: Comms.inCall
+                labelColor: Ui.commsOpen ? Theme.sigHot : Theme.sigLabel
+                interactive: true
+                onClicked: Ui.commsOpen = !Ui.commsOpen
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "↓" + Theme.pad(Sys.rate(Sys.rx), 4, " ") + " ↑" + Theme.pad(Sys.rate(Sys.tx), 4, " ")
+                    text: Theme.pad(Comms.count, 2, "0")
                     font.family: Theme.mono
                     font.pixelSize: 11
                     color: Theme.sigValue
                 }
-                Sparkline {
+                Text {
                     anchors.verticalCenter: parent.verticalCenter
-                    values: Sys.netHist
-                    max: 0
-                    line: Theme.teal
+                    text: Comms.selfDeaf ? "DEAF" : Comms.selfMute ? "MUTE" : "LIVE"
+                    font.family: Theme.mono
+                    font.pixelSize: 11
+                    font.weight: Font.Bold
+                    color: Comms.selfMute || Comms.selfDeaf ? Theme.sigAlarm : Theme.sigHot
                 }
             }
 

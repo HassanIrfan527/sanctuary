@@ -3,8 +3,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// The machine's vital signs: CPU / memory / network (1s, with history for the
-// Signal traces), CPU temperature (1s) and disk space (60s).
+// The machine's vital signs: CPU / memory (1s, with history for the Signal
+// traces), CPU temperature (1s) and disk space (60s).
 //
 // It also decides what counts as ABNORMAL. Two outputs come from that:
 //   exceptions  readouts that only exist while something is off (TEMP, DISK) —
@@ -29,13 +29,10 @@ Singleton {
 
     property real cpu: 0              // 0..1
     property real mem: 0              // 0..1
-    property real rx: 0               // bytes/s
-    property real tx: 0               // bytes/s
     property real temp: -1            // °C, -1 = no sensor found
     property var disks: []            // [{ mount, used }] — real filesystems only
     property var cpuHist: []
     property var memHist: []
-    property var netHist: []          // rx + tx, bytes/s
 
     readonly property real cpuSustained: {
         const h = cpuHist.slice(-cpuWindow);
@@ -81,14 +78,8 @@ Singleton {
         return a;
     }
 
-    // Interfaces that would double-count or are not the network: loopback, and
-    // tunnels/bridges whose traffic also crosses the physical NIC.
-    function _counted(iface) {
-        return !/^(lo|tailscale|docker|veth|br-|virbr|wg)/.test(iface);
-    }
-
     function _parse(out) {
-        let idle = 0, total = 0, memTotal = 0, memAvail = 0, rxb = 0, txb = 0, t = -1;
+        let idle = 0, total = 0, memTotal = 0, memAvail = 0, t = -1;
         for (const l of out.split("\n")) {
             if (l.startsWith("cpu ")) {
                 const f = l.trim().split(/\s+/).slice(1).map(Number);
@@ -100,46 +91,20 @@ Singleton {
                 memAvail = parseInt(l.split(/\s+/)[1]);
             } else if (/^\d+$/.test(l.trim())) {
                 // The hwmon file: a bare number in millidegrees. Nothing else in
-                // /proc/stat, meminfo or net/dev is a line of digits alone.
+                // /proc/stat or meminfo is a line of digits alone.
                 t = parseInt(l.trim()) / 1000;
-            } else {
-                const i = l.indexOf(":");
-                if (i < 0)
-                    continue;
-                const f = l.slice(i + 1).trim().split(/\s+/);
-                // /proc/net/dev rows have 16 counters; meminfo rows have 1-2.
-                if (f.length >= 16 && _counted(l.slice(0, i).trim())) {
-                    rxb += Number(f[0]);
-                    txb += Number(f[8]);
-                }
             }
         }
 
-        const now = Date.now();
         if (_prev) {
-            const dt = Math.max(0.001, (now - _prev.t) / 1000);
             const dTotal = total - _prev.total;
             cpu = dTotal > 0 ? Math.max(0, Math.min(1, 1 - (idle - _prev.idle) / dTotal)) : 0;
-            rx = Math.max(0, (rxb - _prev.rx) / dt);
-            tx = Math.max(0, (txb - _prev.tx) / dt);
             cpuHist = _push(cpuHist, cpu);
-            netHist = _push(netHist, rx + tx);
         }
         mem = memTotal > 0 ? 1 - memAvail / memTotal : 0;
         memHist = _push(memHist, mem);
         temp = tempOverride >= 0 ? tempOverride : t;
-        _prev = { t: now, idle: idle, total: total, rx: rxb, tx: txb };
-    }
-
-    // 1.2M, 340K, 12B — always ≤4 characters before the unit, so the cell
-    // never changes width as the number moves.
-    // Units switch at 1000, not 1024: "1014B" / "1010K" would be 5 characters.
-    function rate(b) {
-        if (b >= 1000 * 1024)
-            return (b / 1048576).toFixed(b >= 10 * 1048576 ? 0 : 1) + "M";
-        if (b >= 1000)
-            return Math.max(1, Math.round(b / 1024)) + "K";
-        return Math.round(b) + "B";
+        _prev = { idle: idle, total: total };
     }
 
     function pct(v) {
@@ -149,7 +114,7 @@ Singleton {
     // ── sampling ──────────────────────────────────────────────────────
     Process {
         id: probe
-        command: ["cat", "/proc/stat", "/proc/meminfo", "/proc/net/dev"]
+        command: ["cat", "/proc/stat", "/proc/meminfo"]
                  .concat(root._tempPath !== "" ? [root._tempPath] : [])
         stdout: StdioCollector {
             id: collected

@@ -4,7 +4,7 @@ import Quickshell.Wayland
 
 // Ink — the bar as a strip of manga panels.
 //
-//   [ workspaces ]          [ CLOCK ]          [ music ] [ mic ] [ tray ] [ 3 ]
+//   [ workspaces ]          [ CLOCK ]     [ vc ] [ music ] [ mic ] [ tray ] [ 3 ]
 //
 // Every module is a separate panel (islands are non-negotiable, §3); each one's
 // hard shadow is its accent. The clock panel is tilted two degrees, the way a
@@ -312,6 +312,32 @@ PanelWindow {
                         font.pixelSize: 10
                         color: exc.modelData.level === "alarm" ? Theme.red : Theme.inkLine
                     }
+                }
+            }
+        }
+
+        // Discord voice, only while in a call: people + your Discord mic. The
+        // shadow is the state — green live, red muted/deaf. Click: COMMS.
+        InkPanel {
+            visible: Comms.inCall
+            accent: Comms.selfMute || Comms.selfDeaf ? Theme.red : Theme.green
+            interactive: true
+            onClicked: Ui.commsOpen = !Ui.commsOpen
+            Row {
+                spacing: 6
+                Text {
+                    text: "VC " + Theme.pad(Comms.count, 2, "0")
+                    font.family: Theme.sans
+                    font.weight: Font.Black
+                    font.pixelSize: 10
+                    color: Theme.inkLine
+                }
+                Text {
+                    text: Comms.selfDeaf ? "DEAF" : Comms.selfMute ? "MUTE" : "LIVE"
+                    font.family: Theme.sans
+                    font.weight: Font.Black
+                    font.pixelSize: 10
+                    color: Comms.selfMute || Comms.selfDeaf ? Theme.red : Theme.inkLine
                 }
             }
         }

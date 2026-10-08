@@ -7,24 +7,28 @@ import Quickshell.Widgets
 // The launcher — Mod+Space (scripts/sanctuary/launcher.sh). Drawn in the
 // current style; when Quickshell is down (fallback) the same key opens fsel.
 //
-// Six modes. Type a prefix as the FIRST character to switch (it is eaten, the
+// Five modes. Type a prefix as the FIRST character to switch (it is eaten, the
 // mode shows as a tab); tab / shift-tab cycles; backspace on an empty field goes
 // back to apps.
 //
-//   APPS        the default. Apps, plus desk actions that match ("lock", "audio"),
-//               plus a calculator row when what you typed is a sum ("2*21").
-//   >  RUN      a shell command. enter = detached · shift-enter = in kitty (--hold).
-//               Past commands are listed (~/.local/state/sanctuary/run-history.json).
+//   APPS        the default. Apps you haven't pinned, plus desk actions that
+//               match ("lock", "audio"), plus a calculator row when what you
+//               typed is a sum ("2*21"). ctrl-s pins the app under the cursor —
+//               it moves to PINNED and leaves this list.
+//   *  PINNED   your pinned apps, then your pinned files and folders — only
+//               those. enter opens (a file: its default app) · shift-enter on a
+//               file opens the folder it is in (a folder: a kitty there) · ctrl-s
+//               unpins. Type a path (~/… or /…) and enter to pin that file or
+//               folder; or Nautilus (right-click → Scripts → Pin to launcher),
+//               or `files.py pin <path>`.
 //   =  CALC     a sum: + - * / % ^ ( ), sqrt sin cos tan log ln abs round floor
 //               ceil min max pow exp pi e. enter copies the answer (wl-copy).
 //   :  DESK     this desk's own actions: audio in/out, recorders, wallpaper,
-//               style, power, lock, notifications, DND, night light, keybinds…
+//               comms, style, power, lock, notifications, DND, night light, keybinds…
 //   ?  WEB      search DuckDuckGo / YouTube / GitHub / Wikipedia, or open a URL.
-//   /  FILES    your pinned files and folders — only those. enter opens in the
-//               default app · shift-enter opens the folder it is in (a folder: a
-//               kitty there) · ctrl-s unpins. Pins also sit on top of APPS, and
-//               match there when you type. Pin with Nautilus (right-click →
-//               Scripts → Pin to launcher) or `files.py pin <path>`.
+//
+// Pinned apps: ~/.local/state/sanctuary/pinned-apps.json (desktop ids, in your
+// order). Pinned files: pins.json beside it (scripts/sanctuary/files.py).
 //
 // App ranking: name starts with the query > a word in the name starts with it >
 // a word in the generic name / keywords starts with it > anywhere in the name >
@@ -32,7 +36,7 @@ import Quickshell.Widgets
 // launch often float up (counts in ~/.local/state/sanctuary/launches.json).
 //
 //   enter  go     ↑ ↓ · ctrl-j ctrl-k · ctrl-n ctrl-p  move     tab  mode     esc  close
-//   ctrl-s  unpin the file or folder under the cursor
+//   ctrl-s  pin the app under the cursor (APPS) · unpin it (PINNED)
 //   click a row to run it; click a tab to switch; click outside to close
 PanelWindow {
     id: win
@@ -54,15 +58,22 @@ PanelWindow {
     property string mode: "apps"
     property int cursor: 0
     readonly property int rows: Theme.signal ? 13 : 9
+    // First result shown: the list scrolls so the cursor is always on screen.
+    property int top: 0
+    onCursorChanged: {
+        if (cursor < top)
+            top = cursor;
+        else if (cursor >= top + rows)
+            top = cursor - rows + 1;
+    }
 
     // ── modes ─────────────────────────────────────────────────────────
     readonly property var modes: [
-        { id: "apps", pre: "",  name: "APPS", hint: "enter launch" },
-        { id: "run",  pre: ">", name: "RUN",  hint: "enter run · shift-enter in kitty" },
-        { id: "calc", pre: "=", name: "CALC", hint: "enter copy" },
-        { id: "desk", pre: ":", name: "DESK", hint: "enter do it" },
-        { id: "web",  pre: "?", name: "WEB",  hint: "enter open in browser" },
-        { id: "files", pre: "/", name: "FILES", hint: "enter open · shift-enter its folder · ctrl-s unpin" }
+        { id: "apps",   pre: "",  name: "APPS",   hint: "enter launch · ctrl-s pin" },
+        { id: "pinned", pre: "*", name: "PINNED", hint: "enter open · shift-enter its folder · ctrl-s unpin" },
+        { id: "calc",   pre: "=", name: "CALC",   hint: "enter copy" },
+        { id: "desk",   pre: ":", name: "DESK",   hint: "enter do it" },
+        { id: "web",    pre: "?", name: "WEB",    hint: "enter open in browser" }
     ]
     readonly property var modeNow: modes.find(m => m.id === mode) || modes[0]
     function modeFor(ch) {
@@ -95,6 +106,10 @@ PanelWindow {
 
     // Every visible app, once. noDisplay entries are hidden by their own choice.
     readonly property var apps: DesktopEntries.applications.values.filter(a => !a.noDisplay)
+    // APPS lists only what isn't pinned; PINNED has the rest, in your order
+    // (an id whose app is gone is skipped, and kept in the file).
+    readonly property var mainApps: apps.filter(a => pinnedIds.indexOf(a.id) < 0)
+    readonly property var pinnedApps: pinnedIds.map(id => apps.find(a => a.id === id)).filter(a => !!a)
     readonly property var results: collect(mode, query)
 
     onVisibleChanged: {
@@ -106,6 +121,7 @@ PanelWindow {
             inkInput.text = "";
             cursor = 0;
             uptimeFile.reload();
+            pinnedAppsFile.reload();
             filesProc.running = true;
             Qt.callLater(() => field().forceActiveFocus());
         }
@@ -139,29 +155,44 @@ PanelWindow {
         countsFile.setText(JSON.stringify(c));
     }
 
-    property var history: []
+    // Pinned apps: desktop ids.
+    property var pinnedIds: []
     FileView {
-        id: historyFile
-        path: win.stateDir + "/run-history.json"
+        id: pinnedAppsFile
+        path: win.stateDir + "/pinned-apps.json"
         blockLoading: true
         printErrors: false
         onLoaded: {
             try {
-                const h = JSON.parse(historyFile.text());
-                win.history = Array.isArray(h) ? h : [];
+                const p = JSON.parse(pinnedAppsFile.text());
+                win.pinnedIds = Array.isArray(p) ? p.filter(x => typeof x === "string") : [];
             } catch (e) {
-                win.history = [];
+                win.pinnedIds = [];
             }
         }
     }
-    function remember(cmd) {
-        const h = [cmd].concat(history.filter(c => c !== cmd)).slice(0, 50);
-        history = h;
-        historyFile.setText(JSON.stringify(h));
+    function setPinnedIds(ids) {
+        pinnedIds = ids;
+        pinnedAppsFile.setText(JSON.stringify(ids, null, 1));
+    }
+    // ctrl-s: pin an app (APPS), unpin an app or a file (PINNED). The row
+    // leaves the list it is in, so keep the cursor inside what is left.
+    function togglePin(r) {
+        if (!r)
+            return;
+        if (r.kind === "app" && !r.pinned)
+            setPinnedIds(pinnedIds.concat([r.entry.id]));
+        else if (r.kind === "app")
+            setPinnedIds(pinnedIds.filter(id => id !== r.entry.id));
+        else if (r.kind === "file")
+            unpin(r);
+        else
+            return;
+        Qt.callLater(() => cursor = Math.max(0, Math.min(cursor, results.length - 1)));
     }
 
     // Pinned files / folders, from scripts/sanctuary/files.py (re-read on
-    // open and after an unpin).
+    // open and after a pin / unpin).
     property var pins: []
     Process {
         id: filesProc
@@ -186,6 +217,17 @@ PanelWindow {
         id: pinsFile
         path: win.stateDir + "/pins.json"
         printErrors: false
+    }
+    // Pin a path typed into PINNED. files.py does the ~ and the checking; the
+    // launcher stays open so you see it land.
+    Process {
+        id: pinProc
+        onExited: filesProc.running = true
+    }
+    function pinPath(p) {
+        pinProc.command = [scripts + "/files.py", "pin", p];
+        pinProc.running = true;
+        field().text = "";
     }
 
     // Header readouts.
@@ -223,6 +265,7 @@ PanelWindow {
         { do: "patch",   glyph: "⇄", name: "Audio in / out",     desc: "PATCH — speakers, headphones, mic · Mod+O", keywords: ["sound", "output", "input", "headphones", "speaker", "mic", "microphone", "bluetooth", "patch", "switch"] },
         { do: "mixer",   glyph: "≋", name: "Mixer",              desc: "wiremix — every stream · Mod+Alt+M",        keywords: ["volume", "sound", "wiremix", "audio"] },
         { do: "rig",     glyph: "◉", name: "Recorders",          desc: "RIG — screen, meeting, practice · Mod+U",   keywords: ["record", "rec", "rig", "meeting", "audio"] },
+        { do: "comms",   glyph: "◎", name: "Comms",              desc: "Discord voice — mute, deafen, leave · Mod+C", keywords: ["discord", "vesktop", "voice", "call", "vc", "comms", "mute", "deafen", "leave"] },
         { do: "capture", glyph: "▣", name: "Record screen",      desc: "drag a region · Ctrl+Print",                keywords: ["record", "screen", "video", "capture"] },
         { do: "shot",    glyph: "⌗", name: "Screenshot",         desc: "Print",                                     keywords: ["screenshot", "capture", "grim"] },
         { do: "clip",    glyph: "⎘", name: "Clipboard",          desc: "history · Mod+V",                           keywords: ["clipboard", "paste", "copy", "history"] },
@@ -234,7 +277,7 @@ PanelWindow {
         { do: "cooler",  glyph: "☼", name: "Night light cooler", desc: "more blue",                                 keywords: ["night", "light", "cool", "gamma"] },
         { do: "nlreset", glyph: "○", name: "Night light off",    desc: "back to 6500K",                             keywords: ["night", "light", "reset", "off", "gamma"] },
         { do: "bar",     glyph: "▔", name: "Hide / show bar",    desc: "Mod+Shift+A",                               keywords: ["bar", "panel", "hide", "show"] },
-        { do: "keys",    glyph: "⌨", name: "Keybinds",           desc: "niri's cheat sheet · Mod+Shift+/",          keywords: ["keys", "keybinds", "shortcuts", "hotkeys", "help"] },
+        { do: "keys",    glyph: "⌨", name: "Keybinds",           desc: "KEYS cheat sheet · Mod+/",                    keywords: ["keys", "keybinds", "shortcuts", "hotkeys", "help"] },
         { do: "power",   glyph: "⏻", name: "Power menu",         desc: "Mod+Shift+Escape",                          keywords: ["power", "shutdown", "reboot", "logout"] },
         { do: "lock",    glyph: "⊘", name: "Lock",               desc: "Mod+Escape",                                keywords: ["lock", "away"] },
         { do: "suspend", glyph: "z", name: "Suspend",            desc: "sleep now",                                 keywords: ["suspend", "sleep"] }
@@ -278,11 +321,14 @@ PanelWindow {
         return s + Math.log((counts[a.id] || 0) + 1) * 8;
     }
 
-    // A row, whatever the mode: kind (app / desk / run / calc / web / hint),
+    // A row, whatever the mode: kind (app / desk / file / pinpath / calc / web / hint),
     // title, sub, tag (right-hand readout), plus what launch() needs.
     function appRow(a) {
         const n = counts[a.id] || 0;
         return { kind: "app", title: a.name, sub: a.genericName || a.comment || "", tag: n > 0 ? n + "×" : "", entry: a, icon: a.icon, glyph: "" };
+    }
+    function pinnedAppRow(a) {
+        return Object.assign(appRow(a), { tag: "PIN", pinned: true });
     }
     function deskRow(d) {
         return { kind: "desk", title: d.name, sub: d.desc, tag: "DESK", act: d.do, icon: "", glyph: d.glyph };
@@ -300,13 +346,22 @@ PanelWindow {
     function fileScore(f, q) {
         return score({ name: f.name, desc: f.where.replace(/[~\/]+/g, " "), keywords: [] }, q);
     }
-    function fileRows(q) {
-        if (pins.length === 0)
-            return [hint("nothing pinned", "Nautilus: right-click → Scripts → Pin to launcher · or files.py pin <path>")];
+    // PINNED: apps first, then files, each in your order. A path typed here
+    // (~/… or /…) offers to pin it.
+    function pinnedRows(raw) {
+        const p = raw.trim();
+        if (/^[~\/]/.test(p))
+            return [{ kind: "pinpath", title: p, sub: "enter pins this file or folder", tag: "PIN", path: p, icon: "", glyph: "+" }];
+        const q = p.toLowerCase();
+        const all = pinnedApps.map(pinnedAppRow).concat(pins.map(fileRow));
+        if (all.length === 0)
+            return [hint("nothing pinned", "APPS: ctrl-s pins an app · here: type ~/path and enter · Nautilus: Scripts → Pin to launcher")];
         if (q === "")
-            return pins.map(fileRow);
+            return all;
         // a tie keeps your order
-        return pins.map((f, i) => ({ r: fileRow(f), s: fileScore(f, q), i: i }))
+        return pinnedApps.map(a => ({ r: pinnedAppRow(a), s: score(a, q) }))
+                   .concat(pins.map(f => ({ r: fileRow(f), s: fileScore(f, q) })))
+                   .map((x, i) => Object.assign(x, { i: i }))
                    .filter(x => x.s > 0).sort((x, y) => (y.s - x.s) || (x.i - y.i)).map(x => x.r);
     }
     function hint(t, s) {
@@ -315,29 +370,26 @@ PanelWindow {
 
     function collect(m, raw) {
         const q = raw.trim().toLowerCase();
-        if (m === "run")
-            return runRows(raw.trim());
         if (m === "calc")
             return calcRows(raw.trim(), true);
         if (m === "web")
             return webRows(raw.trim());
-        if (m === "files")
-            return fileRows(q);
+        if (m === "pinned")
+            return pinnedRows(raw);
         if (m === "desk") {
             if (q === "")
                 return desk.map(deskRow);
             return desk.map(d => ({ d: d, s: score(d, q) })).filter(x => x.s > 0)
                        .sort((x, y) => y.s - x.s).map(x => deskRow(x.d));
         }
-        // apps — pins first, then apps by use
+        // apps — the ones not pinned (those live in PINNED), by use
         if (q === "")
-            return pins.filter(f => !f.gone).map(fileRow).concat(apps.slice().sort((a, b) => ((counts[b.id] || 0) - (counts[a.id] || 0))
-                                              || a.name.localeCompare(b.name)).map(appRow));
+            return mainApps.slice().sort((a, b) => ((counts[b.id] || 0) - (counts[a.id] || 0))
+                                         || a.name.localeCompare(b.name)).map(appRow);
         // Desk actions join in only on a real word match (≥ 60), so typing
         // "f" doesn't bury Firefox under "Suspend". -1: an app wins a tie.
-        const ranked = apps.map(a => ({ r: appRow(a), s: score(a, q) }))
+        const ranked = mainApps.map(a => ({ r: appRow(a), s: score(a, q) }))
             .concat(desk.map(d => ({ r: deskRow(d), s: score(d, q) - 1 })).filter(x => x.s >= 59))
-            .concat(pins.filter(f => !f.gone).map(f => ({ r: fileRow(f), s: fileScore(f, q) })).filter(x => x.s >= 60))
             .filter(x => x.s > 0)
             .sort((x, y) => (y.s - x.s) || x.r.title.localeCompare(y.r.title))
             .map(x => x.r);
@@ -345,20 +397,6 @@ PanelWindow {
         if (/[0-9]/.test(q) && /[-+*\/%^(]/.test(q))
             return calcRows(raw.trim(), false).concat(ranked);
         return ranked;
-    }
-
-    // ── RUN ───────────────────────────────────────────────────────────
-    function runRows(cmd) {
-        const r = [];
-        if (cmd !== "")
-            r.push({ kind: "run", title: cmd, sub: "run it · shift-enter keeps a kitty open", tag: "SH", cmd: cmd, icon: "", glyph: "$" });
-        const q = cmd.toLowerCase();
-        for (const h of history)
-            if (h !== cmd && (q === "" || h.toLowerCase().indexOf(q) >= 0))
-                r.push({ kind: "run", title: h, sub: "from history", tag: "", cmd: h, icon: "", glyph: "↺" });
-        if (r.length === 0)
-            r.push(hint("type a command", "e.g. nautilus ~/Videos · btop · systemctl --user restart pipewire"));
-        return r;
     }
 
     // ── CALC ──────────────────────────────────────────────────────────
@@ -442,6 +480,7 @@ PanelWindow {
         if (v === "patch") Ui.patchOpen = true;
         else if (v === "mixer") Media.openMixer();
         else if (v === "rig") Ui.rigOpen = true;
+        else if (v === "comms") Ui.commsOpen = true;
         else if (v === "capture") Ui.captureOpen = true;
         // a beat first, so the launcher is gone from the picture
         else if (v === "shot") sh(["bash", "-c", "sleep 0.3; ~/.dotfiles/scripts/screenshot.sh"]);
@@ -454,7 +493,7 @@ PanelWindow {
         else if (v === "cooler") sh([scripts + "/nightlight.sh", "cooler"]);
         else if (v === "nlreset") sh([scripts + "/nightlight.sh", "reset"]);
         else if (v === "bar") Ui.barShown = !Ui.barShown;
-        else if (v === "keys") sh(["niri", "msg", "action", "show-hotkey-overlay"]);
+        else if (v === "keys") Ui.keysOpen = true;
         else if (v === "power") Ui.powerOpen = true;
         else if (v === "lock") sh(["loginctl", "lock-session"]);
         else if (v === "suspend") sh([scripts + "/power.sh", "do", "suspend"]);
@@ -463,6 +502,10 @@ PanelWindow {
         const r = results[i];
         if (!r || r.kind === "hint" || (r.kind === "file" && r.file.gone))
             return;
+        if (r.kind === "pinpath") {
+            pinPath(r.path);
+            return;
+        }
         Ui.launcherOpen = false;   // first: the next overlay wants the keyboard
         if (r.kind === "app") {
             bump(r.entry.id);
@@ -472,9 +515,6 @@ PanelWindow {
                 r.entry.execute();
         } else if (r.kind === "desk") {
             doDesk(r.act);
-        } else if (r.kind === "run") {
-            remember(r.cmd);
-            sh(shift ? ["kitty", "--hold", "sh", "-c", r.cmd] : ["sh", "-c", r.cmd]);
         } else if (r.kind === "calc") {
             sh(["wl-copy", r.value]);
         } else if (r.kind === "web") {
@@ -505,7 +545,7 @@ PanelWindow {
 
     function key(event) {
         const k = event.key, ctrl = event.modifiers & Qt.ControlModifier;
-        const n = Math.min(results.length, rows);
+        const n = results.length;
         if (k === Qt.Key_Escape) {
             Ui.launcherOpen = false;
         } else if (k === Qt.Key_Return || k === Qt.Key_Enter) {
@@ -517,7 +557,7 @@ PanelWindow {
         } else if (k === Qt.Key_Backspace && field().text === "" && mode !== "apps") {
             setMode("apps");
         } else if (ctrl && k === Qt.Key_S) {
-            unpin(results[cursor]);
+            togglePin(results[cursor]);
         } else if (k === Qt.Key_Down || (ctrl && (k === Qt.Key_J || k === Qt.Key_N))) {
             if (n > 0)
                 cursor = (cursor + 1) % n;
@@ -561,7 +601,7 @@ PanelWindow {
     //   │ SIGNAL  ∿∿∿∿∿∿∿ live trace ∿∿∿∿∿∿∿              19:06    │  ← masthead
     //   │ SANCTUARY // CONSOLE                CITADEL · UP 3H 12M   │
     //   ├────────────────────────────────────────────────────────────┤
-    //   │ APPS   > RUN   = CALC   : DESK   ? WEB     50 APPS · 18 DESK │  ← mode tabs
+    //   │ APPS   * PINNED   = CALC   : DESK   ? WEB   50 APPS · 18 DESK │  ← mode tabs
     //   │ ▸ fir▌                                                     │
     //   ├────────────────────────────────────────────────────────────┤
     //   │▌01  Firefox        Web Browser                       12×   │
@@ -758,7 +798,7 @@ PanelWindow {
                     anchors.right: parent.right
                     anchors.rightMargin: 14
                     anchors.verticalCenter: parent.verticalCenter
-                    text: win.apps.length + " APPS · " + win.desk.length + " DESK · " + win.pins.length + " PIN"
+                    text: win.mainApps.length + " APPS · " + win.desk.length + " DESK · " + (win.pinnedApps.length + win.pins.length) + " PIN"
                     font.family: Theme.mono
                     font.pixelSize: 9
                     font.letterSpacing: 1.4
@@ -801,11 +841,10 @@ PanelWindow {
                     anchors.leftMargin: 18
                     anchors.verticalCenter: parent.verticalCenter
                     visible: sigInput.text === ""
-                    text: win.mode === "apps" ? "type to find · >  =  :  ?  /  for the other modes"
-                        : win.mode === "run" ? "a shell command"
+                    text: win.mode === "apps" ? "type to find · *  =  :  ?  for the other modes"
                         : win.mode === "calc" ? "a sum"
                         : win.mode === "desk" ? "a desk action"
-                        : win.mode === "files" ? "a pinned file or folder"
+                        : win.mode === "pinned" ? "a pinned app or file · or ~/path to pin one"
                         : "search the web"
                     font.family: Theme.mono
                     font.pixelSize: 12
@@ -817,12 +856,12 @@ PanelWindow {
 
             // ── rows ──
             Repeater {
-                model: Theme.signal ? win.results.slice(0, win.rows) : []
+                model: Theme.signal ? win.results.slice(win.top, win.top + win.rows) : []
                 delegate: Rectangle {
                     id: row
                     required property var modelData
                     required property int index
-                    readonly property bool sel: index === win.cursor && modelData.kind !== "hint"
+                    readonly property bool sel: win.top + index === win.cursor && modelData.kind !== "hint"
                     readonly property bool big: modelData.kind === "calc"
                     width: sigCol.width
                     height: big ? 40 : 30
@@ -841,7 +880,7 @@ PanelWindow {
                         Text {
                             width: 16
                             anchors.verticalCenter: parent.verticalCenter
-                            text: row.modelData.kind === "app" ? Theme.pad(row.index + 1, 2, "0") : row.modelData.glyph
+                            text: row.modelData.kind === "app" ? Theme.pad(win.top + row.index + 1, 2, "0") : row.modelData.glyph
                             font.family: Theme.mono
                             font.pixelSize: row.modelData.kind === "app" ? 10 : 12
                             color: row.modelData.kind === "app" ? Theme.surface2 : row.sel ? Theme.sigHot : Theme.sigLabel
@@ -880,8 +919,8 @@ PanelWindow {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: row.modelData.kind === "hint" ? Qt.ArrowCursor : Qt.PointingHandCursor
-                        onEntered: win.cursor = row.index
-                        onClicked: mouse => win.launch(row.index, mouse.modifiers & Qt.ShiftModifier)
+                        onEntered: win.cursor = win.top + row.index
+                        onClicked: mouse => win.launch(win.top + row.index, mouse.modifiers & Qt.ShiftModifier)
                     }
                 }
             }
@@ -933,7 +972,7 @@ PanelWindow {
     //
     //   ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     //   ┃ INK!                       ░░▒▒▓▓ 19:06 ┃  ← the style, lettered, offset-printed
-    //   ┃ [APPS] [> RUN] [= CALC] [: DESK] [? WEB] ┃  ← mode chips
+    //   ┃ [APPS] [* PINNED] [= CALC] [: DESK] [? WEB] ┃  ← mode chips
     //   ┃   ╭────────────────────────────╮       ┃
     //   ┃   │ fir▌                       │       ┃  ← the query in a speech bubble
     //   ┃   ╰──╲─────────────────────────╯       ┃
@@ -1108,10 +1147,9 @@ PanelWindow {
                     y: 12 + (46 - height) / 2
                     visible: inkInput.text === ""
                     text: win.mode === "apps" ? "what are we opening?"
-                        : win.mode === "run" ? "what do we run?"
                         : win.mode === "calc" ? "do the maths!"
                         : win.mode === "desk" ? "what should the desk do?"
-                        : win.mode === "files" ? "which pinned file?"
+                        : win.mode === "pinned" ? "which pin? (or ~/path to pin)"
                         : "what are we looking up?"
                     font.family: Theme.sans
                     font.weight: Font.Bold
@@ -1125,12 +1163,12 @@ PanelWindow {
                 width: parent.width
                 spacing: 9
                 Repeater {
-                    model: Theme.ink ? win.results.slice(0, win.rows) : []
+                    model: Theme.ink ? win.results.slice(win.top, win.top + win.rows) : []
                     delegate: Item {
                         id: irow
                         required property var modelData
                         required property int index
-                        readonly property bool sel: index === win.cursor && modelData.kind !== "hint"
+                        readonly property bool sel: win.top + index === win.cursor && modelData.kind !== "hint"
                         readonly property bool big: modelData.kind === "calc"
                         width: parent.width - 6
                         height: big ? 54 : 44
@@ -1211,7 +1249,7 @@ PanelWindow {
                                 anchors.right: parent.right
                                 anchors.rightMargin: 12
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: irow.modelData.kind === "app" ? "" : irow.modelData.tag
+                                text: irow.modelData.kind === "app" && !irow.modelData.pinned ? "" : irow.modelData.tag
                                 font.family: Theme.sans
                                 font.weight: Font.Black
                                 font.pixelSize: 10
@@ -1222,8 +1260,8 @@ PanelWindow {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: irow.modelData.kind === "hint" ? Qt.ArrowCursor : Qt.PointingHandCursor
-                            onEntered: win.cursor = irow.index
-                            onClicked: mouse => win.launch(irow.index, mouse.modifiers & Qt.ShiftModifier)
+                            onEntered: win.cursor = win.top + irow.index
+                            onClicked: mouse => win.launch(win.top + irow.index, mouse.modifiers & Qt.ShiftModifier)
                         }
                     }
                 }

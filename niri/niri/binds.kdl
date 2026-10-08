@@ -1,4 +1,7 @@
 // ── Keybinds ──────────────────────────────────────────────────────────
+// RULE: the KEYS cheat sheet (Mod+/) is a HAND-WRITTEN list in
+// quickshell/sanctuary/Keymap.qml. Any change here — add, remove, rename,
+// rebind — updates Keymap.qml in the same edit, or the sheet lies.
 binds {
     //── Launch apps ──
     Mod+Return hotkey-overlay-title="Terminal" { spawn "kitty"; }
@@ -77,6 +80,12 @@ binds {
 
     //── RIG — the recorders (Quickshell). Screen: drag a region, the rest dims,
     //   MIC on / SYS off, pause, stop. Audio: the meeting recorder above. ──
+    //── COMMS — Discord voice (Quickshell card, Vesktop + SanctuaryComms plugin).
+    //   M D X F inside the card; Mod+M stays the SYSTEM mic. ──
+    Mod+C hotkey-overlay-title="COMMS (Discord voice)" {
+        spawn "/home/dweller/.dotfiles/scripts/sanctuary/comms.sh";
+    }
+
     Mod+U hotkey-overlay-title="RIG (recorders)" {
         spawn "/home/dweller/.dotfiles/scripts/sanctuary/qs.sh" "call" "rig" "toggle";
     }
@@ -98,11 +107,17 @@ binds {
     }
     Mod+Ctrl+0 { spawn "/home/dweller/.dotfiles/scripts/sanctuary/nightlight.sh" "reset"; }
 
-    //── Cheat sheet ──  a custom binds block drops all of niri's defaults, this one too
-    Mod+Shift+Slash { show-hotkey-overlay; }
+    //── Cheat sheet ──  KEYS, Quickshell's styled sheet (KeySheet.qml, words from
+    //   Keymap.qml). Fallback when Quickshell is down: niri's own overlay.
+    Mod+Slash hotkey-overlay-title="Keys (cheat sheet)" { spawn "/home/dweller/.dotfiles/scripts/sanctuary/keys.sh"; }
 
     //── Overview ──  zoomed-out view of all workspaces/columns; drag windows around
     Mod+Tab { toggle-overview; }
+
+    //── Column strip ──  the map of what Mod+1..9 points at on this workspace,
+    //   on demand only (left of 1): 1-9 jump, H L move, Enter go, Esc close.
+    //   See quickshell/sanctuary/Columns.qml.
+    Mod+Grave hotkey-overlay-title="Column strip" { spawn "/home/dweller/.dotfiles/scripts/sanctuary/columns.sh" "peek"; }
 
     //── Window management ──
     Mod+W       { close-window; }

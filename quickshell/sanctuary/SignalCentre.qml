@@ -9,6 +9,11 @@ import Quickshell.Services.Notifications
 //
 //   Mod+Shift+D  open / close      c  clear all     d  DND     esc  close
 //   click a row: its default action · right click: dismiss it
+//   click anywhere outside the panel: close
+//
+// The window spans the whole screen (below the bar — Normal exclusion keeps the
+// bar clickable) and is see-through; the panel sits at its right edge. That way
+// a click outside the panel lands on our scrim instead of the app underneath.
 PanelWindow {
     id: win
 
@@ -16,34 +21,45 @@ PanelWindow {
     color: "transparent"
     anchors {
         top: true
+        left: true
         right: true
         bottom: true
     }
-    margins {
-        top: 6
-        right: 8
-        bottom: 8
-    }
     exclusionMode: ExclusionMode.Normal
     exclusiveZone: 0
-    implicitWidth: 440
 
     WlrLayershell.namespace: "sanctuary-centre"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: Ui.centreOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
+    MouseArea {   // scrim: click outside = close
+        anchors.fill: parent
+        acceptedButtons: Qt.AllButtons
+        onClicked: Ui.centreOpen = false
+    }
+
     Rectangle {
         id: frame
-        width: parent.width
-        height: parent.height
+        width: 440
+        height: parent.height - 6 - 8
+        y: 6
         color: Theme.sigFill
         border.width: 1
         border.color: Theme.sigRule
         focus: true
 
-        x: Ui.centreOpen ? 0 : 32
+        MouseArea {   // swallow clicks on the panel's empty parts
+            anchors.fill: parent
+            acceptedButtons: Qt.AllButtons
+        }
+
+        // Only the slide offset animates — never x itself. The window's width is
+        // 0 for a moment when it's shown, then becomes the screen width; if x
+        // were animated, the panel would glide across from the left edge.
+        property real slide: Ui.centreOpen ? 0 : 32
+        x: parent.width - width - 8 + slide
         opacity: Ui.centreOpen ? 1 : 0
-        Behavior on x { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
+        Behavior on slide { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
         Behavior on opacity { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
 
         Keys.onEscapePressed: Ui.centreOpen = false

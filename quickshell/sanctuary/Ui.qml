@@ -18,6 +18,9 @@ Singleton {
     property bool patchOpen: false  // Mod+O — audio in/out switcher (Patch.qml)
     property bool rigOpen: false    // Mod+U, or click the ◉ cell — the recorders card
     property bool captureOpen: false // Ctrl+Print, or SCREEN in RIG — the region overlay
+    property bool columnsOpen: false // Mod+Grave — the column strip, held open to pick from
+    property bool keysOpen: false   // Mod+/ — the keybind cheat sheet (KeySheet.qml)
+    property bool commsOpen: false  // Mod+C, or click the VC cell — Discord voice (CommsCard.qml)
     // Right-click a tray icon: that app's menu, drawn by TrayMenu.qml.
     property var trayMenu: null     // the item's QsMenuHandle; null = closed
     property real trayX: 0          // screen x of the icon's centre — the menu hangs from it
