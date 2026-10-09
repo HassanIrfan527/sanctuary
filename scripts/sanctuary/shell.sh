@@ -68,6 +68,25 @@ point_layout() {                             # $1 = style
   niri msg action load-config-file >/dev/null 2>&1
 }
 
+# ── terminal styling: same idea for kitty + starship ──────────────────
+# kitty.conf ends with `include style.conf` (git-ignored symlink → style-<word>.conf);
+# ~/.config/starship.toml → starship/themes/<word>.toml. A style without its own
+# file looks like Signal, as with layout.kdl. kitty reloads its config on
+# SIGUSR1 (open windows restyle at once); starship re-reads on the next prompt.
+KITTY_DIR="$HOME/.dotfiles/kitty/kitty"
+STARSHIP_DIR="$HOME/.dotfiles/starship/themes"
+point_term() {                               # $1 = style
+  local kit="style-$1.conf" star="$STARSHIP_DIR/$1.toml"
+  [ -r "$KITTY_DIR/$kit" ] || kit="style-signal.conf"
+  [ -r "$star" ] || star="$STARSHIP_DIR/signal.toml"
+  [ "$(readlink "$HOME/.config/starship.toml" 2>/dev/null)" = "$star" ] \
+    || ln -sfn "$star" "$HOME/.config/starship.toml"
+  [ "$(readlink "$KITTY_DIR/style.conf" 2>/dev/null)" = "$kit" ] && return 0
+  ln -sfn "$kit" "$KITTY_DIR/style.conf"
+  pkill -USR1 -x kitty 2>/dev/null
+  return 0
+}
+
 # ── the classic stack ─────────────────────────────────────────────────
 classic_down() {
   pkill -f "^$POLKIT_MATE" 2>/dev/null
@@ -138,6 +157,7 @@ start_watch() {
 
 up() {                                       # $1 = style
   point_layout "$1"                          # windows first: instant, and independent of Quickshell
+  point_term "$1"                            # kitty + starship follow the desk
   touch "$SWITCHING"
   classic_down                               # no-op unless we are leaving the fallback
   if "$QS" start "$1"; then

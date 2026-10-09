@@ -43,7 +43,7 @@ LINKS=(
   # ── single-file links (config dir stays real, one file is linked) ──
   "opencode/opencode.jsonc            : ~/.config/opencode/opencode.jsonc"
   "sheldon/plugins.toml               : ~/.config/sheldon/plugins.toml"
-  "starship/themes/rose-pine-moon.toml : ~/.config/starship.toml"
+  "starship/themes/signal.toml         : ~/.config/starship.toml"
 
   # ── links that go straight to $HOME (not ~/.config) ──
   # gitconfig / gitconfig-work are NOT here on purpose — home-manager
@@ -125,6 +125,14 @@ if [[ ! -e "$seed_theme" ]]; then
   say ""
   run "cp '$DOTFILES/themes/themes/mocha/kitty.conf' '$seed_theme'"
   say "→ seeded: kitty current-theme.conf (dark default)"
+fi
+
+# kitty.conf ends with `include style.conf`, a git-ignored symlink that
+# shell.sh re-points per desk style. Seed it with Signal, the default desk.
+seed_style="$DOTFILES/kitty/kitty/style.conf"
+if [[ ! -e "$seed_style" ]]; then
+  run "ln -sfn style-signal.conf '$seed_style'"
+  say "→ seeded: kitty style.conf -> style-signal.conf"
 fi
 
 # niri's config.kdl includes `layout.kdl`, a git-ignored symlink to the active
