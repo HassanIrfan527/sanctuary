@@ -31,7 +31,8 @@ PanelWindow {
     readonly property var styles: [
         { word: "signal", name: "Signal", desc: "instrument strip · live traces" },
         { word: "ink",    name: "Ink",    desc: "dark manga panels · bubbles" },
-        { word: "paper",  name: "Paper",  desc: "light manga panels · bubbles" }
+        { word: "paper",  name: "Paper",  desc: "light manga panels · bubbles" },
+        { word: "flare",  name: "Flare",  desc: "signal in daylight · parchment + ember" }
     ]
     readonly property int current: Math.max(0, styles.findIndex(s => s.word === Theme.word))
     property int cursor: current

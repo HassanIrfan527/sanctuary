@@ -10,7 +10,7 @@
 #
 # ── The rule ──────────────────────────────────────────────────────────
 # Nothing here writes niri config or keybinds (2026-10-03). Window styling lives
-# in three HAND-KEPT files, niri/niri/layout-{signal,ink,paper}.kdl; config.kdl
+# in three HAND-KEPT files, niri/niri/layout-{signal,ink,paper,flare}.kdl; config.kdl
 # includes `layout.kdl`, a symlink to the active one. A style switch re-points
 # that symlink (validated first) and restarts Quickshell — it never writes a
 # byte of config. The old per-mode renderer is in archive/mode-system/.
@@ -87,6 +87,56 @@ point_term() {                               # $1 = style
   return 0
 }
 
+# ── browser: qutebrowser reads the style itself ───────────────────────
+# qutebrowser/theme.py reads $STYLE_FILE (Signal palette, or Flare's for
+# `flare`); a running browser only needs to re-run its config. Started only if
+# it is already open — `qutebrowser :cmd` with none running would launch one.
+point_browser() {
+  pgrep -u "$USER" -f '/qutebrowser( |$)' >/dev/null 2>&1 || return 0
+  ( setsid qutebrowser ':config-source' >/dev/null 2>&1 </dev/null & )
+}
+
+# ── system light/dark: the one setting the rest of the desktop follows ─
+# org.gnome.desktop.interface color-scheme reaches apps through the portal and
+# they restyle live: Brave (profiles on "Device"), Vesktop (signal24's
+# @media prefers-color-scheme block), libadwaita/GTK4, qutebrowser pages under
+# Signal ("auto"). GTK3 can't follow it, so its theme name is switched with it:
+# adw-gtk3 / adw-gtk3-dark (Adwaita's look for GTK3). NOT "Adwaita-dark" — GTK3
+# has no theme by that name and silently draws light Adwaita (probed 2026-10-12).
+# Dracula was retired the same day (archive/gtk-dracula/).
+# Only Flare is light, as with the wallpaper.
+point_scheme() {                             # $1 = style
+  local scheme=prefer-dark gtk=adw-gtk3-dark
+  [ "$1" = flare ] && scheme=prefer-light gtk=adw-gtk3
+  gsettings set org.gnome.desktop.interface color-scheme "$scheme" 2>/dev/null
+  gsettings set org.gnome.desktop.interface gtk-theme "$gtk" 2>/dev/null
+  return 0
+}
+
+# ── wallpaper: light styles get a light wallpaper, and give yours back ─
+# Each side remembers its own: leaving the dark side saves the current
+# wallpaper as wallpaper.dark, leaving the light side saves wallpaper.light, and
+# arriving restores what that side had (first time on the light side: the first
+# image in $LIGHT_WALLS). "Which side is it on" = is the file inside
+# $LIGHT_WALLS, so a wallpaper picked by hand (Mod+Shift+W) is respected. Only
+# Flare is light here — Paper keeps its wallpaper, as before (2026-10-12).
+LIGHT_WALLS="${SANCTUARY_WALLPAPERS:-$HOME/Pictures/Wallpapers}/light"
+point_wall() {                               # $1 = style
+  local want=dark cur side=dark target
+  [ "$1" = flare ] && want=light
+  cur=$(cat "$STATE/wallpaper" 2>/dev/null)
+  case "$cur" in "$LIGHT_WALLS"/*) side=light ;; esac
+  [ "$want" = "$side" ] && return 0
+  [ -n "$cur" ] && printf '%s\n' "$cur" > "$STATE/wallpaper.$side"
+  target=$(cat "$STATE/wallpaper.$want" 2>/dev/null)
+  if [ "$want" = light ] && [ ! -f "$target" ]; then
+    target=$(find "$LIGHT_WALLS" -maxdepth 1 -type f \( -iname '*.png' -o -iname '*.jpg' \
+      -o -iname '*.jpeg' -o -iname '*.webp' \) 2>/dev/null | sort | head -1)
+  fi
+  [ -f "$target" ] || return 0               # nothing to go back to: leave it be
+  ( trap '' HUP; setsid "$DIR/wallpaper.sh" set "$target" >/dev/null 2>&1 </dev/null & )
+}
+
 # ── the classic stack ─────────────────────────────────────────────────
 classic_down() {
   pkill -f "^$POLKIT_MATE" 2>/dev/null
@@ -158,6 +208,9 @@ start_watch() {
 up() {                                       # $1 = style
   point_layout "$1"                          # windows first: instant, and independent of Quickshell
   point_term "$1"                            # kitty + starship follow the desk
+  point_scheme "$1"                          # system light/dark + GTK3 theme — before the browser re-reads
+  point_browser                              # qutebrowser re-reads the style file
+  point_wall "$1"                            # light style ⇄ light wallpaper
   touch "$SWITCHING"
   classic_down                               # no-op unless we are leaving the fallback
   if "$QS" start "$1"; then

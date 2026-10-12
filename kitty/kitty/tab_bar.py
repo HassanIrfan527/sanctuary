@@ -8,18 +8,37 @@
 # •    output arrived in a tab you are not looking at
 # GRID the focused window's size in cells — a live readout where a clock would be
 #
-# Loaded by `tab_bar_style custom` (style-signal.conf). kitty only reads this file
+# Loaded by `tab_bar_style custom` (style-signal.conf / style-flare.conf). kitty only reads this file
 # at startup and on config reload; an exception here falls back to the fade style.
-from kitty.fast_data_types import Screen, get_boss
+from kitty.fast_data_types import Screen, get_boss, get_options
 from kitty.tab_bar import DrawData, ExtraData, TabBarData, as_rgb
 
-# Mocha, same names as Theme.qml's sig* tokens
-VALUE = 0xCDD6F4   # text
-LABEL = 0x6C7086   # overlay0
-DIM = 0x585B70     # surface2
-RULE = 0x313244    # surface0
-HOT = 0xA6E3A1     # green
-ALARM = 0xF38BA8   # red
+# The palette comes from the loaded style-<word>.conf, so Signal and Flare share
+# this one file (2026-10-12). Each name maps to a kitty option that style sets;
+# the Mocha values are the fallback if an option can't be read.
+_FROM = {
+    'VALUE': ('active_tab_foreground', 0xCDD6F4),    # text
+    'LABEL': ('inactive_tab_foreground', 0x6C7086),  # overlay0
+    'DIM': ('color8', 0x585B70),                     # surface2
+    'RULE': ('inactive_border_color', 0x313244),     # surface0
+    'HOT': ('active_border_color', 0xA6E3A1),        # the trace
+    'ALARM': ('bell_border_color', 0xF38BA8),        # Master Caution
+}
+
+
+def _palette() -> dict:
+    try:
+        opts = get_options()
+    except Exception:
+        opts = None
+    out = {}
+    for name, (opt, default) in _FROM.items():
+        try:
+            c = getattr(opts, opt)
+            out[name] = (c.red << 16) | (c.green << 8) | c.blue
+        except Exception:
+            out[name] = default
+    return out
 
 
 def _pen(screen: Screen, fg: int, bold: bool = False) -> None:
@@ -50,6 +69,8 @@ def draw_tab(
     before: int, max_tab_length: int, index: int, is_last: bool,
     extra_data: ExtraData,
 ) -> int:
+    p = _palette()
+    VALUE, LABEL, DIM, RULE, HOT, ALARM = (p[k] for k in ('VALUE', 'LABEL', 'DIM', 'RULE', 'HOT', 'ALARM'))
     if index == 1:
         _pen(screen, HOT)
         screen.draw('┌ ')

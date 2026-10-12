@@ -1,0 +1,67 @@
+/* Dracula palette for libadwaita (GTK4) apps.
+   The Dracula theme's own gtk-4.0 CSS isn't libadwaita-aware, so recolor instead. */
+
+@define-color accent_color #bd93f9;
+@define-color accent_bg_color #bd93f9;
+@define-color accent_fg_color #282a36;
+@define-color destructive_color #ff5555;
+@define-color destructive_bg_color #ff5555;
+@define-color destructive_fg_color #f8f8f2;
+@define-color success_color #50fa7b;
+@define-color success_bg_color #50fa7b;
+@define-color success_fg_color #282a36;
+@define-color warning_color #ffb86c;
+@define-color warning_bg_color #ffb86c;
+@define-color warning_fg_color #282a36;
+@define-color error_color #ff5555;
+@define-color error_bg_color #ff5555;
+@define-color error_fg_color #f8f8f2;
+@define-color window_bg_color #282a36;
+@define-color window_fg_color #f8f8f2;
+@define-color view_bg_color #282a36;
+@define-color view_fg_color #f8f8f2;
+@define-color headerbar_bg_color #21222c;
+@define-color headerbar_fg_color #f8f8f2;
+@define-color headerbar_backdrop_color #282a36;
+@define-color sidebar_bg_color #21222c;
+@define-color sidebar_fg_color #f8f8f2;
+@define-color sidebar_backdrop_color #21222c;
+@define-color secondary_sidebar_bg_color #1e1f29;
+@define-color secondary_sidebar_fg_color #f8f8f2;
+@define-color card_bg_color #44475a;
+@define-color card_fg_color #f8f8f2;
+@define-color dialog_bg_color #343746;
+@define-color dialog_fg_color #f8f8f2;
+@define-color popover_bg_color #343746;
+@define-color popover_fg_color #f8f8f2;
+@define-color thumbnail_bg_color #44475a;
+@define-color thumbnail_fg_color #f8f8f2;
+
+:root {
+  --accent-color: #bd93f9;
+  --accent-bg-color: #bd93f9;
+  --accent-fg-color: #282a36;
+  --destructive-bg-color: #ff5555;
+  --success-bg-color: #50fa7b;
+  --warning-bg-color: #ffb86c;
+  --error-bg-color: #ff5555;
+  --window-bg-color: #282a36;
+  --window-fg-color: #f8f8f2;
+  --view-bg-color: #282a36;
+  --view-fg-color: #f8f8f2;
+  --headerbar-bg-color: #21222c;
+  --headerbar-fg-color: #f8f8f2;
+  --headerbar-backdrop-color: #282a36;
+  --sidebar-bg-color: #21222c;
+  --sidebar-fg-color: #f8f8f2;
+  --sidebar-backdrop-color: #21222c;
+  --secondary-sidebar-bg-color: #1e1f29;
+  --card-bg-color: #44475a;
+  --card-fg-color: #f8f8f2;
+  --dialog-bg-color: #343746;
+  --dialog-fg-color: #f8f8f2;
+  --popover-bg-color: #343746;
+  --popover-fg-color: #f8f8f2;
+  --thumbnail-bg-color: #44475a;
+  --thumbnail-fg-color: #f8f8f2;
+}

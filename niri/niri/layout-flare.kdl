@@ -1,0 +1,55 @@
+// ── Layout + shape · FLARE ────────────────────────────────────────────
+// Hand-maintained. Edit this file directly — nothing generates it.
+//
+// One of the hand-kept layout files: layout-signal.kdl, layout-ink.kdl,
+// layout-paper.kdl, layout-flare.kdl. config.kdl includes `layout.kdl`, a symlink to the active
+// one. Picking a style (Mod+Shift+T → shell.sh set) only re-points that
+// symlink and reloads niri — no script ever writes config text (the
+// 2026-10-03 rule; the old per-mode renderer is in archive/mode-system/).
+//
+// Flare: Signal printed on daylight (2026-10-12). Signal's exact geometry —
+// change anything here and only Flare changes. Colours from Theme.qml's Flare palette.
+//
+// niri permits exactly ONE top-level layout block ("duplicate node layout"), so
+// each layout file holds the whole layout.
+
+layout {
+    gaps 6                          // inner gap BETWEEN windows
+    struts {
+        left 8
+        right 8
+        top 4                       // the bar's own exclusive zone sits on top of this
+        bottom 8
+    }
+    center-focused-column "never"   // columns stay put; never auto-recenter
+    // Widths cycled by Mod+R. This IS niri's "resize" idiom.
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+    default-column-width { proportion 0.5; }
+
+    border {
+        on
+        width 2                     // a hair heavier than the bar's 1px rules: windows are the subject
+        active-color "#b04a06"      // focused — ember, Flare's trace colour
+        inactive-color "#c6b48a"    // unfocused — surface1: surface0 vanishes against parchment windows
+    }
+    focus-ring { off; }
+}
+
+// ── Overview ──────────────────────────────────────────────────────────
+overview {
+    backdrop-color "#e2d4ad"     // crust
+}
+
+// ── Shape ─────────────────────────────────────────────────────────────
+// `window-rule` blocks are additive and the LAST one wins, so this overrides the
+// 2px floor in window-rules.kdl. That only holds because config.kdl includes
+// this file *after* it — reorder the includes and the radius silently stops
+// applying.
+window-rule {
+    geometry-corner-radius 0
+    clip-to-geometry true
+}

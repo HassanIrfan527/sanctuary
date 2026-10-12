@@ -49,7 +49,7 @@ need_qs() {
 
 # Variants: a second printing of an existing style, palette chosen inside
 # Theme.qml. `word:base` — the word is valid only if <Base>Bar.qml exists.
-VARIANTS=(paper:ink)
+VARIANTS=(paper:ink flare:signal)
 
 styles() {
   local f v

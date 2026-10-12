@@ -1,0 +1,194 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# ─────────────────────────────────────────────────────────────
+# Flare — Signal's prompt printed on daylight (2026-10-12). Identical layout
+# to signal.toml; only the palette differs (Theme.qml's Flare values). The
+# trace is ember here, so `green` → `trace` throughout.
+#
+#   ┌ DIR ~/D/pixiecode  GIT main !2 ?1 ──────────── PY 3.11 VENV .venv  T+ 4.2s
+#   └ ▸
+#
+# Same rules as the Quickshell strip (DESIGN-BRIEF §2, Theme.qml sig*):
+#   labels  overlay0, caps, dimmer than their values
+#   values  text
+#   rules   surface0 (the fill)
+#   colour  only for state — ember live/ok, ochre changed, crimson fault
+#   ┌ └     registration marks, ember
+# No clock (the bar already has one). Its slot holds two readouts that exist
+# only when they mean something: T+ (how long the last command ran, ≥2s)
+# and FAULT (its exit code). Empty states render nothing.
+#
+# ~/.config/starship.toml points here; shell.sh re-points it per desk style.
+# ─────────────────────────────────────────────────────────────
+
+format = """
+[┌](fg:trace) \
+$username\
+$directory\
+$git_branch\
+$git_status\
+$fill\
+$c\
+$elixir\
+$elm\
+$golang\
+$haskell\
+$java\
+$julia\
+$nodejs\
+$nim\
+$rust\
+$scala\
+$conda\
+$python\
+$jobs\
+$cmd_duration\
+$status
+[└](fg:trace) $character"""
+
+command_timeout = 1000
+palette = "flare"
+
+[palettes.flare]           # Flare parchment, names as in Theme.qml
+surface0 = '#d6c69c'
+surface2 = '#a8986f'
+overlay0 = '#857a62'
+subtext0 = '#5c5445'
+text = '#2b2838'
+lavender = '#3f56a6'
+trace = '#b04a06'
+yellow = '#8a6400'
+red = '#b0283c'
+
+# ── the rule between the left readouts and the right ones ──
+[fill]
+symbol = "─"
+style = "fg:surface0"
+
+# ── line 2: the input mark. Green when the last command was fine, red when not ──
+[character]
+success_symbol = "[▸](fg:trace)"
+error_symbol = "[▸](fg:red)"
+vimcmd_symbol = "[◂](fg:lavender)"
+
+# ── left: who / where / what changed ─────────────────────────
+[username]
+disabled = false
+show_always = false                    # hidden; appears only as root (red) or over SSH
+format = "[OP](fg:overlay0) [$user]($style)  "
+style_user = "fg:text"
+style_root = "fg:red"                 # root is a state worth colour
+
+[directory]
+format = "[DIR](fg:overlay0) [$path]($style)[$read_only]($read_only_style)  "
+style = "fg:text"
+read_only = " RO"
+read_only_style = "fg:red"
+truncation_length = 3
+truncation_symbol = "…/"
+fish_style_pwd_dir_length = 1          # ~/D/pixiecode, not ~/Development/pixiecode
+
+[git_branch]
+format = "[GIT](fg:overlay0) [$branch]($style) "
+style = "fg:text"
+
+[git_status]
+format = "([$all_status$ahead_behind]($style) )"
+style = "fg:subtext0"
+up_to_date = ""                         # clean + synced says nothing: silence is "all is well"
+conflicted = "[=$count ](fg:red)"
+deleted = "[✘$count ](fg:red)"
+modified = "[!$count ](fg:yellow)"
+untracked = "[?$count ](fg:yellow)"
+renamed = "[»$count ](fg:yellow)"
+staged = "[+$count ](fg:trace)"
+stashed = "[≡$count ](fg:overlay0)"
+ahead = "[⇡$count](fg:subtext0)"
+behind = "[⇣$count](fg:subtext0)"
+diverged = "[⇡$ahead_count⇣$behind_count](fg:yellow)"
+
+# ── right: the readouts that replace the clock ───────────────
+[jobs]
+format = "  [BG](fg:overlay0) [$number]($style)"
+style = "fg:text"
+number_threshold = 1
+symbol_threshold = 1
+
+[cmd_duration]
+min_time = 2000
+format = "  [T+](fg:overlay0) [$duration]($style)"
+style = "fg:text"
+
+[status]
+disabled = false
+format = "  [FAULT](fg:overlay0) [$status( $signal_name)]($style)"
+style = "fg:red"
+recognize_signal_code = true
+map_symbol = false
+pipestatus = false
+
+# ── right: toolchains. Each appears only inside a project that uses it ──
+# Label = what, value = version (major.minor — the patch is noise here).
+
+[python]
+format = "  [PY](fg:overlay0) [$version]($style)( [VENV](fg:overlay0) [$virtualenv](fg:trace))"
+version_format = "${major}.${minor}"
+style = "fg:text"
+
+[conda]
+format = "  [CONDA](fg:overlay0) [$environment](fg:trace)"
+ignore_base = true
+
+[nodejs]
+format = "  [NODE](fg:overlay0) [$version]($style)"
+version_format = "${major}.${minor}"
+style = "fg:text"
+
+[c]
+format = "  [C](fg:overlay0) [$version]($style)"
+version_format = "${major}.${minor}"
+style = "fg:text"
+
+[elixir]
+format = "  [EX](fg:overlay0) [$version]($style)"
+version_format = "${major}.${minor}"
+style = "fg:text"
+
+[elm]
+format = "  [ELM](fg:overlay0) [$version]($style)"
+version_format = "${major}.${minor}"
+style = "fg:text"
+
+[golang]
+format = "  [GO](fg:overlay0) [$version]($style)"
+version_format = "${major}.${minor}"
+style = "fg:text"
+
+[haskell]
+format = "  [HS](fg:overlay0) [$version]($style)"
+style = "fg:text"
+
+[java]
+format = "  [JAVA](fg:overlay0) [$version]($style)"
+version_format = "${major}"
+style = "fg:text"
+
+[julia]
+format = "  [JL](fg:overlay0) [$version]($style)"
+version_format = "${major}.${minor}"
+style = "fg:text"
+
+[nim]
+format = "  [NIM](fg:overlay0) [$version]($style)"
+version_format = "${major}.${minor}"
+style = "fg:text"
+
+[rust]
+format = "  [RS](fg:overlay0) [$version]($style)"
+version_format = "${major}.${minor}"
+style = "fg:text"
+
+[scala]
+format = "  [SCALA](fg:overlay0) [$version]($style)"
+version_format = "${major}.${minor}"
+style = "fg:text"

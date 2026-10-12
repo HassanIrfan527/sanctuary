@@ -271,7 +271,7 @@ PanelWindow {
         { do: "shot",    glyph: "⌗", name: "Screenshot",         desc: "Print",                                     keywords: ["screenshot", "capture", "grim"] },
         { do: "clip",    glyph: "⎘", name: "Clipboard",          desc: "history · Mod+V",                           keywords: ["clipboard", "paste", "copy", "history"] },
         { do: "wall",    glyph: "▤", name: "Wallpaper",          desc: "stills and live · Mod+Shift+W",             keywords: ["wallpaper", "background"] },
-        { do: "style",   glyph: "◐", name: "Style",              desc: "Signal · Ink · Paper · Mod+Shift+T",        keywords: ["theme", "style", "signal", "ink", "paper", "look"] },
+        { do: "style",   glyph: "◐", name: "Style",              desc: "Signal · Ink · Paper · Flare · Mod+Shift+T", keywords: ["theme", "style", "signal", "ink", "paper", "flare", "light", "look"] },
         { do: "notifs",  glyph: "☰", name: "Notifications",      desc: "the centre · Mod+Shift+D",                  keywords: ["notifications", "centre", "center"] },
         { do: "dnd",     glyph: "◌", name: "Do not disturb",     desc: "toggle · Mod+Alt+D",                        keywords: ["dnd", "quiet", "silence", "notifications"] },
         { do: "warmer",  glyph: "☾", name: "Night light warmer", desc: "less blue",                                 keywords: ["night", "light", "warm", "gamma", "blue"] },

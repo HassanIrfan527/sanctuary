@@ -6,37 +6,47 @@ import Quickshell
 //
 // THE ONE WORD: `SANCTUARY_QS`, exported by scripts/sanctuary/qs.sh from the
 // mode file's `BAR=` line. `BAR=ink` → Ink (dark manga), `BAR=paper` → Paper
-// (light manga), `BAR=signal` → Signal. Anything else falls back to Ink rather than
-// showing nothing.
+// (light manga), `BAR=signal` → Signal, `BAR=flare` → Flare (Signal in daylight).
+// Anything else falls back to Ink rather than showing nothing.
 Singleton {
     id: root
 
-    // The words: `ink`, `paper`, `signal`. Ink and Paper are the same manga
+    // The words: `ink`, `paper`, `signal`, `flare`. Ink and Paper are the same manga
     // style printed two ways — Ink is ONLY ever dark, Paper is the light one —
     // so both draw with the Ink*.qml files and differ only in the palette below.
+    // Signal and Flare are the same pair for the instrument panel: Flare draws
+    // with the Signal*.qml files on the parchment palette (2026-10-12).
     readonly property string word: String(Quickshell.env("SANCTUARY_QS") || "ink").toLowerCase()
-    readonly property string style: word === "signal" ? "signal" : "ink"
+    readonly property bool flare: word === "flare"
+    readonly property string style: word === "signal" || flare ? "signal" : "ink"
     readonly property bool light: word === "paper"
     readonly property bool ink: style === "ink"
     readonly property bool signal: style === "signal"
 
-    // ── Catppuccin Mocha (DESIGN-BRIEF §4) ────────────────────────────
-    readonly property color crust: "#11111b"
-    readonly property color mantle: "#181825"
-    readonly property color base: "#1e1e2e"
-    readonly property color surface0: "#313244"
-    readonly property color surface1: "#45475a"
-    readonly property color surface2: "#585b70"
-    readonly property color overlay0: "#6c7086"
-    readonly property color subtext0: "#a6adc8"
-    readonly property color text: "#cdd6f4"
-    readonly property color lavender: "#b4befe"
-    readonly property color mauve: "#cba6f7"
-    readonly property color peach: "#fab387"
-    readonly property color green: "#a6e3a1"
-    readonly property color teal: "#94e2d5"
-    readonly property color yellow: "#f9e2af"
-    readonly property color red: "#f38ba8"
+    // ── Catppuccin Mocha (DESIGN-BRIEF §4) — or Flare's parchment ─────
+    // Flare keeps the NAMES so every Signal file restyles untouched; the values
+    // are warm parchment that reads white but isn't (Kanagawa-lotus feel), deep
+    // indigo ink, and dark-enough accents (all >= 4:1 on mantle). The roles flip
+    // where the hue would fail on paper: the trace is ember, not green (`sigHot`),
+    // and peach — Signal's warm second voice — turns cool teal, so it still
+    // stands apart from the trace.
+    readonly property color crust: flare ? "#e2d4ad" : "#11111b"     // strip fill
+    readonly property color mantle: flare ? "#eadfc0" : "#181825"    // cells, cards
+    readonly property color base: flare ? "#f1e8cf" : "#1e1e2e"      // windows
+    readonly property color surface0: flare ? "#d6c69c" : "#313244"  // rules, selection
+    readonly property color surface1: flare ? "#c6b48a" : "#45475a"
+    readonly property color surface2: flare ? "#a8986f" : "#585b70"  // "off" / dim
+    readonly property color overlay0: flare ? "#857a62" : "#6c7086"  // labels
+    readonly property color subtext0: flare ? "#5c5445" : "#a6adc8"
+    readonly property color text: flare ? "#2b2838" : "#cdd6f4"      // ink
+    readonly property color lavender: flare ? "#3f56a6" : "#b4befe"  // indigo
+    readonly property color mauve: flare ? "#74489a" : "#cba6f7"     // violet
+    readonly property color peach: flare ? "#17706a" : "#fab387"     // teal (see above)
+    readonly property color green: flare ? "#3d7a2a" : "#a6e3a1"
+    readonly property color teal: flare ? "#17706a" : "#94e2d5"
+    readonly property color yellow: flare ? "#8a6400" : "#f9e2af"    // ochre
+    readonly property color red: flare ? "#b0283c" : "#f38ba8"       // crimson
+    readonly property color ember: "#b04a06"                         // Flare's trace
 
     // Left-pad to a fixed width so readouts never change size as numbers move.
     // (Hand-rolled: String.padStart is ES2017, newer than QML's JS baseline.)
@@ -89,7 +99,7 @@ Singleton {
     readonly property color sigRule: surface0
     readonly property color sigLabel: overlay0
     readonly property color sigValue: text
-    readonly property color sigHot: green         // the trace colour
+    readonly property color sigHot: flare ? ember : green   // the trace colour
     readonly property color sigWarn: yellow
     readonly property color sigAlarm: red
     readonly property int sigStripH: 35           // was 30; +5 on 2026-10-03, Harry's call

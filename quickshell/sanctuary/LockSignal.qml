@@ -117,11 +117,11 @@ Item {
     // Scan lines: every third pixel, barely there. Drawn once.
     Canvas {
         anchors.fill: parent
-        opacity: 0.35
+        opacity: Theme.flare ? 0.10 : 0.35     // black lines on parchment read as dirt; keep them a whisper
         onPaint: {
             const c = getContext("2d");
             c.reset();
-            c.fillStyle = "#000000";
+            c.fillStyle = Theme.flare ? "#5c5445" : "#000000";
             for (let y = 0; y < height; y += 3)
                 c.fillRect(0, y, width, 1);
         }
@@ -380,7 +380,7 @@ Item {
                 x: keyWrap.shake
                 width: parent.width
                 height: parent.height
-                color: Qt.rgba(0.07, 0.07, 0.11, 0.92)
+                color: Qt.rgba(Theme.crust.r, Theme.crust.g, Theme.crust.b, 0.92)   // was literal #12121c ≈ crust
                 border.width: 1
                 border.color: face.phase === "denied" ? Theme.sigAlarm
                             : face.phase === "idle" ? Theme.sigRule : Qt.darker(face.state, 1.6)
@@ -421,10 +421,10 @@ Item {
                                                            && Math.abs(index - sweep.pos) < 1.5
                             width: 11
                             height: 18
-                            color: face.phase === "denied" ? Qt.rgba(0.95, 0.55, 0.66, 0.22)
+                            color: face.phase === "denied" ? Qt.rgba(Theme.sigAlarm.r, Theme.sigAlarm.g, Theme.sigAlarm.b, 0.22)
                                  : face.phase === "granted" ? Theme.sigHot
                                  : runner ? Theme.sigWarn
-                                 : face.phase === "verify" ? Qt.rgba(0.98, 0.89, 0.69, 0.18)
+                                 : face.phase === "verify" ? Qt.rgba(Theme.sigWarn.r, Theme.sigWarn.g, Theme.sigWarn.b, 0.18)
                                  : filled ? Theme.sigHot : Theme.surface0
                             Behavior on color { ColorAnimation { duration: 90 } }
                         }

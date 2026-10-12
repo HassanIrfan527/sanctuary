@@ -258,7 +258,8 @@ PanelWindow {
                     anchors.verticalCenter: parent.verticalCenter
                     width: lampText.implicitWidth + 16
                     height: Theme.sigStripH - 12
-                    color: lampArea.containsMouse ? "#3a1f2a" : "#2a1720"
+                    color: Theme.flare ? (lampArea.containsMouse ? "#ecc6bd" : "#f2d6cc")      // a red-tinted cell on paper
+                                       : (lampArea.containsMouse ? "#3a1f2a" : "#2a1720")
                     border.width: 1
                     border.color: Theme.sigAlarm
                     Text {
