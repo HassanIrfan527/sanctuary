@@ -1,11 +1,31 @@
 pragma Singleton
 import QtQuick
 import Quickshell
+import Quickshell.Io
 
 // Shell-wide UI state. Flipped by the IPC handlers in shell.qml (keybinds) and
 // by clicks on the bar.
 Singleton {
     property bool barShown: true    // Mod+Shift+A
+    // Signal bar, compact: a centred strip with WS · clock · status only (no
+    // CPU/MEM, no ◉, no window title). DESK "Compact / extend bar". Remembered
+    // in ~/.local/state/sanctuary/bar.json so it survives a restart.
+    property bool barCompact: false
+    function setBarCompact(on) {
+        barCompact = on;
+        barFile.setText(JSON.stringify({ compact: on }));
+    }
+    FileView {
+        id: barFile
+        path: Quickshell.env("HOME") + "/.local/state/sanctuary/bar.json"
+        blockLoading: true
+        printErrors: false
+        onLoaded: {
+            try {
+                barCompact = JSON.parse(barFile.text()).compact === true;
+            } catch (e) {}
+        }
+    }
     property bool centreOpen: false // Mod+Shift+D
     property bool pickerOpen: false // Mod+Shift+T
     property bool launcherOpen: false // Mod+Space

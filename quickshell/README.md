@@ -116,6 +116,7 @@ survives it (`keepOnReload`).
 | `Mod+/` | KEYS cheat sheet — type to filter (non-matches dim) · `backspace` · `esc` close (in fallback: niri's overlay) |
 | `Mod+C` | COMMS (Discord voice) — `m` Discord mute · `d` deafen · `x` leave · `f` Vesktop · `j`/`k` move · `esc` close. `Mod+M` stays the system mic. |
 | `Mod+Shift+A` | hide / show the bar |
+| DESK "Compact / extend bar" | Signal bar as a centred strip: WS · clock · status (no CPU/MEM, ◉ or window title). Clock stays dead-centre; remembered in `~/.local/state/sanctuary/bar.json`. IPC: `bar compact`. |
 | `Mod+Shift+D` | notification centre — inside it: `c` clear all · `d` DND · `esc` close |
 | `Mod+Ctrl+D` | clear all notifications |
 | `Mod+Alt+D` | DND toggle |
@@ -195,7 +196,7 @@ Last resort: Ctrl+Alt+F3, log in, `WAYLAND_DISPLAY=wayland-1 swaylock`.
   `*` PINNED (pinned apps, then pinned files) ·
   `=` CALC (numbers, `+ - * / % ^ ( )`, `sqrt sin cos tan log ln abs round floor ceil
   min max pow exp pi e` — nothing else reaches the evaluator; `enter` copies) ·
-  `:` DESK (audio, recorders, wallpaper, style, power, lock, DND, night light, keybinds…) ·
+  `:` DESK (audio, recorders, wallpaper, style, power, lock, DND, night light, keybinds, compact bar…) ·
   `?` WEB (DuckDuckGo / YouTube / GitHub / Wikipedia, or a URL).
   To add a desk action: one row in `desk` + one line in `doDesk()` in `Launcher.qml`.
 - **Pins** (`*` PINNED — 2026-10-06: `>` RUN removed, `/` FILES folded in here): pinned

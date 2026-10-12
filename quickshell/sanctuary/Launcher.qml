@@ -279,6 +279,7 @@ PanelWindow {
         { do: "nlreset", glyph: "○", name: "Night light off",    desc: "back to 6500K",                             keywords: ["night", "light", "reset", "off", "gamma"] },
         { do: "bt",      glyph: "󰂯", name: "Bluetooth",          desc: "toggle",                                    keywords: ["bluetooth", "bt", "headphones", "earbuds", "pair", "wireless"] },
         { do: "bar",     glyph: "▔", name: "Hide / show bar",    desc: "Mod+Shift+A",                               keywords: ["bar", "panel", "hide", "show"] },
+        { do: "compact", glyph: "↔", name: "Compact / extend bar", desc: "Signal — centred: WS · clock · status, no CPU/MEM/title", keywords: ["bar", "panel", "compact", "extend", "expand", "small", "mini", "centre", "center", "wide", "full"] },
         { do: "keys",    glyph: "⌨", name: "Keybinds",           desc: "KEYS cheat sheet · Mod+/",                    keywords: ["keys", "keybinds", "shortcuts", "hotkeys", "help"] },
         { do: "power",   glyph: "⏻", name: "Power menu",         desc: "Mod+Shift+Escape",                          keywords: ["power", "shutdown", "reboot", "logout"] },
         { do: "lock",    glyph: "⊘", name: "Lock",               desc: "Mod+Escape",                                keywords: ["lock", "away"] },
@@ -504,6 +505,7 @@ PanelWindow {
         else if (v === "nlreset") sh([scripts + "/nightlight.sh", "reset"]);
         else if (v === "bt") { if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = !Bluetooth.defaultAdapter.enabled; }
         else if (v === "bar") Ui.barShown = !Ui.barShown;
+        else if (v === "compact") Ui.setBarCompact(!Ui.barCompact);
         else if (v === "keys") Ui.keysOpen = true;
         else if (v === "power") Ui.powerOpen = true;
         else if (v === "lock") sh(["loginctl", "lock-session"]);

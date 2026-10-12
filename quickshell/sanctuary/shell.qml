@@ -255,5 +255,6 @@ ShellRoot {
         function toggle(): void { Ui.barShown = !Ui.barShown; }
         function show(): void { Ui.barShown = true; }
         function hide(): void { Ui.barShown = false; }
+        function compact(): void { Ui.setBarCompact(!Ui.barCompact); }
     }
 }

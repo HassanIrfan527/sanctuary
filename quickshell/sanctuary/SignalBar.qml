@@ -29,6 +29,18 @@ PanelWindow {
 
     readonly property string output: modelData ? modelData.name : ""
 
+    // Compact (Ui.barCompact, DESK "Compact / extend bar"): no CPU/MEM, no
+    // idle ◉ (the live SCR/AUD cells still show), no window title, and the
+    // strip shrinks to a centred block instead of running edge to edge. The
+    // clock stays dead-centre: the strip is as wide as its wider half needs,
+    // mirrored, so the narrow WS side gets some air rather than the clock
+    // sliding off-centre whenever music, VC or MSG come and go.
+    readonly property bool compact: Ui.barCompact
+    readonly property int gap: 14   // clock ↔ its neighbours
+    readonly property real half: Math.max(
+        left.width + alertRow.width + gap * 2 + clockRow.width / 2,
+        clockRow.width / 2 + gap + right.width)
+
     // Threshold colouring, shared by the three meters.
     function level(v) {
         return v >= 0.85 ? Theme.sigAlarm : v >= 0.65 ? Theme.sigWarn : Theme.sigHot;
@@ -41,9 +53,9 @@ PanelWindow {
 
     Rectangle {
         id: strip
-        x: 8
+        x: bar.compact ? Math.round((parent.width - width) / 2) : 8
         y: 6
-        width: parent.width - 16
+        width: bar.compact ? Math.min(parent.width - 16, Math.ceil(bar.half * 2)) : parent.width - 16
         height: Theme.sigStripH
         color: Theme.sigFill
         border.width: 1
@@ -71,7 +83,7 @@ PanelWindow {
                 height: parent.height
 
                 SignalCell {
-                    visible: !Rec.any
+                    visible: !Rec.any && !bar.compact
                     interactive: true
                     onClicked: Ui.rigOpen = !Ui.rigOpen
                     Text {
@@ -170,7 +182,7 @@ PanelWindow {
 
             SignalCell {
                 label: "WIN"
-                visible: Niri.focusedWindow !== null
+                visible: Niri.focusedWindow !== null && !bar.compact
                 rule: false
                 Text {
                     // Yields to the alert row: never closer than 24px to it.
@@ -230,7 +242,7 @@ PanelWindow {
         Row {
             id: alertRow
             anchors.right: clockRow.left
-            anchors.rightMargin: 14
+            anchors.rightMargin: bar.gap
             height: parent.height
             layoutDirection: Qt.RightToLeft
             spacing: 6
@@ -293,6 +305,7 @@ PanelWindow {
 
         // ── right ────────────────────────────────────────────────────
         Row {
+            id: right
             anchors.right: parent.right
             height: parent.height
 
@@ -325,6 +338,7 @@ PanelWindow {
             // Right-click CPU or MEM: btop, floating (again to close it).
             SignalCell {
                 label: "CPU"
+                visible: !bar.compact
                 interactive: true
                 onClicked: mouse => { if (mouse.button === Qt.RightButton) Sys.btop(); }
                 Text {
@@ -343,6 +357,7 @@ PanelWindow {
 
             SignalCell {
                 label: "MEM"
+                visible: !bar.compact
                 interactive: true
                 onClicked: mouse => { if (mouse.button === Qt.RightButton) Sys.btop(); }
                 Text {
