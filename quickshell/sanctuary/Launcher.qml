@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Bluetooth
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
@@ -276,6 +277,7 @@ PanelWindow {
         { do: "warmer",  glyph: "☾", name: "Night light warmer", desc: "less blue",                                 keywords: ["night", "light", "warm", "gamma", "blue"] },
         { do: "cooler",  glyph: "☼", name: "Night light cooler", desc: "more blue",                                 keywords: ["night", "light", "cool", "gamma"] },
         { do: "nlreset", glyph: "○", name: "Night light off",    desc: "back to 6500K",                             keywords: ["night", "light", "reset", "off", "gamma"] },
+        { do: "bt",      glyph: "󰂯", name: "Bluetooth",          desc: "toggle",                                    keywords: ["bluetooth", "bt", "headphones", "earbuds", "pair", "wireless"] },
         { do: "bar",     glyph: "▔", name: "Hide / show bar",    desc: "Mod+Shift+A",                               keywords: ["bar", "panel", "hide", "show"] },
         { do: "keys",    glyph: "⌨", name: "Keybinds",           desc: "KEYS cheat sheet · Mod+/",                    keywords: ["keys", "keybinds", "shortcuts", "hotkeys", "help"] },
         { do: "power",   glyph: "⏻", name: "Power menu",         desc: "Mod+Shift+Escape",                          keywords: ["power", "shutdown", "reboot", "logout"] },
@@ -330,8 +332,16 @@ PanelWindow {
     function pinnedAppRow(a) {
         return Object.assign(appRow(a), { tag: "PIN", pinned: true });
     }
+    // Bluetooth's sub line is live: ON/OFF, and what's connected.
+    function btStatus() {
+        const a = Bluetooth.defaultAdapter;
+        if (!a) return "no adapter";
+        if (!a.enabled) return "OFF — enter to turn on";
+        const on = Bluetooth.devices.values.filter(d => d.connected).map(d => d.name);
+        return "ON" + (on.length ? " · " + on.join(", ") : "") + " — enter to turn off";
+    }
     function deskRow(d) {
-        return { kind: "desk", title: d.name, sub: d.desc, tag: "DESK", act: d.do, icon: "", glyph: d.glyph };
+        return { kind: "desk", title: d.name, sub: d.do === "bt" ? btStatus() : d.desc, tag: "DESK", act: d.do, icon: "", glyph: d.glyph };
     }
     // A file or folder. `where` is its folder, with ~ for home.
     function fileRow(f) {
@@ -492,6 +502,7 @@ PanelWindow {
         else if (v === "warmer") sh([scripts + "/nightlight.sh", "warmer"]);
         else if (v === "cooler") sh([scripts + "/nightlight.sh", "cooler"]);
         else if (v === "nlreset") sh([scripts + "/nightlight.sh", "reset"]);
+        else if (v === "bt") { if (Bluetooth.defaultAdapter) Bluetooth.defaultAdapter.enabled = !Bluetooth.defaultAdapter.enabled; }
         else if (v === "bar") Ui.barShown = !Ui.barShown;
         else if (v === "keys") Ui.keysOpen = true;
         else if (v === "power") Ui.powerOpen = true;

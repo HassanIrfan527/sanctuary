@@ -1,0 +1,5 @@
+[Desktop Entry]
+# Masks /etc/xdg/autostart/blueman.desktop — not wanted at login (sanctuary).
+Type=Application
+Name=blueman
+Hidden=true

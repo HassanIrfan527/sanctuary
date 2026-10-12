@@ -39,6 +39,7 @@ LINKS=(
   "yazi/yazi             : ~/.config/yazi"
   "niri/niri             : ~/.config/niri"
   "quickshell            : ~/.config/quickshell"   # QS modes; lets `qs -c sanctuary` find it
+  "autostart/autostart   : ~/.config/autostart"    # Hidden=true masks for /etc/xdg/autostart (blueman, kdeconnect)
 
   # ── single-file links (config dir stays real, one file is linked) ──
   "opencode/opencode.jsonc            : ~/.config/opencode/opencode.jsonc"

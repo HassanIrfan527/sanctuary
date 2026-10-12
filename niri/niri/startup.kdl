@@ -13,6 +13,9 @@ spawn-at-startup "/home/dweller/.dotfiles/scripts/sanctuary/idle.sh"
 
 spawn-sh-at-startup "bash /home/$USER/.dotfiles/scripts/keysounds.sh toggle"
 
+// Bluetooth starts OFF every login. Turn it on from the launcher: :DESK → Bluetooth.
+spawn-at-startup "bluetoothctl" "power" "off"
+
 // Clipboard history. Nothing stores history on its own: this watcher feeds
 // every copy into cliphist, which Mod+V (scripts/sanctuary/clipboard.sh) reads.
 // On NixOS this came from the system config and was lost in the Fedora move.

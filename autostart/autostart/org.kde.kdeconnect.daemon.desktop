@@ -1,0 +1,5 @@
+[Desktop Entry]
+# Masks /etc/xdg/autostart/org.kde.kdeconnect.daemon.desktop — not wanted at login (sanctuary).
+Type=Application
+Name=org.kde.kdeconnect.daemon
+Hidden=true
