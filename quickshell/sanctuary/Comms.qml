@@ -36,9 +36,9 @@ Singleton {
 
     // Vesktop's window; started if it isn't running.
     function focus() {
-        for (const id in Niri.windows) {
-            if (Niri.windows[id].app_id === "vesktop") {
-                Quickshell.execDetached(["niri", "msg", "action", "focus-window", "--id", String(id)]);
+        for (const id in Wm.windows) {
+            if (Wm.windows[id].app_id === "vesktop") {
+                Wm.focusWindow(id);
                 return;
             }
         }

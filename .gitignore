@@ -25,3 +25,4 @@ swaync/swaync/style.css
 # each Mod+Shift+T. install.sh seeds it (-> layout-signal.kdl) on a fresh clone,
 # where config.kdl's include would otherwise dangle.
 niri/niri/layout.kdl
+mango/mango/look.conf

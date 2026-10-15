@@ -40,7 +40,7 @@ start() {
     # No -p here: auto-pause would cut the audio every time a window covers
     # the wallpaper. One output only, or every monitor plays its own copy.
     local out
-    out=$(niri msg -j focused-output 2>/dev/null | sed -n 's/.*"name":"\([^"]*\)".*/\1/p')
+    out=$("$HOME/.dotfiles/scripts/sanctuary/wm.sh" focused-output 2>/dev/null)
     setsid -f mpvpaper -o "$MPV_OPTS volume=${LIVEWALL_VOLUME:-100}" "${out:-*}" "$vid" >/dev/null 2>&1
   else
     # -p: pause when the wallpaper is fully covered, so it costs nothing then.

@@ -1,0 +1,514 @@
+/* ==UserStyle==
+@name           VULMS — Signal
+@namespace      sanctuary.dweller
+@version        0.1.0
+@description    VU's LMS as a Signal instrument panel: one flat dark, hairline islands, DM Mono, colour spent on state only.
+@author         Harry
+==/UserStyle== */
+
+/*
+ * Signal, from ~/.dotfiles/DESIGN-BRIEF.md and vesktop/signal24.theme.css:
+ *   structure   islands drawn by 1px hairlines, registration marks at the corners
+ *   shape       square (0–2px)
+ *   type        monospace only — DM Mono, light; labels small caps, dimmer than values
+ *   colour      green = live / selected / open · lavender = what you touch
+ *               peach = new · yellow = waiting · red = needs you · everything else grey
+ *   motion      160ms ease-out, nothing bounces
+ *
+ * VULMS runs /js/security-protection.js, which blanks the page if a <style> mentions an
+ * extension URL. So: no extension:// assets anywhere in this file, fonts are local().
+ * Turn Dark Reader OFF for vulms.vu.edu.pk — it fights this and trips that script.
+ *
+ * Built from a read of the live DOM on 2026-10-12 (Metronic 5 skin, ASP.NET WebForms).
+ * Pages seen: Home, CourseHome, To Do Calendar, Lecture Schedule, Grade Book,
+ * My Study Scheme, Progress, Notes, Login. Anything else falls back to the generic rules.
+ */
+
+@-moz-document domain("vulms.vu.edu.pk") {
+
+:root {
+    --crust: #11111b;
+    --mantle: #181825;
+    --base: #1e1e2e;
+    --surface0: #313244;
+    --surface1: #45475a;
+    --surface2: #585b70;
+    --overlay0: #6c7086;
+    --overlay1: #7f849c;
+    --subtext0: #a6adc8;
+    --subtext1: #bac2de;
+    --text: #cdd6f4;
+    --lavender: #b4befe;
+    --blue: #89b4fa;
+    --mauve: #cba6f7;
+    --peach: #fab387;
+    --green: #a6e3a1;
+    --yellow: #f9e2af;
+    --red: #f38ba8;
+
+    --tick: var(--surface1);
+    --tick-hot: var(--lavender);
+    --tick-len: 7px;
+    --dur: 160ms;
+    --font: 'DM Mono', 'JetBrainsMono Nerd Font', ui-monospace, monospace;
+
+    color-scheme: dark;
+}
+
+/* ── type: monospace, everywhere ─────────────────────────────────────── */
+html, body, body *:not(i):not([class*="flaticon"]):not([class*="la-"]):not([class*="fa-"]):not([class*="fa "]) {
+    font-family: var(--font) !important;
+    letter-spacing: -0.02ch;
+}
+body {
+    font-weight: 300 !important;
+    font-size: 13px;
+    background: var(--crust) !important;
+    color: var(--subtext1) !important;
+}
+b, strong, h1, h2, h3, h4, h5, h6 { font-weight: 500 !important; }
+h1, h2, h3, h4, h5, h6 { color: var(--text) !important; }
+a { color: var(--blue); transition: color var(--dur) ease-out; }
+a:hover { color: var(--lavender) !important; text-decoration: none; }
+::selection { background: var(--surface1); color: var(--text); }
+input, textarea { caret-color: var(--lavender); }
+
+/* hairline scrollbars, like the desk */
+* { scrollbar-width: thin; scrollbar-color: var(--surface1) transparent; }
+
+/* square, flat: no radius, no drop shadows anywhere */
+body * { border-radius: 0 !important; box-shadow: none !important; text-shadow: none !important; }
+
+/* ── page shell ──────────────────────────────────────────────────────── */
+.m-page, .m-body, .m-grid--root, .m-wrapper, .m-content, .m-grid__item--fluid,
+.m-container, .m-stack {
+    background: var(--crust) !important;
+}
+
+/* header → the HUD strip: one hairline row, readouts not logos */
+.m-header, .m-header .m-container, .m-header .m-stack, .m-brand, .m-header-head, .m-topbar {
+    background: var(--crust) !important;
+}
+.m-header {
+    border-bottom: 1px solid var(--surface0) !important;
+}
+.m-header .m-brand__logo img,
+.m-header .m-header-head img:not(.m--img-rounded):not([class*="userpic"] img) {
+    filter: grayscale(1) brightness(0.9) contrast(0.9);
+    opacity: 0.55;
+    transition: opacity var(--dur) ease-out, filter var(--dur) ease-out;
+}
+.m-header .m-brand__logo:hover img { opacity: 1; filter: none; }
+.m-header, .m-header * { color: var(--subtext0) !important; }
+.m-topbar .m-topbar__username, .m-topbar .m-card-user__name {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 11px !important;
+    font-variant-numeric: tabular-nums;
+}
+/* "Learning Management System" title → a dim station label */
+.m-header h3, .m-header .m-header__title, .m-header .m-subheader__title {
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--overlay0) !important;
+}
+/* profile dropdown */
+.m-dropdown__wrapper, .m-dropdown__inner, .m-dropdown__header, .m-dropdown__body,
+.m-dropdown__content, .dropdown-menu {
+    background: var(--mantle) !important;
+    background-image: none !important;
+    border: 1px solid var(--surface0) !important;
+}
+.m-dropdown__arrow { display: none !important; }
+
+/* ── sidebar: the launcher's list ────────────────────────────────────── */
+.m-aside-left, .m-aside-left--skin-dark, .m-aside-menu, .m-aside-menu--skin-dark,
+.m-aside-left .mCustomScrollBox, .m-aside-left .mCSB_container {
+    background: var(--crust) !important;
+}
+.m-aside-left { border-right: 1px solid var(--surface0) !important; }
+.m-aside-menu .m-menu__item > .m-menu__link {
+    background: transparent !important;
+    padding-top: 7px !important;
+    padding-bottom: 7px !important;
+    transition: background-color var(--dur) ease-out;
+}
+.m-aside-menu .m-menu__link-text,
+.m-aside-left a, .m-aside-left span {
+    color: var(--subtext0) !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.04em;
+}
+.m-aside-menu .m-menu__link-icon, .m-aside-left i {
+    color: var(--overlay0) !important;
+    font-size: 15px !important;
+}
+.m-aside-menu .m-menu__item:hover > .m-menu__link {
+    background: var(--mantle) !important;
+}
+.m-aside-menu .m-menu__item:hover > .m-menu__link :is(.m-menu__link-text, .m-menu__link-icon) {
+    color: var(--lavender) !important;
+}
+/* selected = the launcher's cursor row: a 2px green bar and a cell wash */
+.m-aside-menu .m-menu__item--active > .m-menu__link,
+.m-aside-menu .m-menu__item--here > .m-menu__link,
+.m-aside-left a.active, .m-aside-left .active > a {
+    background: var(--mantle) !important;
+    box-shadow: inset 2px 0 0 var(--green) !important;
+}
+.m-aside-menu .m-menu__item--active > .m-menu__link :is(.m-menu__link-text, .m-menu__link-icon) {
+    color: var(--text) !important;
+}
+/* footer "Virtual University Of Pakistan / Federal Government University" */
+.m-aside-left > :last-child, .m-aside-left [class*="footer"] {
+    color: var(--overlay0) !important;
+}
+.m-aside-left [style*="color"], .m-aside-left .m--font-success, .m-aside-left .text-success {
+    color: var(--overlay0) !important;
+}
+
+/* ── subheader: page title as a section label ────────────────────────── */
+.m-subheader { padding-top: 22px !important; }
+.m-subheader .m-subheader__title, .m-content > h3, .m-content > h4 {
+    font-size: 13px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text) !important;
+}
+.m-subheader .m-subheader__title a, .m-subheader a { color: var(--green) !important; }
+
+/* ── islands: every portlet / card is a hairline box with marks ──────── */
+.m-portlet, .card, .panel, .m-widget, .tab-content, .well, .modal-content {
+    background-color: var(--mantle) !important;
+    border: 1px solid var(--surface0) !important;
+    color: var(--subtext1) !important;
+    transition: border-color var(--dur) ease-out;
+}
+.m-portlet, .card {
+    --t: var(--tick);
+    background-image:
+        linear-gradient(var(--t), var(--t)), linear-gradient(var(--t), var(--t)),
+        linear-gradient(var(--t), var(--t)), linear-gradient(var(--t), var(--t)),
+        linear-gradient(var(--t), var(--t)), linear-gradient(var(--t), var(--t)),
+        linear-gradient(var(--t), var(--t)), linear-gradient(var(--t), var(--t)) !important;
+    background-size:
+        var(--tick-len) 1px, 1px var(--tick-len),
+        var(--tick-len) 1px, 1px var(--tick-len),
+        var(--tick-len) 1px, 1px var(--tick-len),
+        var(--tick-len) 1px, 1px var(--tick-len) !important;
+    background-position:
+        left top, left top, right top, right top,
+        left bottom, left bottom, right bottom, right bottom !important;
+    background-repeat: no-repeat !important;
+}
+.m-portlet:hover, .card:hover {
+    --t: var(--tick-hot);
+    border-color: color-mix(in srgb, var(--lavender) 35%, var(--surface0)) !important;
+}
+
+/* portlet heads: no purple gradients — the title is a readout */
+.m-portlet__head, .card-header, .m-portlet .m-portlet__head-caption,
+.m-portlet__head[style], [class*="portlet__head"] {
+    background: transparent !important;
+    background-image: none !important;
+    border-bottom: 1px solid var(--surface0) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding-top: 12px !important;
+    padding-bottom: 10px !important;
+}
+.m-portlet__head *, .card-header * {
+    color: var(--subtext0) !important;
+}
+.m-portlet__head-text, .m-portlet__head h3, .m-portlet__head h4, .card-header h3, .card-header h4,
+.m-portlet__head a {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.06em;
+    color: var(--text) !important;
+}
+.m-portlet__body, .card-body { background: transparent !important; }
+
+/* ── Home: course cards ──────────────────────────────────────────────── */
+/* course code + title */
+[id^="MainContent_gvCourseList_ibtnCourseHome"] { color: var(--text) !important; }
+a[id^="MainContent_gvCourseList_ibtnCourseHome"]:hover,
+a[id^="MainContent_gvCourseList_ibtnCourseHome"]:hover * { color: var(--lavender) !important; }
+/* instructor photo: quiet until you touch the card */
+.m-portlet img:not([src*="icon"]):not([type="image"]) {
+    filter: grayscale(0.85) brightness(0.8);
+    transition: filter var(--dur) ease-out;
+}
+.m-portlet:hover img:not([src*="icon"]):not([type="image"]) { filter: none; }
+/* course-site tools (Assignments · GDB · Quiz · Activity · Announcements): dark icons → light glyphs */
+input[type="image"], .m-nav__link img, .m-portlet__foot img {
+    filter: grayscale(1) invert(0.82);
+    transition: filter var(--dur) ease-out;
+}
+input[type="image"]:hover, .m-nav__link:hover img {
+    filter: grayscale(1) invert(0.86) sepia(0.4) hue-rotate(190deg) saturate(3);
+}
+[id*="_lblAssignment_"], [id*="_lblGDB_"], [id*="_lblQuiz_"], [id*="_lblActivity_"],
+[id*="_lblAnnouncement_"], [id*="_lblTDB_"] {
+    font-size: 10px !important;
+    font-weight: 500 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--overlay1) !important;
+}
+/* locked = not there yet. Empty states say nothing loud. */
+.aspNetDisabled, .aspNetDisabled * {
+    opacity: 0.35 !important;
+    filter: grayscale(1) invert(0.6) !important;
+    cursor: default !important;
+}
+a.aspNetDisabled[id*="ibtnCourseHome"], a.aspNetDisabled[id*="ibtnCourseHome"] * {
+    filter: none !important;
+    color: var(--overlay0) !important;
+    opacity: 1 !important;
+}
+/* current lesson no. → a green readout */
+[id*="lblCurrentLessonNo"] {
+    font-variant-numeric: tabular-nums;
+    color: var(--green) !important;
+    font-weight: 500 !important;
+}
+[id*="lbtnCurrentLesson"] {
+    border: 1px solid var(--green) !important;
+    background: transparent !important;
+    color: var(--green) !important;
+}
+/* badges: [n] in peach — something new */
+.m-badge, .badge {
+    background: transparent !important;
+    color: var(--peach) !important;
+    border: 1px solid var(--peach) !important;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500 !important;
+    min-width: 0 !important;
+    padding: 0 4px !important;
+    line-height: 15px !important;
+    height: auto !important;
+}
+.m-badge--danger, .badge-danger { color: var(--red) !important; border-color: var(--red) !important; }
+
+/* alert strip ("course selection is opened…") → a log entry with a yellow urgency stripe */
+#MainContent_divShowAlerts, .m-alert, .alert {
+    background: var(--mantle) !important;
+    background-image: none !important;
+    border: 1px solid var(--surface0) !important;
+    box-shadow: inset 2px 0 0 var(--yellow) !important;
+    color: var(--subtext1) !important;
+}
+#MainContent_divShowAlerts *, .m-alert *, .alert * { color: var(--subtext1) !important; }
+#MainContent_divShowAlerts a, .m-alert a, .alert a { color: var(--yellow) !important; }
+.m-alert__icon, .m-alert__icon * { color: var(--yellow) !important; background: transparent !important; }
+.m-alert__icon::after { display: none !important; }
+
+/* ── tabs (Grade Book, Progress, course site) ────────────────────────── */
+.nav-tabs, .m-tabs-line, .nav.nav-pills {
+    border-bottom: 1px solid var(--surface0) !important;
+    background: transparent !important;
+}
+.nav-tabs .nav-link, .nav-pills .nav-link, .m-tabs__link, .nav-tabs > li > a {
+    background: transparent !important;
+    border: 0 !important;
+    color: var(--subtext0) !important;
+    font-size: 12px !important;
+    letter-spacing: 0.04em;
+    transition: color var(--dur) ease-out;
+}
+.nav-tabs .nav-link:hover, .nav-pills .nav-link:hover, .m-tabs__link:hover { color: var(--lavender) !important; }
+.nav-tabs .nav-link.active, .nav-pills .nav-link.active, .m-tabs__link.active,
+.nav-tabs > li.active > a, .nav-pills .show > .nav-link {
+    background: var(--mantle) !important;
+    color: var(--text) !important;
+    box-shadow: inset 0 -2px 0 var(--green) !important;
+}
+.nav-tabs .nav-link i, .nav-pills .nav-link i { color: var(--overlay0) !important; }
+
+/* ── tables: lesson index, study scheme, schedule, grade book ─────────── */
+table, .table {
+    background: transparent !important;
+    color: var(--subtext1) !important;
+    border-color: var(--surface0) !important;
+    font-variant-numeric: tabular-nums;
+}
+table th, .table thead th, table thead td, .table-bordered thead th,
+tr[style*="background"]:first-child, .GridHeader, .gridHeader {
+    background: var(--crust) !important;
+    background-image: none !important;
+    color: var(--overlay0) !important;
+    font-size: 10px !important;
+    font-weight: 500 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    border-color: var(--surface0) !important;
+}
+table td, .table td {
+    background-color: transparent;
+    border-color: var(--surface0) !important;
+    color: var(--subtext1);
+}
+.table-striped tbody tr:nth-of-type(odd), tr.alt, tr.AlternatingRow { background: var(--base) !important; }
+table tr:hover > td { background-color: rgb(205 214 244 / 0.03); }
+/* section rows like "Semester No 1" */
+table td[colspan], table tr td:only-child { color: var(--lavender) !important; font-weight: 500 !important; }
+
+/* Lecture Schedule cells: Regular (gold) / Repeat (blue) → outlined cells, colour by state */
+table td [style*="241, 185, 67"], table td [style*="#F1B943" i], table td[style*="241, 185, 67"],
+table td [style*="rgb(241,185,67)"] {
+    background: var(--base) !important;
+    border: 1px solid var(--surface1) !important;
+    box-shadow: inset 2px 0 0 var(--lavender) !important;
+}
+table td [style*="61, 161, 237"], table td[style*="61, 161, 237"], table td [style*="#3DA1ED" i] {
+    background: var(--base) !important;
+    border: 1px solid var(--surface1) !important;
+    box-shadow: inset 2px 0 0 var(--blue) !important;
+}
+table td [style*="241, 185, 67"] *, table td [style*="61, 161, 237"] * { color: var(--text) !important; }
+
+/* ── state text: Metronic's font colour helpers, re-spent on state ───── */
+.m--font-success, .text-success, .m--font-accent { color: var(--green) !important; }   /* Open, live */
+.m--font-warning, .text-warning { color: var(--yellow) !important; }                     /* waiting */
+.m--font-info, .text-info, .m--font-primary, .text-primary, .m--font-brand { color: var(--blue) !important; }
+.m--font-danger, .text-danger { color: var(--overlay0) !important; }   /* "Closed" / "No Record Found" — not an alarm */
+.m--font-metal, .text-muted, .m--font-light, small { color: var(--overlay0) !important; }
+.m--font-bold, .m--font-boldest { color: var(--text) !important; }
+/* lesson rows: the time readout */
+.la-clock-o, .fa-clock-o, [class*="clock"] + span { color: var(--overlay0) !important; }
+
+/* ── forms + buttons ─────────────────────────────────────────────────── */
+.form-control, input[type="text"], input[type="password"], input[type="email"], input[type="number"],
+input[type="search"], select, textarea, .m-input, .chosen-container .chosen-single, .chosen-container .chosen-choices {
+    background: var(--crust) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--surface0) !important;
+    transition: border-color var(--dur) ease-out;
+}
+.form-control:focus, input:focus, select:focus, textarea:focus, .m-input:focus {
+    border-color: var(--lavender) !important;
+    outline: none !important;
+}
+::placeholder { color: var(--overlay0) !important; opacity: 1; }
+.chosen-container .chosen-drop, .chosen-results { background: var(--mantle) !important; color: var(--subtext1) !important; }
+.chosen-container .chosen-results li.highlighted { background: var(--surface0) !important; color: var(--text) !important; }
+
+.btn, input[type="submit"], input[type="button"], button:not(.m-aside-left-close):not([class*="fc-"]) {
+    background: transparent !important;
+    background-image: none !important;
+    color: var(--lavender) !important;
+    border: 1px solid var(--surface1) !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: border-color var(--dur) ease-out, color var(--dur) ease-out;
+}
+.btn:hover, input[type="submit"]:hover, input[type="button"]:hover, button:hover {
+    border-color: var(--lavender) !important;
+    color: var(--text) !important;
+}
+.btn-success, .btn-primary, .btn-brand { border-color: var(--green) !important; color: var(--green) !important; }
+.btn-danger { border-color: var(--red) !important; color: var(--red) !important; }
+
+/* ── To Do Calendar (FullCalendar) ───────────────────────────────────── */
+.fc, .fc-view, .fc-view-container, .fc-unthemed td, .fc-unthemed th, .fc-unthemed thead,
+.fc-unthemed tbody, .fc-unthemed .fc-content, .fc-unthemed .fc-divider, .fc-unthemed .fc-row,
+.fc-unthemed .fc-popover {
+    background: transparent !important;
+    border-color: var(--surface0) !important;
+}
+.fc-toolbar h2 {
+    font-size: 13px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--text) !important;
+}
+.fc-day-header, .fc th {
+    color: var(--overlay0) !important;
+    font-size: 10px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-weight: 500 !important;
+}
+.fc-day-number { color: var(--subtext0) !important; font-variant-numeric: tabular-nums; }
+.fc-other-month .fc-day-number { color: var(--surface2) !important; }
+.fc-unthemed td.fc-today, .fc-today { background: var(--base) !important; box-shadow: inset 0 2px 0 var(--green) !important; }
+.fc-today .fc-day-number { color: var(--green) !important; }
+.fc-button, .fc-button-group .fc-button, .fc-state-default {
+    background: transparent !important;
+    background-image: none !important;
+    border: 1px solid var(--surface1) !important;
+    color: var(--subtext0) !important;
+    text-shadow: none !important;
+    text-transform: uppercase;
+    font-size: 11px !important;
+    letter-spacing: 0.08em;
+}
+.fc-state-active, .fc-button-active, .fc-button.fc-state-active {
+    color: var(--text) !important;
+    box-shadow: inset 0 -2px 0 var(--green) !important;
+}
+.fc-event, .fc-day-grid-event, .fc-time-grid-event {
+    background: var(--base) !important;
+    border: 1px solid var(--surface1) !important;
+    border-left: 2px solid var(--peach) !important;
+    color: var(--text) !important;
+}
+.fc-event .fc-title, .fc-event .fc-time { color: var(--text) !important; }
+
+/* ── Progress: Chart.js draws on canvas, so CSS can't recolour it — flip it
+   (invert + hue-rotate keeps hues roughly right and makes its dark text light) ── */
+canvas[id^="pieChart"], canvas[id^="lineChart"], canvas[id^="barChart"] {
+    filter: invert(0.9) hue-rotate(180deg) saturate(0.8);
+}
+
+/* ── modals, popups, notify toasts ───────────────────────────────────── */
+.modal-header, .modal-footer { border-color: var(--surface0) !important; background: transparent !important; }
+.modal-backdrop.show { opacity: 0.7 !important; background: var(--crust) !important; }
+[data-notify="container"], .PopupNotification, #PopupAlertWindow, .jqmWindow {
+    background: var(--mantle) !important;
+    border: 1px solid var(--surface0) !important;
+    box-shadow: inset 2px 0 0 var(--peach) !important;
+    color: var(--subtext1) !important;
+}
+
+/* ── odds and ends ───────────────────────────────────────────────────── */
+hr, .m-separator, .m-portlet__foot, .m-widget__item, .m-nav__separator,
+.m-portlet .m-portlet__body > hr { border-color: var(--surface0) !important; }
+.m-scroll-top { background: var(--mantle) !important; border: 1px solid var(--surface1) !important; }
+.m-scroll-top i { color: var(--lavender) !important; }
+#MLoaderDiv, .blockUI.blockOverlay { background: var(--crust) !important; }
+.grecaptcha-badge { opacity: 0.25; filter: grayscale(1); transition: opacity var(--dur) ease-out; }
+.grecaptcha-badge:hover { opacity: 1; }
+iframe { color-scheme: normal; }   /* embedded content keeps its own look */
+
+/* white backgrounds Metronic sets inline or via utility classes */
+.m--bg-white, .bg-white, .m-portlet--bordered, [style*="background-color: white" i],
+[style*="background-color:#fff" i], [style*="background-color: #fff" i], [style*="background:#fff" i],
+[style*="background: #fff" i], [style*="background-color: rgb(255, 255, 255)"] {
+    background-color: var(--mantle) !important;
+}
+
+/* ── login page ──────────────────────────────────────────────────────── */
+.m-login, .m-login__wrapper, .m-login__container, .m-login__signin, .m-login__head,
+.m-grid.m-grid--hor.m-grid--root.m-page[style*="background"] {
+    background: var(--crust) !important;
+    background-image: none !important;
+}
+.m-login__container, .m-login__signin {
+    border: 1px solid var(--surface0) !important;
+}
+.m-login__title { text-transform: uppercase; letter-spacing: 0.22em; font-size: 13px !important; }
+
+/* reduce motion */
+@media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+}
+
+}

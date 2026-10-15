@@ -190,6 +190,6 @@ Singleton {
     // Right-click on CPU / MEM / TEMP: btop as a floating kitty. A toggle — if
     // it is already open, the same click closes it.
     function btop() {
-        Niri.toggleApp("sanctuary-btop", ["kitty", "--class", "sanctuary-btop", "-e", "btop"]);
+        Wm.toggleApp("sanctuary-btop", ["kitty", "--class", "sanctuary-btop", "-e", "btop"]);
     }
 }

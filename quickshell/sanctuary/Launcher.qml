@@ -262,7 +262,9 @@ PanelWindow {
     // ── desk actions (DESK mode, and mixed into APPS when they match) ──
     // `do` is the verb doDesk() dispatches on. Keywords are what you might type.
     readonly property string scripts: Quickshell.env("HOME") + "/.dotfiles/scripts/sanctuary"
-    readonly property var desk: [
+    // `mango: true` = only offered in a Mango session.
+    readonly property var desk: _desk.filter(d => !d.mango || Wm.isMango)
+    readonly property var _desk: [
         { do: "patch",   glyph: "⇄", name: "Audio in / out",     desc: "PATCH — speakers, headphones, mic · Mod+O", keywords: ["sound", "output", "input", "headphones", "speaker", "mic", "microphone", "bluetooth", "patch", "switch"] },
         { do: "mixer",   glyph: "≋", name: "Mixer",              desc: "wiremix — every stream · Mod+Alt+M",        keywords: ["volume", "sound", "wiremix", "audio"] },
         { do: "rig",     glyph: "◉", name: "Recorders",          desc: "RIG — screen, meeting, practice · Mod+U",   keywords: ["record", "rec", "rig", "meeting", "audio"] },
@@ -271,6 +273,7 @@ PanelWindow {
         { do: "shot",    glyph: "⌗", name: "Screenshot",         desc: "Print",                                     keywords: ["screenshot", "capture", "grim"] },
         { do: "clip",    glyph: "⎘", name: "Clipboard",          desc: "history · Mod+V",                           keywords: ["clipboard", "paste", "copy", "history"] },
         { do: "wall",    glyph: "▤", name: "Wallpaper",          desc: "stills and live · Mod+Shift+W",             keywords: ["wallpaper", "background"] },
+        { do: "layout",  glyph: "▥", name: "Layout",             desc: "this tag — scroller, tile, grid … · Mod+Ctrl+Space", mango: true, keywords: ["layout", "tile", "tiling", "scroller", "grid", "monocle", "deck", "dwindle", "fair", "tag", "mango"] },
         { do: "style",   glyph: "◐", name: "Style",              desc: "Signal · Ink · Paper · Flare · Mod+Shift+T", keywords: ["theme", "style", "signal", "ink", "paper", "flare", "light", "look"] },
         { do: "notifs",  glyph: "☰", name: "Notifications",      desc: "the centre · Mod+Shift+D",                  keywords: ["notifications", "centre", "center"] },
         { do: "dnd",     glyph: "◌", name: "Do not disturb",     desc: "toggle · Mod+Alt+D",                        keywords: ["dnd", "quiet", "silence", "notifications"] },
@@ -498,6 +501,7 @@ PanelWindow {
         else if (v === "clip") sh(["kitty", "--class", "sanctuary-clipboard", "-e", scripts + "/clipboard.sh"]);
         else if (v === "wall") Ui.wallOpen = true;
         else if (v === "style") Ui.pickerOpen = true;
+        else if (v === "layout") Ui.layoutOpen = true;
         else if (v === "notifs") Ui.centreOpen = true;
         else if (v === "dnd") sh([scripts + "/qs.sh", "call", "notifs", "dnd"]);
         else if (v === "warmer") sh([scripts + "/nightlight.sh", "warmer"]);

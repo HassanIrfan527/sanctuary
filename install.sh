@@ -38,6 +38,7 @@ LINKS=(
   "waybar                : ~/.config/waybar"
   "yazi/yazi             : ~/.config/yazi"
   "niri/niri             : ~/.config/niri"
+  "mango/mango           : ~/.config/mango"        # MangoWC — sanctuary on tags; niri stays the other session
   "quickshell            : ~/.config/quickshell"   # QS modes; lets `qs -c sanctuary` find it
   "autostart/autostart   : ~/.config/autostart"    # Hidden=true masks for /etc/xdg/autostart (blueman, kdeconnect)
 
@@ -143,6 +144,15 @@ if [[ ! -e "$seed_layout" ]]; then
   say ""
   run "ln -sfn layout-signal.kdl '$seed_layout'"
   say "→ seeded: niri layout.kdl -> layout-signal.kdl"
+fi
+
+# Mango's config.conf sources `look.conf`, the same kind of git-ignored
+# symlink (→ look-<style>.conf). Seed it with Signal's.
+seed_look="$DOTFILES/mango/mango/look.conf"
+if [[ ! -e "$seed_look" ]]; then
+  say ""
+  run "ln -sfn look-signal.conf '$seed_look'"
+  say "→ seeded: mango look.conf -> look-signal.conf"
 fi
 
 # swaync's live config.json/style.css are git-ignored copies of a theme. The

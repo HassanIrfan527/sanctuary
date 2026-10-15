@@ -3,7 +3,10 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// niri state from `niri msg --json event-stream`. Quickshell has no built-in
+// niri state from `niri msg --json event-stream`. Only runs inside a niri
+// session ($NIRI_SOCKET set) — under Mango, Mango.qml does this job and Wm.qml
+// picks whichever is live. Everything else talks to Wm, not to this file.
+// Quickshell has no built-in
 // niri module, but niri's stream does the hard part: the first lines it prints
 // are the FULL state (WorkspacesChanged, WindowsChanged), and every line after
 // is a delta. So this is a reducer, nothing more.
@@ -17,6 +20,7 @@ Singleton {
     property var windows: ({})    // id -> niri window object
     property int focusedId: -1
     property bool overview: false
+    readonly property bool active: (Quickshell.env("NIRI_SOCKET") || "") !== ""
 
     readonly property var focusedWindow: windows[focusedId] ?? null
 
@@ -66,9 +70,27 @@ Singleton {
     function workspaceDown() {
         Quickshell.execDetached(["niri", "msg", "action", "focus-workspace-down"]);
     }
+    // Shift+scroll on the WS cell: the next column within this workspace.
+    // Stops at either end, never wraps or leaves the workspace.
+    function windowLeft() {
+        Quickshell.execDetached(["niri", "msg", "action", "focus-column-left"]);
+    }
+    function windowRight() {
+        Quickshell.execDetached(["niri", "msg", "action", "focus-column-right"]);
+    }
 
     // A "popup app": a floating kitty with its own app-id (btop, the mixer).
     // Open it if it isn't, close it if it is — so the same click dismisses it.
+    function focusWindow(id) {
+        Quickshell.execDetached(["niri", "msg", "action", "focus-window", "--id", String(id)]);
+    }
+
+    // niri has no per-workspace layout switching: always its scroller.
+    function layoutOn(output) {
+        return "";
+    }
+    function setLayout(name) {}
+
     function toggleApp(appId, cmd) {
         for (const id in windows) {
             if (windows[id].app_id === appId) {
@@ -162,7 +184,7 @@ Singleton {
 
     Process {
         id: stream
-        running: true
+        running: root.active
         command: ["niri", "msg", "--json", "event-stream"]
         stdout: SplitParser {
             onRead: line => {
@@ -175,7 +197,7 @@ Singleton {
         }
         // niri restarting (or a config reload that drops the socket) ends the
         // stream. Reconnect; the first lines of a new stream are full state.
-        onExited: reconnect.start()
+        onExited: if (root.active) reconnect.start()
     }
 
     Timer {

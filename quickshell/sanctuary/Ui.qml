@@ -41,6 +41,7 @@ Singleton {
     property bool columnsOpen: false // Mod+Grave — the column strip, held open to pick from
     property bool keysOpen: false   // Mod+/ — the keybind cheat sheet (KeySheet.qml)
     property bool commsOpen: false  // Mod+C, or click the VC cell — Discord voice (CommsCard.qml)
+    property bool layoutOpen: false // Mod+Ctrl+Space (Mango only) — this tag's layout (LayoutPicker.qml)
     // Right-click a tray icon: that app's menu, drawn by TrayMenu.qml.
     property var trayMenu: null     // the item's QsMenuHandle; null = closed
     property real trayX: 0          // screen x of the icon's centre — the menu hangs from it

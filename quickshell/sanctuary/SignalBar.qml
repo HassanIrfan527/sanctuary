@@ -4,7 +4,7 @@ import Quickshell.Wayland
 
 // Signal — the bar as an instrument strip.
 //
-//   ◉ │ WS 1 2 3 4 │ WIN kitty · nvim      10:41:07 PM      VC 04 LIVE │ CPU 12% ╱╲ │ MEM 41% ╱╲ │ MIC LIVE ▮▮▮▯▯ │ ♪ … │ tray │ MSG 03
+//   ◉ │ WS 1 2 3 4 │ WIN kitty · nvim      10:41:07 PM      VC 04 LIVE │ TMR 00:00 │ CPU 12% ╱╲ │ MEM 41% ╱╲ │ MIC LIVE ▮▮▮▯▯ │ ♪ … │ tray │ MSG 03
 //
 // One panel, cut into cells by hairlines, with registration marks at the
 // corners. Every value is fixed-width so nothing shuffles as numbers change.
@@ -143,19 +143,19 @@ PanelWindow {
                 id: wsCell
                 label: "WS"
                 interactive: true
-                onScrolled: wheel => wheel.angleDelta.y > 0 ? Niri.workspaceUp() : Niri.workspaceDown()
+                onScrolled: wheel => Wm.wheel(wheel)
 
                 Repeater {
-                    model: Niri.workspacesOn(bar.output)
+                    model: Wm.workspacesOn(bar.output)
                     delegate: MouseArea {
                         id: ws
                         required property var modelData
                         readonly property bool focused: modelData.is_active
-                        readonly property int wins: Niri.windowCount(modelData.id)
+                        readonly property int wins: Wm.windowCount(modelData.id)
                         width: num.implicitWidth + 4
                         height: 18
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: Niri.focusWorkspace(modelData.idx)
+                        onClicked: Wm.focusWorkspace(modelData.idx)
 
                         Text {
                             id: num
@@ -178,19 +178,33 @@ PanelWindow {
                         }
                     }
                 }
+
+                // Mango only: the viewed tag's layout (SCROLL, TILE, GRID …),
+                // in label weight so the numbers stay the thing you read.
+                // niri has one layout, so it says nothing there.
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: text !== ""
+                    text: Wm.layoutOn(bar.output)
+                    font.family: Theme.mono
+                    font.pixelSize: 9
+                    font.weight: Font.Bold
+                    font.letterSpacing: 1.4
+                    color: Theme.sigLabel
+                }
             }
 
             SignalCell {
                 label: "WIN"
-                visible: Niri.focusedWindow !== null && !bar.compact
+                visible: Wm.focusedWindow !== null && !bar.compact
                 rule: false
                 Text {
                     // Yields to the alert row: never closer than 24px to it.
                     width: Math.max(0, Math.min(implicitWidth, 260,
                                                 alertRow.x - left.x - recRow.width - wsCell.width - 70))
                     elide: Text.ElideRight
-                    text: Niri.focusedWindow
-                          ? (Niri.focusedWindow.app_id || "?") + "  " + (Niri.focusedWindow.title || "")
+                    text: Wm.focusedWindow
+                          ? (Wm.focusedWindow.app_id || "?") + "  " + (Wm.focusedWindow.title || "")
                           : ""
                     font.family: Theme.mono
                     font.pixelSize: 11
@@ -333,6 +347,24 @@ PanelWindow {
                     font.pixelSize: 11
                     font.weight: Font.Bold
                     color: Comms.selfMute || Comms.selfDeaf ? Theme.sigAlarm : Theme.sigHot
+                }
+            }
+
+            // The time tracker (Tracker.qml). Always here, even compact: 00:00
+            // dim at rest, green while running, yellow when stopped mid-way.
+            // Left: start / stop (stop keeps the time). Right: reset to 00:00.
+            SignalCell {
+                label: "TMR"
+                labelColor: Tracker.running ? Theme.sigHot : Theme.sigLabel
+                interactive: true
+                onClicked: mouse => mouse.button === Qt.RightButton ? Tracker.reset() : Tracker.toggle()
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: Tracker.text
+                    font.family: Theme.mono
+                    font.pixelSize: 11
+                    font.weight: Tracker.idle ? Font.Normal : Font.Bold
+                    color: Tracker.running ? Theme.sigHot : Tracker.idle ? Theme.surface2 : Theme.sigWarn
                 }
             }
 

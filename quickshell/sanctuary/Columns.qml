@@ -34,11 +34,11 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: peek ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-    readonly property var ws: Niri.focusedWorkspace
-    readonly property var cols: ws ? Niri.columnsOf(ws.id) : []
+    readonly property var ws: Wm.focusedWorkspace
+    readonly property var cols: ws ? Wm.columnsOf(ws.id) : []
     // niri's column number (1-based, what Mod+N takes) of the focused window.
     readonly property int focusedCol: {
-        const f = Niri.focusedWindow;
+        const f = Wm.focusedWindow;
         if (!f || !ws || f.workspace_id !== ws.id || !f.layout || !f.layout.pos_in_scrolling_layout)
             return -1;
         return f.layout.pos_in_scrolling_layout[0];
@@ -48,7 +48,7 @@ PanelWindow {
     // A column of several windows (stacked or tabbed) is shown by the one you
     // were last in, or its top one.
     function face(c) {
-        return c.windows.find(w => w.id === Niri.focusedId) || c.windows[0];
+        return c.windows.find(w => w.id === Wm.focusedId) || c.windows[0];
     }
     function entry(w) {
         return DesktopEntries.heuristicLookup(w.app_id || "");
@@ -70,7 +70,7 @@ PanelWindow {
     function go(c) {
         if (!c)
             return;
-        Niri.focusColumn(c.index);
+        Wm.focusColumn(c.index);
         Ui.columnsOpen = false;
     }
 

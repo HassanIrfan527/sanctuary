@@ -10,5 +10,5 @@ QS="$HOME/.dotfiles/scripts/sanctuary/qs.sh"
 if "$QS" running; then
   "$QS" call columns toggle >/dev/null
 else
-  niri msg action toggle-overview
+  "$HOME/.dotfiles/scripts/sanctuary/wm.sh" overview
 fi

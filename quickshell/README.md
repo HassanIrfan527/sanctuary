@@ -41,7 +41,9 @@ hand-kept layout file — `niri/niri/layout-signal.kdl` (square, tight, 2px gree
 border), `layout-ink.kdl` (3px light outline + hard mauve shadow),
 `layout-paper.kdl` (starts as Ink's). `layout.kdl` is a git-ignored symlink to
 the active one; a style switch re-points it (after `niri validate` passes — a
-broken file is refused and the old link kept) and reloads niri. Edit those files
+broken file is refused and the old link kept) and reloads niri. On Mango the
+same switch re-points `mango/mango/look.conf` → `look-<style>.conf` (only Signal
+exists yet; others fall back to it). Edit those files
 by hand to change how windows look in a style. The old per-mode renderer is in
 `archive/mode-system/`.
 
@@ -57,6 +59,8 @@ toast says why it happened. `shell.sh status` prints which one is up.
 | `sanctuary/Theme.qml` | Tokens for both styles. Reads `SANCTUARY_QS`. |
 | `sanctuary/Notifs.qml` | **The notification daemon** (Quickshell's `NotificationServer`), DND, history. |
 | `sanctuary/Niri.qml` | Workspaces + windows from `niri msg --json event-stream`. |
+| `sanctuary/Mango.qml` | The same for MangoWC, from `mmsg watch all-tags / all-clients / focusing-client`. Tags are dressed as niri workspaces (`id` = `<output>:<tag>`). |
+| `sanctuary/Wm.qml` | The door the shell uses: hands every call to Niri.qml or Mango.qml, whichever session is live (`$MANGO_INSTANCE_SIGNATURE` / `$NIRI_SOCKET`). Nothing else imports Niri or Mango directly. |
 | `sanctuary/Media.qml` | MPRIS now-playing, PipeWire mic. |
 | `sanctuary/Sys.qml` | CPU / mem / temp / disk, history, thresholds, exceptions. |
 | `sanctuary/Caution.qml` | Master Caution: reasons + acknowledge. |
@@ -70,6 +74,7 @@ toast says why it happened. `shell.sh status` prints which one is up.
 | `sanctuary/Patch.qml` | Mod+O PATCH: default audio output / input, per-device volume + mute (all styles); wiremix is the fallback. |
 | `sanctuary/PowerMenu.qml` | Mod+Shift+Escape power menu (all styles); fzf in kitty is the fallback. |
 | `sanctuary/Rec.qml` | Both recorders' state (reads `$XDG_RUNTIME_DIR/{screenrec,meeting-rec}/state.json` once a second) + commands. |
+| `sanctuary/Tracker.qml` | The TMR cell's stopwatch (Signal bar, left of CPU, always shown). Left-click start / stop (stop keeps the time), right-click reset to 00:00. Dim at 00:00, green running, yellow stopped. State `~/.local/state/sanctuary/timer.json` (start time + banked ms), so it survives a restart. IPC: `tracker toggle / reset / state`. |
 | `sanctuary/Rig.qml` | Mod+U RIG card: SCREEN / MEETING / PRACTICE, or stop / pause whatever runs. |
 | `sanctuary/Keymap.qml`, `KeySheet.qml` | Mod+/ KEYS cheat sheet (all styles). Keymap.qml is **hand-written** — every binds.kdl change updates it. Fallback: niri's hotkey overlay. |
 | `sanctuary/Comms.qml`, `CommsCard.qml` | Discord voice: reads `$XDG_RUNTIME_DIR/sanctuary-comms.sock` from the SanctuaryComms Vencord plugin (`vesktop/sanctuaryComms`, built by `scripts/sanctuary/vencord.sh`). VC bar cell (only in a call) + Mod+C COMMS card. |
@@ -121,7 +126,7 @@ survives it (`keepOnReload`).
 | `Mod+Ctrl+D` | clear all notifications |
 | `Mod+Alt+D` | DND toggle |
 
-Mouse on the bar: workspaces click/scroll · music left play-pause, **right the player
+Mouse on the bar: workspaces click/scroll · **TMR left start/stop, right reset** · music left play-pause, **right the player
 card**, scroll skip · **CPU / MEM / TEMP right-click: btop** (again to close) · mic left
 mixer, right mute · count left centre, right DND.
 

@@ -179,6 +179,15 @@ binds {
     Mod+P { focus-workspace-up; }     //   unified "prev"
     Mod+N { focus-workspace-down; }   //   unified "next"
 
+    //── Wheel ──  Mod+wheel anywhere = the bar's WS-cell wheel: workspaces,
+    //   and with Shift the columns of this one (up = left; stops at the ends).
+    //   Same in Mango (binds.conf axisbind). The cooldown keeps one notch from
+    //   flying past several workspaces.
+    Mod+WheelScrollUp         cooldown-ms=150 { focus-workspace-up; }
+    Mod+WheelScrollDown       cooldown-ms=150 { focus-workspace-down; }
+    Mod+Shift+WheelScrollUp   { focus-column-left; }
+    Mod+Shift+WheelScrollDown { focus-column-right; }
+
     //── Reorder column to index ──  Mod+Shift+N makes this the Nth column
     Mod+Shift+1 { move-column-to-index 1; }
     Mod+Shift+2 { move-column-to-index 2; }

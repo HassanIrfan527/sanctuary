@@ -128,22 +128,22 @@ PanelWindow {
         accent: Theme.mauve
         padX: 8
         interactive: true
-        onScrolled: wheel => wheel.angleDelta.y > 0 ? Niri.workspaceUp() : Niri.workspaceDown()
+        onScrolled: wheel => Wm.wheel(wheel)
 
         Row {
             spacing: 5
             Repeater {
-                model: Niri.workspacesOn(bar.output)
+                model: Wm.workspacesOn(bar.output)
 
                 delegate: MouseArea {
                     id: ws
                     required property var modelData
-                    readonly property int wins: Niri.windowCount(modelData.id)
+                    readonly property int wins: Wm.windowCount(modelData.id)
                     readonly property bool focused: modelData.is_active
                     width: 18 + Math.min(wins, 3) * 7
                     height: 18
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: Niri.focusWorkspace(modelData.idx)
+                    onClicked: Wm.focusWorkspace(modelData.idx)
 
                     Behavior on width { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
 

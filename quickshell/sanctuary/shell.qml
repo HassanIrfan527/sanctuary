@@ -72,6 +72,10 @@ ShellRoot {
         active: true
         Picker {}
     }
+    LazyLoader {   // Mango only: per-tag layouts are a Mango thing
+        active: Wm.isMango
+        LayoutPicker {}
+    }
     LazyLoader {
         active: true
         Launcher {}
@@ -197,6 +201,21 @@ ShellRoot {
         target: "rec"
         function select(): void { Ui.rigOpen = false; Ui.captureOpen = true; }
         function cancel(): void { Ui.captureOpen = false; }
+    }
+
+    // The TMR cell's stopwatch (Tracker.qml). No keybind yet.
+    IpcHandler {
+        target: "tracker"
+        function toggle(): void { Tracker.toggle(); }
+        function reset(): void { Tracker.reset(); }
+        function state(): string { return (Tracker.running ? "running " : Tracker.idle ? "idle " : "stopped ") + Tracker.text; }
+    }
+
+    // Mod+Ctrl+Space (Mango binds.conf) → `layouts toggle`
+    IpcHandler {
+        target: "layouts"
+        function toggle(): void { Ui.layoutOpen = Wm.isMango && !Ui.layoutOpen; }
+        function close(): void { Ui.layoutOpen = false; }
     }
 
     IpcHandler {

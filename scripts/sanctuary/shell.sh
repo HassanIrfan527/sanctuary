@@ -68,6 +68,20 @@ point_layout() {                             # $1 = style
   niri msg action load-config-file >/dev/null 2>&1
 }
 
+# ── Mango: the same, for its look.conf → look-<style>.conf ───────────
+# Mango re-reads its config on its own when a sourced file changes; the
+# explicit reload is for when the symlink flips but the target file didn't.
+MANGO_DIR="$HOME/.dotfiles/mango/mango"
+point_look() {                               # $1 = style
+  local want="look-$1.conf" link="$MANGO_DIR/look.conf"
+  [ -r "$MANGO_DIR/$want" ] || want="look-signal.conf"   # only Signal exists so far
+  [ "$(readlink "$link" 2>/dev/null)" = "$want" ] && return 0
+  ln -sfn "$want" "$link"
+  [ "$("$HOME/.dotfiles/scripts/sanctuary/wm.sh" name)" = mango ] &&
+    "$HOME/.dotfiles/scripts/sanctuary/wm.sh" reload
+  return 0
+}
+
 # ── terminal styling: same idea for kitty + starship ──────────────────
 # kitty.conf ends with `include style.conf` (git-ignored symlink → style-<word>.conf);
 # ~/.config/starship.toml → starship/themes/<word>.toml. A style without its own
@@ -207,6 +221,7 @@ start_watch() {
 
 up() {                                       # $1 = style
   point_layout "$1"                          # windows first: instant, and independent of Quickshell
+  point_look "$1"                            # …on Mango too
   point_term "$1"                            # kitty + starship follow the desk
   point_scheme "$1"                          # system light/dark + GTK3 theme — before the browser re-reads
   point_browser                              # qutebrowser re-reads the style file

@@ -27,7 +27,7 @@ fi
 rows=$(cat <<'ROWS'
 lock	lock        back in with your password
 suspend	suspend     sleep, resume where you left off
-logout	log out     quit niri
+logout	log out     leave the session
 reboot	reboot      restart now
 poweroff	shut down   power off now
 ROWS
@@ -70,7 +70,7 @@ act() {
 case "$sel" in
   lock)     act loginctl lock-session ;;
   suspend)  act systemctl suspend ;;
-  logout)   act niri msg action quit --skip-confirmation ;;
+  logout)   act "$HOME/.dotfiles/scripts/sanctuary/wm.sh" quit ;;
   reboot)   act systemctl reboot ;;
   poweroff) act systemctl poweroff ;;
   *)        echo "power.sh: unknown action '$sel'" >&2; exit 1 ;;

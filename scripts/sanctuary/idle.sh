@@ -10,6 +10,7 @@
 # no backslash line-continuations — the whole thing would be one unreadable line.
 set -uo pipefail
 LOCK="$HOME/.dotfiles/scripts/sanctuary/lock.sh"
+WM="$HOME/.dotfiles/scripts/sanctuary/wm.sh"   # niri or Mango, whichever is running
 pkill -x swayidle 2>/dev/null
 pkill -f "^python3 $HOME/.dotfiles/scripts/sanctuary/awake.py" 2>/dev/null
 
@@ -19,7 +20,7 @@ mkdir -p "$STATE"
 
 exec swayidle -w \
   timeout 1800 "$LOCK" \
-  timeout 2700 'niri msg action power-off-monitors' \
-  resume       'niri msg action power-on-monitors' \
+  timeout 2700 "$WM monitors-off" \
+  resume       "$WM monitors-on" \
   before-sleep "$LOCK" \
   lock         "$LOCK"
