@@ -1,7 +1,6 @@
 import QtQuick
 import Quickshell
-import Quickshell.Wayland
-import Quickshell.Widgets
+import "kit"
 
 // The column strip: what Mod+1..9 points at on this workspace, left to right.
 // niri scrolls sideways forever, so past three columns you lose track of which
@@ -16,23 +15,18 @@ import Quickshell.Widgets
 //
 // No automatic flash on column / workspace switches: tried on 2026-10-08 and
 // dropped the same day, Harry found it distracting.
-PanelWindow {
+Popup {
     id: win
 
-    readonly property bool peek: Ui.columnsOpen
-
-    visible: peek
-    color: "transparent"
-    anchors {
-        top: true
-        bottom: true
-        left: true
-        right: true
-    }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.namespace: "sanctuary-columns"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: peek ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    name: "columns"
+    open: Ui.columnsOpen
+    onDismissed: Ui.columnsOpen = false
+    cardWidth: strip.implicitWidth
+    // Low on the screen, centred: the map sits over the windows it maps.
+    centred: false
+    cardX: Math.round((width - cardWidth) / 2)   // whole pixels, as a centre anchor would
+    cardY: height - 56 - cardHeight
+    onKeyPressed: event => key(event)
 
     readonly property var ws: Wm.focusedWorkspace
     readonly property var cols: ws ? Wm.columnsOf(ws.id) : []
@@ -43,7 +37,6 @@ PanelWindow {
             return -1;
         return f.layout.pos_in_scrolling_layout[0];
     }
-    property int cursor: 0   // index into cols, peek only
 
     // A column of several windows (stacked or tabbed) is shown by the one you
     // were last in, or its top one.
@@ -74,8 +67,8 @@ PanelWindow {
         Ui.columnsOpen = false;
     }
 
-    onPeekChanged: {
-        if (peek) {
+    onOpenChanged: {
+        if (open) {
             const i = cols.findIndex(c => c.index === focusedCol);
             cursor = Math.max(0, i);
             idle.restart();
@@ -92,7 +85,7 @@ PanelWindow {
         idle.restart();
         const k = event.key;
         const n = cols.length;
-        if (k === Qt.Key_Escape || k === Qt.Key_Q || k === Qt.Key_QuoteLeft)
+        if (k === Qt.Key_QuoteLeft)
             Ui.columnsOpen = false;
         else if (k >= Qt.Key_1 && k <= Qt.Key_9)
             go(cols.find(c => c.index === k - Qt.Key_0));
@@ -109,191 +102,42 @@ PanelWindow {
         event.accepted = true;
     }
 
-    MouseArea {   // scrim: click outside = close
-        id: scrim
-        anchors.fill: parent
-        acceptedButtons: Qt.AllButtons
-        enabled: win.peek
-        onClicked: Ui.columnsOpen = false
-    }
+    Fade {
+        shown: win.visible
 
-    Item {
-        id: body
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 56
-        width: sig.width
-        height: sig.height
-        opacity: win.visible ? 1 : 0
-        Behavior on opacity { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
+        Panel {
+            id: strip
+            width: implicitWidth
+            fit: true
+            vpad: 10
+            inset: 12
+            spacing: 6
+            headerHeight: 12
+            hintGap: 0
+            hintCaps: true
+            title: "COLUMNS"
+            detail: "WS " + (win.ws ? win.ws.idx : "?") + " · " + win.cols.length + " COL"
+            hint: win.cols.length ? "1-9 JUMP · H L MOVE · ENTER GO · ESC CLOSE" : "NO COLUMNS ON THIS WORKSPACE"
 
-        focus: true
-        Keys.onPressed: event => win.key(event)
-
-        MouseArea {   // swallow clicks between the cells
-            anchors.fill: parent
-            acceptedButtons: Qt.AllButtons
-            enabled: win.peek
-        }
-
-        // ══ Signal: a channel strip ═══════════════════════════════════
-        Rectangle {
-            id: sig
-            width: Math.max(sigRow.implicitWidth, win.peek ? sigHint.implicitWidth + 24 : 0) + 2
-            height: sigCol.implicitHeight + (win.peek ? 20 : 2)
-            color: Theme.sigFill
-            border.width: 1
-            border.color: Theme.sigRule
-
-            SignalTicks {
-                anchors.fill: parent
-                anchors.margins: -3
-            }
-
-            Column {
-                id: sigCol
-                x: 1
-                y: win.peek ? 10 : 1
-                width: sig.width - 2
-                spacing: 6
-
-                Item {
-                    visible: win.peek
-                    width: parent.width
-                    height: 12
-                    Text {
-                        x: 12
-                        text: "COLUMNS"
-                        font.family: Theme.mono
-                        font.pixelSize: 9
-                        font.weight: Font.Bold
-                        font.letterSpacing: 2
-                        color: Theme.sigHot
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                Repeater {
+                    model: win.cols
+                    delegate: Tile {
+                        required property var modelData
+                        required property int index
+                        readonly property var w: win.face(modelData)
+                        number: win.num(modelData)
+                        count: modelData.windows.length
+                        icon: win.icon(w)
+                        name: win.appName(w)
+                        title: w.title || ""
+                        lit: modelData.index === win.focusedCol
+                        selected: index === win.cursor
+                        last: index === win.cols.length - 1
+                        onHovered: { win.cursor = index; idle.restart(); }
+                        onClicked: win.go(modelData)
                     }
-                    Text {
-                        anchors.right: parent.right
-                        anchors.rightMargin: 12
-                        text: "WS " + (win.ws ? win.ws.idx : "?") + " · " + win.cols.length + " COL"
-                        font.family: Theme.mono
-                        font.pixelSize: 9
-                        font.letterSpacing: 1.4
-                        color: Theme.sigLabel
-                    }
-                }
-
-                Row {
-                    id: sigRow
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    Repeater {
-                        model: win.cols
-                        delegate: Item {
-                            id: cell
-                            required property var modelData
-                            required property int index
-                            readonly property var w: win.face(modelData)
-                            readonly property bool lit: modelData.index === win.focusedCol
-                            readonly property bool sel: win.peek && index === win.cursor
-                            width: 96
-                            height: win.peek ? 84 : 70
-
-                            Rectangle {
-                                anchors.fill: parent
-                                color: cell.lit ? Theme.sigCell : "transparent"
-                            }
-                            Rectangle {
-                                width: parent.width
-                                height: 2
-                                color: Theme.sigHot
-                                visible: cell.lit
-                            }
-                            Rectangle {   // the rule between channels
-                                anchors.right: parent.right
-                                width: 1
-                                height: parent.height
-                                color: Theme.sigRule
-                                visible: cell.index < win.cols.length - 1
-                            }
-                            Text {
-                                x: 8
-                                y: 6
-                                text: win.num(cell.modelData)
-                                font.family: Theme.mono
-                                font.pixelSize: 11
-                                font.weight: Font.Bold
-                                color: cell.lit ? Theme.sigHot : Theme.sigLabel
-                            }
-                            Text {
-                                anchors.right: parent.right
-                                anchors.rightMargin: 8
-                                y: 7
-                                visible: cell.modelData.windows.length > 1
-                                text: "×" + cell.modelData.windows.length
-                                font.family: Theme.mono
-                                font.pixelSize: 9
-                                color: Theme.sigLabel
-                            }
-                            IconImage {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                y: 14
-                                implicitSize: 28
-                                source: win.icon(cell.w)
-                                opacity: cell.lit || cell.sel ? 1 : 0.7
-                            }
-                            Column {
-                                y: 48
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                width: parent.width - 12
-                                spacing: 2
-                                Text {
-                                    width: parent.width
-                                    horizontalAlignment: Text.AlignHCenter
-                                    elide: Text.ElideRight
-                                    text: win.appName(cell.w)
-                                    font.family: Theme.mono
-                                    font.pixelSize: 10
-                                    font.weight: cell.lit || cell.sel ? Font.Bold : Font.Normal
-                                    color: cell.sel ? Theme.sigHot : cell.lit ? Theme.sigValue : Theme.sigLabel
-                                }
-                                Text {
-                                    visible: win.peek
-                                    width: parent.width
-                                    horizontalAlignment: Text.AlignHCenter
-                                    elide: Text.ElideRight
-                                    text: cell.w.title || ""
-                                    font.family: Theme.mono
-                                    font.pixelSize: 8
-                                    color: Theme.surface2
-                                }
-                            }
-                            Rectangle {   // the peek cursor
-                                anchors.fill: parent
-                                anchors.margins: 2
-                                color: "transparent"
-                                border.width: 1
-                                border.color: Theme.sigHot
-                                visible: cell.sel
-                            }
-                            MouseArea {
-                                anchors.fill: parent
-                                enabled: win.peek
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onEntered: { win.cursor = cell.index; idle.restart(); }
-                                onClicked: win.go(cell.modelData)
-                            }
-                        }
-                    }
-                }
-
-                Text {
-                    id: sigHint
-                    visible: win.peek
-                    x: 12
-                    text: win.cols.length ? "1-9 JUMP · H L MOVE · ENTER GO · ESC CLOSE" : "NO COLUMNS ON THIS WORKSPACE"
-                    font.family: Theme.mono
-                    font.pixelSize: 9
-                    font.letterSpacing: 1
-                    color: Theme.sigLabel
                 }
             }
         }

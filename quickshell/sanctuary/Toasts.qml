@@ -1,9 +1,10 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import "kit"
 
-// The toast column, top-right, under the bar. The style passes its delegate
-// (SignalToast today).
+// The toast column, top-right, under the bar: one Notice per toast. How wide
+// and how far apart is the kit's (ToastSpec).
 //
 // ScriptModel diffs the popups array by identity, so a new toast arriving
 // creates ONE delegate — the ones already on screen keep their state and don't
@@ -11,9 +12,9 @@ import Quickshell.Wayland
 PanelWindow {
     id: win
 
-    property Component delegate
-    property int gap: 10
-    property int toastWidth: 380
+    ToastSpec { id: spec }
+    readonly property int gap: spec.gap
+    readonly property int toastWidth: spec.width
 
     visible: Notifs.popups.length > 0
     color: "transparent"
@@ -46,7 +47,7 @@ PanelWindow {
 
         Repeater {
             model: ScriptModel { values: Notifs.popups }
-            delegate: win.delegate
+            delegate: Component { Notice {} }
         }
     }
 }

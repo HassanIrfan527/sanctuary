@@ -26,3 +26,5 @@ swaync/swaync/style.css
 # where config.kdl's include would otherwise dangle.
 niri/niri/layout.kdl
 mango/mango/look.conf
+# The active style's kit (quickshell/sanctuary/kit -> kits/<style>), set by qs.sh start.
+quickshell/sanctuary/kit

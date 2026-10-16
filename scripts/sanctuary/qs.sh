@@ -8,6 +8,7 @@
 #   qs.sh call <target> <function> [args…]    IPC, e.g. `qs.sh call notifs toggle`
 #   qs.sh styles          list the styles this config can draw
 #   qs.sh has <style>     exit 0 if <style> is one of them
+#   qs.sh kit <style>     point quickshell/sanctuary/kit at that style's kit (start does this)
 #   qs.sh log             follow the running instance's log
 #
 # ── Why the waiting matters ───────────────────────────────────────────
@@ -20,9 +21,9 @@
 #          can claim the name.
 #
 # ── Adding a style ────────────────────────────────────────────────────
-# A style is <Name>Bar.qml in the config dir (SignalBar.qml → `signal`), plus its
-# branch in Theme.qml and shell.qml. `styles` lists whatever *Bar.qml exists,
-# plus the VARIANTS below (same files, different palette in Theme.qml).
+# A style is a kit: quickshell/sanctuary/kits/<word>/ (DESIGN-SYSTEM.md §4),
+# plus its palette in Theme.qml. `styles` lists every kit, plus the VARIANTS
+# below (a base style's kit, a different palette in Theme.qml).
 set -uo pipefail
 
 QS_DIR="$HOME/.dotfiles/quickshell/sanctuary"
@@ -48,19 +49,34 @@ need_qs() {
 }
 
 # Variants: a second printing of an existing style, palette chosen inside
-# Theme.qml. `word:base` — the word is valid only if <Base>Bar.qml exists.
+# Theme.qml. `word:base` — the word is valid only if kits/<base>/ exists.
 VARIANTS=(flare:signal)
 
+# The kit: quickshell/sanctuary/kit is a (git-ignored) symlink to kits/<style>/,
+# the drawing parts every module imports (DESIGN-SYSTEM.md §4). A variant draws
+# with its base's kit (flare → signal); a style with no kit draws with Signal's.
+kit_of() {                                   # $1 = style word → kit name
+  local v
+  for v in "${VARIANTS[@]}"; do
+    [ "${v%%:*}" = "$1" ] && { printf '%s\n' "${v#*:}"; return; }
+  done
+  printf '%s\n' "$1"
+}
+point_kit() {                                # $1 = style word
+  local k
+  k=$(kit_of "$1")
+  [ -d "$QS_DIR/kits/$k" ] || k=signal
+  [ "$(readlink "$QS_DIR/kit" 2>/dev/null)" = "kits/$k" ] || ln -sfn "kits/$k" "$QS_DIR/kit"
+}
+
 styles() {
-  local f v
-  for f in "$QS_DIR"/*Bar.qml; do
-    [ -e "$f" ] || continue
-    f=$(basename "$f" Bar.qml)
-    printf '%s\n' "${f,,}"
+  local d v
+  for d in "$QS_DIR"/kits/*/; do
+    [ -d "$d" ] || continue
+    basename "$d"
   done
   for v in "${VARIANTS[@]}"; do
-    f=${v#*:}; f=${f^}
-    [ -e "$QS_DIR/${f}Bar.qml" ] && printf '%s\n' "${v%%:*}"
+    [ -d "$QS_DIR/kits/${v#*:}" ] && printf '%s\n' "${v%%:*}"
   done
 }
 
@@ -99,6 +115,7 @@ start() {
     return 1
   fi
   stop
+  point_kit "$style"
   # setsid + ignored HUP: whatever started us (niri, the picker's detached
   # process) may be gone a moment later; Quickshell must not go with it.
   trap '' HUP
@@ -120,6 +137,7 @@ case "${1:-}" in
   call)    shift; call "$@" ;;
   styles)  styles ;;
   has)     has_style "${2:?qs.sh has <style>}" ;;
+  kit)     point_kit "${2:?qs.sh kit <style>}"; readlink "$QS_DIR/kit" ;;
   log)     need_qs && exec "$QS_BIN" log -p "$QS_DIR" -f ;;
   *)       printf 'usage: qs.sh start <style>|stop|running|call <target> <fn> [args]|styles|log\n' >&2
            exit 2 ;;

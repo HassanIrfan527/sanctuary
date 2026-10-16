@@ -1,14 +1,17 @@
 import QtQuick
+import ".."
 
-// One cell of the instrument strip: a small-caps LABEL, then its readout, then
-// a hairline rule. The label is always dimmer than the value — you read the
+// KIT · Cell — one readout on the bar: a small-caps LABEL, then its value(s),
+// then a hairline. The label is always dimmer than the value — you read the
 // number, the label only tells you which number it is.
+//   labelTone  "" | "hot" | "warn" | "alarm" | "second" (Signal's warm voice)
+//   rule       hairline on the right edge · interactive  hover wash + clicks
 Item {
     id: cell
 
     property string label: ""
-    property color labelColor: Theme.sigLabel
-    property bool rule: true          // hairline on the right edge
+    property string labelTone: ""
+    property bool rule: true
     property bool interactive: false
 
     signal clicked(var mouse)
@@ -35,7 +38,9 @@ Item {
         font.pixelSize: 9
         font.weight: Font.Bold
         font.letterSpacing: 1.4
-        color: cell.labelColor
+        color: cell.labelTone === "hot" ? Theme.sigHot : cell.labelTone === "warn" ? Theme.sigWarn
+             : cell.labelTone === "alarm" ? Theme.sigAlarm : cell.labelTone === "second" ? Theme.peach
+             : Theme.sigLabel
     }
 
     Row {

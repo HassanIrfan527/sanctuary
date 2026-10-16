@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Bluetooth
 import Quickshell.Io
-import Quickshell.Wayland
+import "kit"
 
 // The launcher — Mod+Space (scripts/sanctuary/launcher.sh). Drawn in the
 // current style; when Quickshell is down (fallback) the same key opens fsel.
@@ -38,33 +38,29 @@ import Quickshell.Wayland
 //   enter  go     ↑ ↓ · ctrl-j ctrl-k · ctrl-n ctrl-p  move     tab  mode     esc  close
 //   ctrl-s  pin the app under the cursor (APPS) · unpin it (PINNED)
 //   click a row to run it; click a tab to switch; click outside to close
-PanelWindow {
+Popup {
     id: win
 
-    visible: Ui.launcherOpen
-    color: "transparent"
-    anchors {
-        top: true
-        bottom: true
-        left: true
-        right: true
-    }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.namespace: "sanctuary-launcher"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    name: "launcher"
+    open: Ui.launcherOpen
+    onDismissed: Ui.launcherOpen = false
+    cardWidth: 680
+    // A little above centre, where the eye already is.
+    centred: false
+    cardX: Math.round((width - cardWidth) / 2)
+    cardY: Math.round(height * 0.14)
+    qCloses: false   // q is typed into the prompt
 
     property string query: ""
     property string mode: "apps"
-    property int cursor: 0
     readonly property int rows: 13
     // First result shown: the list scrolls so the cursor is always on screen.
-    property int top: 0
+    property int firstRow: 0
     onCursorChanged: {
-        if (cursor < top)
-            top = cursor;
-        else if (cursor >= top + rows)
-            top = cursor - rows + 1;
+        if (cursor < firstRow)
+            firstRow = cursor;
+        else if (cursor >= firstRow + rows)
+            firstRow = cursor - rows + 1;
     }
 
     // ── modes ─────────────────────────────────────────────────────────
@@ -88,7 +84,7 @@ PanelWindow {
         setMode(modes[(i + step + modes.length) % modes.length].id);
     }
     function field() {
-        return sigInput;
+        return prompt;
     }
     // Both inputs feed this. A prefix typed into an empty APPS field switches
     // the mode and is removed again.
@@ -117,19 +113,19 @@ PanelWindow {
             // Clear the fields themselves: a `text: query` binding would break
             // the moment you type, and the old query would come back next time.
             mode = "apps";
-            sigInput.text = "";
+            prompt.text = "";
             cursor = 0;
             uptimeFile.reload();
             pinnedAppsFile.reload();
             filesProc.running = true;
-            Qt.callLater(() => field().forceActiveFocus());
+            Qt.callLater(() => field().focusInput());
         }
     }
     onQueryChanged: {
         cursor = 0;
-        scope.kick();
+        masthead.kick();
     }
-    onModeChanged: scope.kick()
+    onModeChanged: masthead.kick()
 
     // ── state files ───────────────────────────────────────────────────
     readonly property string stateDir: Quickshell.env("HOME") + "/.local/state/sanctuary"
@@ -585,32 +581,7 @@ PanelWindow {
         event.accepted = true;
     }
 
-    MouseArea {   // scrim: click outside = close
-        anchors.fill: parent
-        acceptedButtons: Qt.AllButtons
-        onClicked: Ui.launcherOpen = false
-    }
-
-    // The trace in the masthead: a slow carrier wave that jumps when you type
-    // (kick) and settles back. Painted only while the launcher is open.
-    QtObject {
-        id: scope
-        property real phase: 0
-        property real energy: 0.35
-        function kick() { energy = Math.min(1.6, energy + 0.55); }
-    }
-    Timer {
-        running: win.visible
-        interval: 33
-        repeat: true
-        onTriggered: {
-            scope.phase += 0.12;
-            scope.energy = Math.max(0.18, scope.energy * 0.94);
-            traceCanvas.requestPaint();
-        }
-    }
-
-    // ══ Signal: a console on an instrument ═══════════════════════════
+    // ══ a console ═══════════════════════════════════════════════════
     //
     //   ┌────────────────────────────────────────────────────────────┐
     //   │ SIGNAL  ∿∿∿∿∿∿∿ live trace ∿∿∿∿∿∿∿              19:06    │  ← masthead
@@ -622,364 +593,89 @@ PanelWindow {
     //   │▌01  Firefox        Web Browser                       12×   │
     //   │ enter launch · tab mode · ctrl-j/k move · esc     01/03    │
     //   └────────────────────────────────────────────────────────────┘
-    Rectangle {
-        id: sig
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: Math.round(parent.height * 0.14)
-        width: 680
-        height: sigCol.implicitHeight
-        color: Theme.sigFill
-        border.width: 1
-        border.color: Theme.sigRule
+    Panel {
+        width: parent.width
+        pad: 0
+        vpad: 0
+        spacing: 0
 
-        MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons }   // swallow
-
-        SignalTicks {
-            anchors.fill: parent
-            anchors.margins: -3
+        Masthead {
+            id: masthead
+            active: win.visible
+            word: Theme.word.toUpperCase()
+            subtitle: "SANCTUARY // CONSOLE"
+            time: Qt.formatTime(win.now, "HH:mm")
+            detail: (win.host ? win.host.toUpperCase() + " · " : "") + "UP " + win.uptime
         }
 
-        Column {
-            id: sigCol
+        Rule { inset: 0; height: 1 }
+
+        ModeTabs {
+            labels: win.modes.map(m => (m.pre ? m.pre + " " : "") + m.name)
+            current: win.modes.findIndex(m => m.id === win.mode)
+            detail: win.mainApps.length + " APPS · " + win.desk.length + " DESK · " + (win.pinnedApps.length + win.pins.length) + " PIN"
+            onPicked: i => {
+                win.setMode(win.modes[i].id);
+                win.field().focusInput();
+            }
+        }
+
+        Prompt {
+            id: prompt
+            large: true
+            chevron: win.modeNow.pre || "▸"
+            placeholder: win.mode === "apps" ? "type to find · *  =  :  ?  for the other modes"
+                : win.mode === "calc" ? "a sum"
+                : win.mode === "desk" ? "a desk action"
+                : win.mode === "pinned" ? "a pinned app or file · or ~/path to pin one"
+                : "search the web"
+            onEdited: t => win.edited(t)
+            onKeyPressed: event => win.key(event)
+        }
+
+        Rule { inset: 0; height: 1 }
+
+        Repeater {
+            model: win.results.slice(win.firstRow, win.firstRow + win.rows)
+            delegate: ResultRow {
+                required property var modelData
+                required property int index
+                readonly property int at: win.firstRow + index
+                numbered: modelData.kind === "app"
+                mark: numbered ? Theme.pad(at + 1, 2, "0") : modelData.glyph
+                title: modelData.title
+                sub: modelData.sub
+                tag: modelData.tag
+                selected: at === win.cursor && modelData.kind !== "hint"
+                big: modelData.kind === "calc"
+                quiet: modelData.kind === "hint"
+                tagLit: modelData.kind === "desk" || modelData.kind === "calc" || !!modelData.pinned
+                tagTight: modelData.kind === "app"
+                onHovered: win.cursor = at
+                onClicked: shift => win.launch(at, shift)
+            }
+        }
+
+        // nothing matched: say so, once, quietly
+        Item {
+            visible: win.results.length === 0
             width: parent.width
-
-            // ── masthead ──
-            Item {
-                width: parent.width
-                height: 78
-                clip: true
-
-                // graticule: faint dots every 20px, like a scope screen
-                Canvas {
-                    anchors.fill: parent
-                    onPaint: {
-                        const c = getContext("2d");
-                        c.reset();
-                        c.fillStyle = Theme.surface0;
-                        for (let x = 10; x < width; x += 20)
-                            for (let y = 9; y < height; y += 20)
-                                c.fillRect(x, y, 1, 1);
-                    }
-                }
-
-                // the trace
-                Canvas {
-                    id: traceCanvas
-                    x: 200
-                    width: parent.width - 200 - 150
-                    height: parent.height
-                    onPaint: {
-                        const c = getContext("2d");
-                        c.reset();
-                        const mid = height / 2, w = width, ph = scope.phase, en = scope.energy;
-                        // fade in / out at both ends so the line comes from nowhere
-                        const env = x => Math.sin(Math.PI * x / w);
-                        const pass = (alpha, lw) => {
-                            c.beginPath();
-                            for (let x = 0; x <= w; x += 2) {
-                                const t = x / 18;
-                                const y = mid + env(x) * en * (Math.sin(t - ph) * 9
-                                          + Math.sin(t * 2.7 + ph * 1.6) * 4 * en
-                                          + Math.sin(t * 7.1 - ph * 3) * 2 * en);
-                                if (x === 0)
-                                    c.moveTo(x, y);
-                                else
-                                    c.lineTo(x, y);
-                            }
-                            c.strokeStyle = Qt.rgba(Theme.sigHot.r, Theme.sigHot.g, Theme.sigHot.b, alpha);
-                            c.lineWidth = lw;
-                            c.stroke();
-                        };
-                        c.fillStyle = Qt.rgba(Theme.sigHot.r, Theme.sigHot.g, Theme.sigHot.b, 0.12);
-                        c.fillRect(0, mid, w, 1);   // the zero line
-                        pass(0.12, 5);              // glow
-                        pass(0.85, 1.2);            // line
-                    }
-                }
-
-                // wordmark: the style's name
-                Item {
-                    id: mark
-                    x: 18
-                    y: 13
-                    width: word.implicitWidth
-                    height: word.implicitHeight
-                    Text {
-                        id: word
-                        text: Theme.word.toUpperCase()
-                        font.family: Theme.mono
-                        font.pixelSize: 30
-                        font.weight: Font.Black
-                        font.letterSpacing: 7
-                        color: Theme.sigHot
-                    }
-                    // scanlines over the letters: a CRT, not a logo
-                    Column {
-                        anchors.fill: parent
-                        Repeater {
-                            model: Math.ceil(word.implicitHeight / 3)
-                            delegate: Item {
-                                width: mark.width
-                                height: 3
-                                Rectangle { y: 2; width: parent.width; height: 1; color: Theme.sigFill; opacity: 0.55 }
-                            }
-                        }
-                    }
-                }
-                Text {
-                    x: 19
-                    anchors.top: mark.bottom
-                    anchors.topMargin: 2
-                    text: "SANCTUARY // CONSOLE"
-                    font.family: Theme.mono
-                    font.pixelSize: 9
-                    font.letterSpacing: 2
-                    color: Theme.sigLabel
-                }
-
-                // clock + host
-                Column {
-                    anchors.right: parent.right
-                    anchors.rightMargin: 18
-                    y: 16
-                    spacing: 5
-                    Text {
-                        anchors.right: parent.right
-                        text: Qt.formatTime(win.now, "HH:mm")
-                        font.family: Theme.mono
-                        font.pixelSize: 22
-                        font.weight: Font.Bold
-                        color: Theme.sigValue
-                    }
-                    Text {
-                        anchors.right: parent.right
-                        text: (win.host ? win.host.toUpperCase() + " · " : "") + "UP " + win.uptime
-                        font.family: Theme.mono
-                        font.pixelSize: 9
-                        font.letterSpacing: 1.2
-                        color: Theme.sigLabel
-                    }
-                }
+            height: 30
+            Label {
+                x: 14
+                anchors.verticalCenter: parent.verticalCenter
+                width: implicitWidth
+                role: "empty"
+                text: "no match · tab for another mode"
             }
+        }
 
-            Rectangle { width: parent.width; height: 1; color: Theme.sigRule }
+        Rule { inset: 0; height: 1 }
 
-            // ── mode tabs ──
-            Item {
-                width: parent.width
-                height: 30
-                Row {
-                    x: 8
-                    height: parent.height
-                    Repeater {
-                        model: win.modes
-                        delegate: Item {
-                            id: tab
-                            required property var modelData
-                            readonly property bool on: modelData.id === win.mode
-                            width: tabText.implicitWidth + 20
-                            height: parent.height
-                            Text {
-                                id: tabText
-                                anchors.centerIn: parent
-                                text: (tab.modelData.pre ? tab.modelData.pre + " " : "") + tab.modelData.name
-                                font.family: Theme.mono
-                                font.pixelSize: 10
-                                font.weight: tab.on ? Font.Bold : Font.Normal
-                                font.letterSpacing: 1.4
-                                color: tab.on ? Theme.sigHot : Theme.sigLabel
-                            }
-                            Rectangle {
-                                anchors.bottom: parent.bottom
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                width: parent.width - 8
-                                height: 2
-                                color: Theme.sigHot
-                                visible: tab.on
-                            }
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    win.setMode(tab.modelData.id);
-                                    win.field().forceActiveFocus();
-                                }
-                            }
-                        }
-                    }
-                }
-                Text {
-                    anchors.right: parent.right
-                    anchors.rightMargin: 14
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: win.mainApps.length + " APPS · " + win.desk.length + " DESK · " + (win.pinnedApps.length + win.pins.length) + " PIN"
-                    font.family: Theme.mono
-                    font.pixelSize: 9
-                    font.letterSpacing: 1.4
-                    color: Theme.surface2
-                }
-            }
-
-            // ── prompt ──
-            Rectangle {
-                width: parent.width
-                height: 42
-                color: Theme.sigCell
-                Text {
-                    id: chev
-                    x: 14
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: win.modeNow.pre || "▸"
-                    font.family: Theme.mono
-                    font.pixelSize: 15
-                    font.weight: Font.Bold
-                    color: Theme.sigHot
-                }
-                TextInput {
-                    id: sigInput
-                    anchors.left: chev.right
-                    anchors.leftMargin: 10
-                    anchors.right: parent.right
-                    anchors.rightMargin: 14
-                    anchors.verticalCenter: parent.verticalCenter
-                    onTextChanged: win.edited(text)
-                    font.family: Theme.mono
-                    font.pixelSize: 15
-                    color: Theme.sigValue
-                    selectionColor: Theme.surface1
-                    cursorDelegate: Rectangle { width: 8; color: Theme.sigHot; opacity: 0.8 }
-                    Keys.onPressed: event => win.key(event)
-                }
-                Text {
-                    anchors.left: chev.right
-                    anchors.leftMargin: 18
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: sigInput.text === ""
-                    text: win.mode === "apps" ? "type to find · *  =  :  ?  for the other modes"
-                        : win.mode === "calc" ? "a sum"
-                        : win.mode === "desk" ? "a desk action"
-                        : win.mode === "pinned" ? "a pinned app or file · or ~/path to pin one"
-                        : "search the web"
-                    font.family: Theme.mono
-                    font.pixelSize: 12
-                    color: Theme.surface2
-                }
-            }
-
-            Rectangle { width: parent.width; height: 1; color: Theme.sigRule }
-
-            // ── rows ──
-            Repeater {
-                model: win.results.slice(win.top, win.top + win.rows)
-                delegate: Rectangle {
-                    id: row
-                    required property var modelData
-                    required property int index
-                    readonly property bool sel: win.top + index === win.cursor && modelData.kind !== "hint"
-                    readonly property bool big: modelData.kind === "calc"
-                    width: sigCol.width
-                    height: big ? 40 : 30
-                    color: sel ? Theme.sigCell : "transparent"
-
-                    Rectangle {
-                        width: 2
-                        height: parent.height
-                        color: Theme.sigHot
-                        visible: row.sel
-                    }
-                    Row {
-                        x: 14
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: 14
-                        Text {
-                            width: 16
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: row.modelData.kind === "app" ? Theme.pad(win.top + row.index + 1, 2, "0") : row.modelData.glyph
-                            font.family: Theme.mono
-                            font.pixelSize: row.modelData.kind === "app" ? 10 : 12
-                            color: row.modelData.kind === "app" ? Theme.surface2 : row.sel ? Theme.sigHot : Theme.sigLabel
-                        }
-                        Text {
-                            width: row.big ? 300 : 230
-                            anchors.verticalCenter: parent.verticalCenter
-                            elide: Text.ElideRight
-                            text: row.modelData.title
-                            font.family: Theme.mono
-                            font.pixelSize: row.big ? 20 : 12
-                            font.weight: row.sel || row.big ? Font.Bold : Font.Normal
-                            color: row.modelData.kind === "hint" ? Theme.sigLabel : row.sel || row.big ? Theme.sigHot : Theme.sigValue
-                        }
-                        Text {
-                            width: row.big ? 230 : 300
-                            anchors.verticalCenter: parent.verticalCenter
-                            elide: Text.ElideRight
-                            text: row.modelData.sub
-                            font.family: Theme.mono
-                            font.pixelSize: 10
-                            color: Theme.sigLabel
-                        }
-                    }
-                    Text {
-                        anchors.right: parent.right
-                        anchors.rightMargin: 14
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: row.modelData.tag
-                        font.family: Theme.mono
-                        font.pixelSize: 9
-                        font.letterSpacing: row.modelData.kind === "app" ? 0 : 1.2
-                        color: row.modelData.kind === "desk" || row.modelData.kind === "calc" || row.modelData.pinned ? Theme.sigHot : Theme.surface2
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: row.modelData.kind === "hint" ? Qt.ArrowCursor : Qt.PointingHandCursor
-                        onEntered: win.cursor = win.top + row.index
-                        onClicked: mouse => win.launch(win.top + row.index, mouse.modifiers & Qt.ShiftModifier)
-                    }
-                }
-            }
-
-            // nothing matched: say so, once, quietly
-            Item {
-                visible: win.results.length === 0
-                width: parent.width
-                height: 30
-                Text {
-                    x: 14
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: "no match · tab for another mode"
-                    font.family: Theme.mono
-                    font.pixelSize: 11
-                    color: Theme.surface2
-                }
-            }
-
-            Rectangle { width: parent.width; height: 1; color: Theme.sigRule }
-
-            // ── footer ──
-            Item {
-                width: parent.width
-                height: 28
-                Text {
-                    x: 14
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: win.modeNow.hint + " · tab mode · ctrl-j/k move · esc close"
-                    font.family: Theme.mono
-                    font.pixelSize: 9
-                    color: Theme.surface2
-                }
-                Text {
-                    anchors.right: parent.right
-                    anchors.rightMargin: 14
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: Theme.pad(win.results.length ? win.cursor + 1 : 0, 2, "0") + "/"
-                          + Theme.pad(win.results.length, 2, "0")
-                    font.family: Theme.mono
-                    font.pixelSize: 9
-                    color: Theme.sigLabel
-                }
-            }
+        FooterBar {
+            leftText: win.modeNow.hint + " · tab mode · ctrl-j/k move · esc close"
+            rightText: Theme.pad(win.results.length ? win.cursor + 1 : 0, 2, "0") + "/"
+                   + Theme.pad(win.results.length, 2, "0")
         }
     }
-
 }

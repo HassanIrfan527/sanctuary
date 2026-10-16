@@ -1,6 +1,5 @@
 import QtQuick
-import Quickshell
-import Quickshell.Wayland
+import "kit"
 
 // COMMS — Discord voice without leaving your window. Mod+C, or click the VC
 // cell on the bar. Same grammar as RIG: one letter per action, no SUPER.
@@ -16,28 +15,31 @@ import Quickshell.Wayland
 //
 // M here is DISCORD's mute (others see the red icon). SUPER M stays the
 // system mic. Data: Comms.qml ← the SanctuaryComms Vencord plugin.
-PanelWindow {
+Popup {
     id: win
 
-    visible: Ui.commsOpen
-    color: "transparent"
-    anchors {
-        top: true
-        bottom: true
-        left: true
-        right: true
+    name: "comms"
+    open: Ui.commsOpen
+    onDismissed: Ui.commsOpen = false
+    cardWidth: 400
+    count: rows.length
+    tabMoves: true
+    numberKeys: false
+    onChosen: i => run(rows[i].act)
+    onKeyPressed: event => {
+        const row = rows.find(r => r.key === event.text.toUpperCase());
+        if (row) {
+            run(row.act);
+            event.accepted = true;
+        }
     }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.namespace: "sanctuary-comms"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     // The one-word state: what the header lamp and the bar cell say.
     readonly property string word: !Comms.linked ? "NO LINK"
         : !Comms.inCall ? "NOT IN VOICE"
         : Comms.selfDeaf ? "DEAF"
         : Comms.selfMute ? "MUTE" : "LIVE"
-    readonly property bool live: word === "LIVE"
+    readonly property bool off: word === "MUTE" || word === "DEAF"
 
     readonly property var rows: {
         const r = [];
@@ -49,7 +51,6 @@ PanelWindow {
         r.push({ key: "F", name: "VESKTOP", desc: Comms.linked ? "switch to the window" : "open it", act: "focus" });
         return r;
     }
-    property int cursor: 0
 
     onVisibleChanged: if (visible) cursor = 0
 
@@ -65,244 +66,65 @@ PanelWindow {
             Comms.focus();
     }
 
-    function stateColor() {
-        return live ? Theme.sigHot
-             : (word === "MUTE" || word === "DEAF") ? Theme.red
-             : Theme.sigLabel;
-    }
     // A person's right-hand mark: speaking dot, or what they've switched off.
     function mark(m) {
         return m.deaf ? "DEAF" : m.mute ? "MUTE" : m.speaking ? "●" : "";
     }
 
-    MouseArea {   // scrim: click outside = close
-        anchors.fill: parent
-        acceptedButtons: Qt.AllButtons
-        onClicked: Ui.commsOpen = false
-    }
+    Panel {
+        width: parent.width
+        title: "COMMS"
+        headerHeight: 18
+        tone: win.off ? "alarm" : ""
+        detail: win.word
+        detailStrong: true
+        detailTone: win.word === "LIVE" ? "live" : win.off ? "alarm" : ""
+        hint: "letter act · j k move · esc close"
 
-    Item {
-        id: card
-        anchors.centerIn: parent
-        width: 400
-        height: sig.height
-        focus: true
-
-        Keys.onPressed: event => {
-            const k = event.key;
-            const n = win.rows.length;
-            if (k === Qt.Key_Escape || k === Qt.Key_Q)
-                Ui.commsOpen = false;
-            else if (k === Qt.Key_J || k === Qt.Key_Down || k === Qt.Key_Tab)
-                win.cursor = (win.cursor + 1) % n;
-            else if (k === Qt.Key_K || k === Qt.Key_Up || k === Qt.Key_Backtab)
-                win.cursor = (win.cursor + n - 1) % n;
-            else if (k === Qt.Key_Return || k === Qt.Key_Enter || k === Qt.Key_L)
-                win.run(win.rows[win.cursor].act);
-            else {
-                const row = win.rows.find(r => r.key === event.text.toUpperCase());
-                if (!row)
-                    return;
-                win.run(row.act);
-            }
-            event.accepted = true;
+        Pair {   // #channel · server ··· people count
+            visible: Comms.inCall
+            text: "#" + Comms.channel + (Comms.guild !== "" ? "  ·  " + Comms.guild : "")
+            value: Theme.pad(Comms.count, 2, "0")
         }
 
-        MouseArea {   // swallow clicks on the card
-            anchors.fill: parent
-            acceptedButtons: Qt.AllButtons
+        Label {   // why there's nothing
+            visible: !Comms.inCall
+            x: 14
+            width: implicitWidth
+            bottomPadding: 6
+            role: "note"
+            text: Comms.linked ? "join a voice channel in Vesktop"
+                               : "vesktop closed, or SanctuaryComms off"
         }
 
-        // ══ Signal ═══════════════════════════════════════════════════
-        Rectangle {
-            id: sig
-            width: parent.width
-            height: sigCol.implicitHeight + 24
-            color: Theme.sigFill
-            border.width: 1
-            border.color: Theme.sigRule
-
-            SignalTicks {
-                anchors.fill: parent
-                anchors.margins: -3
-                color: win.word === "MUTE" || win.word === "DEAF" ? Theme.sigAlarm : Theme.sigHot
-            }
-
-            Column {
-                id: sigCol
-                x: 1
-                y: 12
-                width: parent.width - 2
-                spacing: 2
-
-                Item {   // COMMS ··· state word
-                    width: parent.width
-                    height: 18
-                    Text {
-                        x: 14
-                        text: "COMMS"
-                        font.family: Theme.mono
-                        font.pixelSize: 9
-                        font.weight: Font.Bold
-                        font.letterSpacing: 2
-                        color: Theme.sigHot
-                    }
-                    Text {
-                        anchors.right: parent.right
-                        anchors.rightMargin: 14
-                        text: win.word
-                        font.family: Theme.mono
-                        font.pixelSize: 9
-                        font.weight: Font.Bold
-                        font.letterSpacing: 1.4
-                        color: win.stateColor()
-                    }
-                }
-
-                Item {   // #channel · server ··· people count
-                    visible: Comms.inCall
-                    width: parent.width
-                    height: 22
-                    Text {
-                        x: 14
-                        width: parent.width - 80
-                        elide: Text.ElideRight
-                        text: "#" + Comms.channel + (Comms.guild !== "" ? "  ·  " + Comms.guild : "")
-                        font.family: Theme.mono
-                        font.pixelSize: 12
-                        font.weight: Font.Bold
-                        color: Theme.sigValue
-                    }
-                    Text {
-                        anchors.right: parent.right
-                        anchors.rightMargin: 14
-                        text: Theme.pad(Comms.count, 2, "0")
-                        font.family: Theme.mono
-                        font.pixelSize: 12
-                        font.weight: Font.Bold
-                        color: Theme.sigValue
-                    }
-                }
-
-                Text {   // why there's nothing
-                    visible: !Comms.inCall
-                    x: 14
-                    bottomPadding: 6
-                    text: Comms.linked ? "join a voice channel in Vesktop"
-                                       : "vesktop closed, or SanctuaryComms off"
-                    font.family: Theme.mono
-                    font.pixelSize: 10
-                    color: Theme.sigLabel
-                }
-
-                Repeater {   // the room
-                    model: Comms.inCall ? Comms.members : []
-                    delegate: Item {
-                        id: who
-                        required property var modelData
-                        width: sigCol.width
-                        height: 22
-                        Rectangle {
-                            width: 2
-                            height: parent.height
-                            color: Theme.sigHot
-                            visible: who.modelData.speaking
-                        }
-                        Text {
-                            x: 14
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: parent.width - 90
-                            elide: Text.ElideRight
-                            text: who.modelData.name + (who.modelData.me ? "  · you" : "")
-                            font.family: Theme.mono
-                            font.pixelSize: 11
-                            color: who.modelData.speaking ? Theme.sigHot : Theme.sigValue
-                        }
-                        Text {
-                            anchors.right: parent.right
-                            anchors.rightMargin: 14
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: win.mark(who.modelData)
-                            font.family: Theme.mono
-                            font.pixelSize: 9
-                            font.weight: Font.Bold
-                            font.letterSpacing: 1.2
-                            color: who.modelData.mute || who.modelData.deaf ? Theme.sigAlarm : Theme.sigHot
-                        }
-                    }
-                }
-
-                Rectangle {
-                    x: 14
-                    width: parent.width - 28
-                    height: 1
-                    color: Theme.sigRule
-                }
-                Item { width: 1; height: 4 }
-
-                Repeater {   // the actions
-                    model: win.rows
-                    delegate: Rectangle {
-                        id: row
-                        required property var modelData
-                        required property int index
-                        readonly property bool sel: index === win.cursor
-                        width: sigCol.width
-                        height: 30
-                        color: sel ? Theme.sigCell : "transparent"
-
-                        Rectangle {
-                            width: 2
-                            height: parent.height
-                            color: Theme.sigHot
-                            visible: row.sel
-                        }
-                        Row {
-                            x: 14
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: 12
-                            Text {
-                                text: row.modelData.key
-                                font.family: Theme.mono
-                                font.pixelSize: 10
-                                font.weight: Font.Bold
-                                color: row.sel ? Theme.sigHot : Theme.surface2
-                            }
-                            Text {
-                                width: 100
-                                text: row.modelData.name
-                                font.family: Theme.mono
-                                font.pixelSize: 12
-                                font.weight: Font.Bold
-                                color: row.sel ? Theme.sigHot : Theme.sigValue
-                            }
-                            Text {
-                                text: row.modelData.desc
-                                font.family: Theme.mono
-                                font.pixelSize: 10
-                                color: Theme.sigLabel
-                            }
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onEntered: win.cursor = row.index
-                            onClicked: win.run(row.modelData.act)
-                        }
-                    }
-                }
-
-                Text {
-                    x: 14
-                    topPadding: 8
-                    text: "letter act · j k move · esc close"
-                    font.family: Theme.mono
-                    font.pixelSize: 9
-                    color: Theme.surface2
-                }
+        Repeater {   // the room
+            model: Comms.inCall ? Comms.members : []
+            delegate: PersonRow {
+                required property var modelData
+                name: modelData.name + (modelData.me ? "  · you" : "")
+                speaking: modelData.speaking
+                mark: win.mark(modelData)
+                markAlarm: modelData.mute || modelData.deaf
             }
         }
 
+        Rule { height: 1 }
+        Item { width: 1; height: 4 }
+
+        Repeater {   // the actions
+            model: win.rows
+            delegate: MenuRow {
+                required property var modelData
+                required property int index
+                key: modelData.key
+                name: modelData.name
+                desc: modelData.desc
+                nameWidth: 100
+                selected: index === win.cursor
+                litWhenSelected: true
+                onHovered: win.cursor = index
+                onClicked: win.run(modelData.act)
+            }
+        }
     }
 }

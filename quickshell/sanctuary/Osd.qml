@@ -1,12 +1,13 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import "kit"
 
 // The volume pop-up: appears under the bar's centre when the output volume or
 // mute changes, holds for 1.4s, goes. It takes no input — the pointer passes
 // straight through it — because it is a readout, never a control (§1).
 //
-//   a hairline gauge: VOL ▕██████████░░░░░░░░░░▏ 52%
+//   VOL ▕██████████░░░░░░░░░░▏ 52%
 PanelWindow {
     id: osd
 
@@ -18,8 +19,8 @@ PanelWindow {
     margins.top: 8
     exclusionMode: ExclusionMode.Normal   // below the bar
     exclusiveZone: 0
-    implicitWidth: sig.width + 16
-    implicitHeight: sig.height + 16
+    implicitWidth: plate.width + 16
+    implicitHeight: plate.height + 16
 
     WlrLayershell.namespace: "sanctuary-osd"
     WlrLayershell.layer: WlrLayer.Overlay
@@ -41,66 +42,34 @@ PanelWindow {
         onTriggered: osd.shown = false
     }
 
-    Item {
-        id: body
+    Fade {
         x: 8
         y: 4
         width: parent.width - 16
-        height: parent.height - 16
-        opacity: osd.shown ? 1 : 0
-        Behavior on opacity { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
+        shown: osd.shown
 
-        // ── Signal ────────────────────────────────────────────────────
-        Rectangle {
-            id: sig
-            width: sigRow.implicitWidth + 28
-            height: 34
-            color: Theme.sigFill
-            border.width: 1
-            border.color: Theme.sigRule
+        Plate {
+            id: plate
+            tone: Media.muted ? "warn" : ""
 
-            SignalTicks {
-                anchors.fill: parent
-                anchors.margins: -3
-                color: Media.muted ? Theme.sigWarn : Theme.sigHot
+            Label {
+                anchors.verticalCenter: parent.verticalCenter
+                width: implicitWidth
+                role: "tag"
+                tone: Media.muted ? "warn" : ""
+                text: Media.muted ? "MUTE" : "VOL"
             }
-
-            Row {
-                id: sigRow
-                anchors.centerIn: parent
-                spacing: 10
-
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: Media.muted ? "MUTE" : "VOL"
-                    font.family: Theme.mono
-                    font.pixelSize: 9
-                    font.weight: Font.Bold
-                    font.letterSpacing: 1.4
-                    color: Media.muted ? Theme.sigWarn : Theme.sigLabel
-                }
-                Row {
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 2
-                    Repeater {
-                        model: 20
-                        delegate: Rectangle {
-                            required property int index
-                            width: 6
-                            height: 12
-                            color: !Media.muted && osd.level > index / 20 ? Theme.sigHot : Theme.surface0
-                            Behavior on color { ColorAnimation { duration: 80 } }
-                        }
-                    }
-                }
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: Theme.pad(osd.pctNum + "%", 4, " ")
-                    font.family: Theme.mono
-                    font.pixelSize: 12
-                    font.weight: Font.Bold
-                    color: Media.muted ? Theme.surface2 : Theme.sigValue
-                }
+            Meter {
+                anchors.verticalCenter: parent.verticalCenter
+                value: osd.level
+                off: Media.muted
+            }
+            Label {
+                anchors.verticalCenter: parent.verticalCenter
+                width: implicitWidth
+                role: "readout"
+                tone: Media.muted ? "dim" : ""
+                text: Theme.pad(osd.pctNum + "%", 4, " ")
             }
         }
     }

@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import "kit"
 
 // The screen recorder's overlay — Ctrl+Print, or SCREEN in RIG.
 //
@@ -138,72 +139,20 @@ PanelWindow {
     }
 
     readonly property bool drawDim: !launching && (selecting || recRegion)
-    readonly property color frameColor: Rec.scrPaused ? Theme.yellow
-                                      : Rec.scrActive ? Theme.red
-                                      : Theme.sigHot
+    // "" while choosing · alarm while recording · warn while paused
+    readonly property string liveTone: Rec.scrPaused ? "warn" : Rec.scrActive ? "alarm" : ""
 
-    // ── dim: four slabs around the region (or one, before there is one) ──
-    Item {
+    // ── dim: the screen around the region, its frame, its size ──────
+    RegionShade {
         anchors.fill: parent
         visible: win.drawDim
-        readonly property color shade: Qt.rgba(0, 0, 0, win.selecting ? 0.5 : 0.42)
-
-        Rectangle {   // whole screen, until a region exists
-            anchors.fill: parent
-            visible: !win.hasRegion
-            color: parent.shade
-        }
-        Rectangle {   // above
-            visible: win.hasRegion
-            width: parent.width
-            height: win.ry
-            color: parent.shade
-        }
-        Rectangle {   // below
-            visible: win.hasRegion
-            y: win.ry + win.rh
-            width: parent.width
-            height: parent.height - y
-            color: parent.shade
-        }
-        Rectangle {   // left
-            visible: win.hasRegion
-            y: win.ry
-            width: win.rx
-            height: win.rh
-            color: parent.shade
-        }
-        Rectangle {   // right
-            visible: win.hasRegion
-            x: win.rx + win.rw
-            y: win.ry
-            width: parent.width - x
-            height: win.rh
-            color: parent.shade
-        }
-
-        // The frame: 2px, one pixel clear of the region on every side.
-        Rectangle {
-            visible: win.hasRegion
-            x: win.rx - 3
-            y: win.ry - 3
-            width: win.rw + 6
-            height: win.rh + 6
-            color: "transparent"
-            border.width: 2
-            border.color: win.frameColor
-        }
-
-        // Size readout while choosing, outside the top-left corner.
-        Text {
-            visible: win.selecting && win.hasRegion
-            x: Math.max(4, win.rx - 3)
-            y: win.ry - 3 - height - 4 >= 0 ? win.ry - 3 - height - 4 : win.ry + win.rh + 6
-            text: win.rw + " × " + win.rh
-            font.family: Theme.mono
-            font.pixelSize: 10
-            color: "#ffffff"
-        }
+        rx: win.rx
+        ry: win.ry
+        rw: win.rw
+        rh: win.rh
+        strong: win.selecting
+        tone: win.liveTone
+        showSize: win.selecting
     }
 
     // ── choosing: drag a region ───────────────────────────────────────
@@ -272,133 +221,85 @@ PanelWindow {
     }
     readonly property bool stripShown: !launching && (selecting || recRegion) && stripY >= 0
 
-    Item {
+    ButtonStrip {
         id: strip
         visible: win.stripShown
         x: win.hasRegion ? Math.max(8, Math.min(win.rx - 3, win.width - width - 8))
                          : (win.width - width) / 2
         y: Math.max(0, win.stripY)
-        width: row.implicitWidth + 2
-        height: 32 + 2
+        tone: Rec.scrActive ? win.liveTone : ""
 
-        // A strip like the bar's.
-        Rectangle {
-            anchors.fill: parent
-            color: Theme.sigFill
-            border.width: 1
-            border.color: Rec.scrActive ? win.frameColor : Theme.sigRule
+        // ── recording: the readout ──
+        StripReadout {
+            visible: Rec.scrActive
+            text: (Rec.scrPaused ? "‖ " : blink.on ? "● " : "○ ") + Rec.clock(Rec.scrMs)
+            tone: Rec.scrPaused ? "warn" : "alarm"
+        }
+        StripButton {
+            visible: Rec.scrActive
+            text: Rec.scrPaused ? "▶ RESUME" : "‖ PAUSE"
+            lit: Rec.scrPaused
+            tone: "warn"
+            onClicked: Rec.screen(["pause-toggle"])
         }
 
-        MouseArea {   // the strip is not part of the drag area
-            anchors.fill: parent
-            acceptedButtons: Qt.AllButtons
+        // ── choosing: the hint ──
+        StripHint {
+            visible: win.selecting && !win.hasRegion
+            text: "DRAG A REGION"
         }
 
-        Row {
-            id: row
-            x: 1
-            y: 1
-            spacing: 0
+        // ── both: what goes into the recording ──
+        StripButton {
+            readonly property bool on: Rec.scrActive ? Rec.scrMic : win.wantMic
+            text: on ? "MIC ●" : "MIC ○"
+            lit: on
+            onClicked: Rec.scrActive ? Rec.screen(["mic", "toggle"]) : win.wantMic = !win.wantMic
+        }
+        StripButton {
+            readonly property bool on: Rec.scrActive ? Rec.scrSys : win.wantSys
+            text: on ? "SYS ●" : "SYS ○"
+            lit: on
+            onClicked: Rec.scrActive ? Rec.screen(["sys", "toggle"]) : win.wantSys = !win.wantSys
+        }
 
-            // ── recording: the readout ──
-            Item {
-                visible: Rec.scrActive
-                width: readout.implicitWidth + 24
-                height: 32
-                Text {
-                    id: readout
-                    anchors.centerIn: parent
-                    text: (Rec.scrPaused ? "‖ " : blink.on ? "● " : "○ ") + Rec.clock(Rec.scrMs)
-                    font.family: Theme.mono
-                    font.pixelSize: 12
-                    font.weight: Font.Bold
-                    color: Rec.scrPaused ? Theme.sigWarn : Theme.sigAlarm
-                }
-                Rectangle {
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 1
-                    height: parent.height - 12
-                    color: Theme.sigRule
-                }
-            }
-            CapButton {
-                visible: Rec.scrActive
-                text: Rec.scrPaused ? "▶ RESUME" : "‖ PAUSE"
-                lit: Rec.scrPaused
-                hot: Theme.yellow
-                onClicked: Rec.screen(["pause-toggle"])
-            }
+        // ── choosing: go ──
+        StripButton {
+            visible: win.selecting
+            text: "FULL"
+            onClicked: win.record(true)
+        }
+        StripButton {
+            visible: win.selecting && win.hasRegion
+            text: "● REC"
+            lit: true
+            tone: "alarm"
+            onClicked: win.record(false)
+        }
 
-            // ── choosing: the hint ──
-            Item {
-                visible: win.selecting && !win.hasRegion
-                width: hint.implicitWidth + 24
-                height: 32
-                Text {
-                    id: hint
-                    anchors.centerIn: parent
-                    text: "DRAG A REGION"
-                    font.family: Theme.mono
-                    font.pixelSize: 11
-                    font.weight: Font.Bold
-                    font.letterSpacing: 1.2
-                    color: Theme.sigValue
-                }
-            }
+        // ── recording: end it ──
+        StripButton {
+            visible: Rec.scrActive
+            text: "■ STOP"
+            lit: true
+            tone: "alarm"
+            onClicked: Rec.screen(["stop"])
+        }
 
-            // ── both: what goes into the recording ──
-            CapButton {
-                readonly property bool on: Rec.scrActive ? Rec.scrMic : win.wantMic
-                text: on ? "MIC ●" : "MIC ○"
-                lit: on
-                onClicked: Rec.scrActive ? Rec.screen(["mic", "toggle"]) : win.wantMic = !win.wantMic
-            }
-            CapButton {
-                readonly property bool on: Rec.scrActive ? Rec.scrSys : win.wantSys
-                text: on ? "SYS ●" : "SYS ○"
-                lit: on
-                onClicked: Rec.scrActive ? Rec.screen(["sys", "toggle"]) : win.wantSys = !win.wantSys
-            }
-
-            // ── choosing: go ──
-            CapButton {
-                visible: win.selecting
-                text: "FULL"
-                onClicked: win.record(true)
-            }
-            CapButton {
-                visible: win.selecting && win.hasRegion
-                text: "● REC"
-                lit: true
-                hot: Theme.red
-                onClicked: win.record(false)
-            }
-
-            // ── recording: end it ──
-            CapButton {
-                visible: Rec.scrActive
-                text: "■ STOP"
-                lit: true
-                hot: Theme.red
-                onClicked: Rec.screen(["stop"])
-            }
-
-            CapButton {
-                text: win.selecting ? "✕" : win.confirmDiscard ? "DISCARD?" : "✕"
-                lit: win.confirmDiscard
-                hot: Theme.red
-                rule: false
-                onClicked: {
-                    if (win.selecting) {
-                        win.cancel();
-                    } else if (win.confirmDiscard) {
-                        win.confirmDiscard = false;
-                        Rec.screen(["discard"]);
-                    } else {
-                        win.confirmDiscard = true;
-                        discardArm.restart();
-                    }
+        StripButton {
+            text: win.selecting ? "✕" : win.confirmDiscard ? "DISCARD?" : "✕"
+            lit: win.confirmDiscard
+            tone: "alarm"
+            rule: false
+            onClicked: {
+                if (win.selecting) {
+                    win.cancel();
+                } else if (win.confirmDiscard) {
+                    win.confirmDiscard = false;
+                    Rec.screen(["discard"]);
+                } else {
+                    win.confirmDiscard = true;
+                    discardArm.restart();
                 }
             }
         }

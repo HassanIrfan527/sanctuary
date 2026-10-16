@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import Quickshell.Wayland
+import "kit"
 
 // The wallpaper picker — Mod+Shift+W (scripts/sanctuary/wallpaper.sh open).
 // Drawn in the current style; when Quickshell is down the same key opens yazi.
@@ -11,7 +11,7 @@ import Quickshell.Wayland
 // stops a live one — it is a layer above awww and would hide the change.
 //
 // Each shelf is a folder tree. Off search you see one folder at a time: its
-// subfolders first (drawn folder tiles, FolderGlyph.qml), then the pictures
+// subfolders first (drawn folder tiles, the kit's FolderGlyph), then the pictures
 // directly in it, with a ".." tile at the head once you are inside. Typing
 // searches every picture in every folder at once, folders matched by path too
 // ("jjk" finds all of jjk/). The tree is built here from the file paths, so a
@@ -28,21 +28,14 @@ import Quickshell.Wayland
 //   backspace  up a folder — only on an empty search box, and never on key
 //              repeat: holding it to clear a word stops at the empty box
 //   esc  close     click a tile to open / set it; click outside to close
-PanelWindow {
+Popup {
     id: win
 
-    visible: Ui.wallOpen
-    color: "transparent"
-    anchors {
-        top: true
-        bottom: true
-        left: true
-        right: true
-    }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.namespace: "sanctuary-wallpaper"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    name: "wallpaper"
+    open: Ui.wallOpen
+    onDismissed: Ui.wallOpen = false
+    cardWidth: 1000
+    qCloses: false   // q is typed into the search
 
     readonly property string scripts: Quickshell.env("HOME") + "/.dotfiles/scripts/sanctuary/"
 
@@ -53,7 +46,6 @@ PanelWindow {
     property string kind: "still"     // the shelf on show
     property string folder: ""        // where you are on it, relative to its root; "" = top
     property string query: ""
-    property int cursor: 0
     property int thumbRev: 0          // bumped when new thumbnails land → tiles retry
 
     readonly property int cols: 4
@@ -98,9 +90,9 @@ PanelWindow {
 
     onVisibleChanged: {
         if (visible) {
-            sigInput.text = "";
+            prompt.text = "";
             lister.running = true;
-            Qt.callLater(() => sigInput.forceActiveFocus());
+            Qt.callLater(() => prompt.focusInput());
         }
     }
     onQueryChanged: cursor = 0
@@ -247,13 +239,7 @@ PanelWindow {
         event.accepted = true;
     }
 
-    MouseArea {   // scrim: click outside = close
-        anchors.fill: parent
-        acceptedButtons: Qt.AllButtons
-        onClicked: Ui.wallOpen = false
-    }
-
-    // ══ Signal: a contact sheet on the instrument ════════════════════
+    // ══ a contact sheet ═════════════════════════════════════════════
     //
     //   ┌ WALLPAPER   STILL 445 · LIVE 21   / DYNAMIC-WALLPAPERS ── 002/003 ┐
     //   │ ▸ filter by name▌                                                  │
@@ -264,287 +250,100 @@ PanelWindow {
     //   │ └───────┘ ┗━━━━━━━┛ └───────┘                                      │
     //   │ Dark/  · 15                                                        │
     //   └ enter open · ⌫ up · shift-enter try · tab still/live · esc ────────┘
-    Rectangle {
-        id: sig
-        anchors.centerIn: parent
-        width: 1000
-        height: sigCol.implicitHeight
-        color: Theme.sigFill
-        border.width: 1
-        border.color: Theme.sigRule
+    Panel {
+        width: parent.width
+        pad: 0
+        vpad: 0
+        spacing: 0
 
-        MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons }   // swallow
-
-        SignalTicks {
-            anchors.fill: parent
-            anchors.margins: -3
+        // header: title, shelves, position
+        TitleBar {
+            title: "WALLPAPER"
+            detail: Theme.pad(win.results.length ? win.cursor + 1 : 0, 3, "0") + "/"
+                    + Theme.pad(win.results.length, 3, "0")
+            Repeater {
+                model: [{ k: "still", n: win.stillCount }, { k: "live", n: win.liveCount }]
+                delegate: Tab {
+                    required property var modelData
+                    kind: "shelf"
+                    text: modelData.k.toUpperCase() + " " + modelData.n
+                    on: win.kind === modelData.k
+                    onClicked: win.kind = modelData.k
+                }
+            }
+            Label {   // where you are
+                width: Math.min(implicitWidth, 460)
+                role: "path"
+                tone: win.searching ? "warn" : ""
+                text: win.crumb.toUpperCase()
+            }
         }
 
-        Column {
-            id: sigCol
-            width: parent.width
+        // filter prompt
+        Prompt {
+            id: prompt
+            placeholder: "search all folders"
+            onEdited: t => win.query = t
+            onKeyPressed: event => win.key(event)
+        }
 
-            // header: title, shelves, position
-            Item {
-                width: parent.width
-                height: 30
-                Row {
-                    x: 14
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 18
-                    Text {
-                        text: "WALLPAPER"
-                        font.family: Theme.mono
-                        font.pixelSize: 9
-                        font.weight: Font.Bold
-                        font.letterSpacing: 2
-                        color: Theme.sigHot
-                    }
-                    Repeater {
-                        model: [{ k: "still", n: win.stillCount }, { k: "live", n: win.liveCount }]
-                        delegate: Text {
-                            required property var modelData
-                            text: modelData.k.toUpperCase() + " " + modelData.n
-                            font.family: Theme.mono
-                            font.pixelSize: 9
-                            font.weight: win.kind === modelData.k ? Font.Bold : Font.Normal
-                            font.letterSpacing: 1.4
-                            color: win.kind === modelData.k ? Theme.sigValue : Theme.sigLabel
-                            font.underline: win.kind === modelData.k
-                            MouseArea {
-                                anchors.fill: parent
-                                anchors.margins: -4
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: win.kind = parent.modelData.k
-                            }
-                        }
-                    }
-                    Text {   // where you are
-                        width: Math.min(implicitWidth, 460)
-                        elide: Text.ElideLeft
-                        text: win.crumb.toUpperCase()
-                        font.family: Theme.mono
-                        font.pixelSize: 9
-                        font.letterSpacing: 1.4
-                        color: win.searching ? Theme.sigWarn : Theme.sigLabel
-                    }
-                }
-                Text {
-                    anchors.right: parent.right
-                    anchors.rightMargin: 14
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: Theme.pad(win.results.length ? win.cursor + 1 : 0, 3, "0") + "/"
-                          + Theme.pad(win.results.length, 3, "0")
-                    font.family: Theme.mono
-                    font.pixelSize: 9
-                    font.letterSpacing: 1.4
-                    color: Theme.sigLabel
-                }
+        Rule { inset: 0; height: 1 }
+        Item { width: 1; height: 6 }
+
+        GridView {
+            id: sigGrid
+            x: 10
+            width: parent.width - 20
+            // Exactly `shown` rows, snapping row by row: no sliver of a
+            // fourth row peeking in at the bottom.
+            height: cellHeight * win.shown
+            clip: true
+            snapMode: GridView.SnapToRow
+            cellWidth: Math.floor(width / win.cols)
+            cellHeight: Math.round(cellWidth * 9 / 16)
+            model: win.results
+            currentIndex: win.cursor
+            boundsBehavior: Flickable.StopAtBounds
+            cacheBuffer: cellHeight * 2
+
+            delegate: PhotoTile {
+                required property var modelData
+                required property int index
+                width: sigGrid.cellWidth
+                height: sigGrid.cellHeight
+                kind: modelData.type
+                entry: modelData
+                rev: win.thumbRev
+                name: modelData.type === "up" ? "UP" : modelData.name
+                sub: modelData.type === "up"
+                     ? "TO " + (modelData.dir === "" ? "TOP" : modelData.dir.split("/").pop().toUpperCase())
+                     : Theme.pad(modelData.count || 0, 3, "0") + " " + modelData.kind.toUpperCase()
+                selected: index === win.cursor
+                now: modelData.type === "file" ? modelData.path === win.currentPath : !!modelData.now
+                live: modelData.kind === "live"
+                onHovered: win.cursor = index
+                onClicked: win.apply(index, false)
             }
 
-            // filter prompt
-            Item {
-                width: parent.width
-                height: 34
-                Text {
-                    id: chev
-                    x: 14
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: "▸"
-                    font.family: Theme.mono
-                    font.pixelSize: 13
-                    color: Theme.sigHot
-                }
-                TextInput {
-                    id: sigInput
-                    anchors.left: chev.right
-                    anchors.leftMargin: 10
-                    anchors.right: parent.right
-                    anchors.rightMargin: 14
-                    anchors.verticalCenter: parent.verticalCenter
-                    onTextChanged: win.query = text
-                    font.family: Theme.mono
-                    font.pixelSize: 13
-                    color: Theme.sigValue
-                    selectionColor: Theme.surface1
-                    cursorDelegate: Rectangle { width: 7; color: Theme.sigHot; opacity: 0.8 }
-                    Keys.onPressed: event => win.key(event)
-                }
-                Text {
-                    anchors.left: chev.right
-                    anchors.leftMargin: 10
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: win.query === ""
-                    text: "search all folders"
-                    font.family: Theme.mono
-                    font.pixelSize: 13
-                    color: Theme.surface2
-                }
+            Label {
+                anchors.centerIn: parent
+                width: implicitWidth
+                visible: win.results.length === 0
+                role: "nomatch"
+                text: lister.running ? "READING…" : "NO MATCH"
             }
+        }
 
-            Rectangle { width: parent.width; height: 1; color: Theme.sigRule }
-            Item { width: 1; height: 6 }
+        Item { width: 1; height: 6 }
+        Rule { inset: 0; height: 1 }
 
-            GridView {
-                id: sigGrid
-                x: 10
-                width: parent.width - 20
-                // Exactly `shown` rows, snapping row by row: no sliver of a
-                // fourth row peeking in at the bottom.
-                height: cellHeight * win.shown
-                clip: true
-                snapMode: GridView.SnapToRow
-                cellWidth: Math.floor(width / win.cols)
-                cellHeight: Math.round(cellWidth * 9 / 16)
-                model: win.results
-                currentIndex: win.cursor
-                boundsBehavior: Flickable.StopAtBounds
-                cacheBuffer: cellHeight * 2
-
-                delegate: Item {
-                    id: tile
-                    required property var modelData
-                    required property int index
-                    readonly property bool sel: index === win.cursor
-                    readonly property bool isFile: modelData.type === "file"
-                    readonly property bool now: isFile ? modelData.path === win.currentPath : !!modelData.now
-                    width: sigGrid.cellWidth
-                    height: sigGrid.cellHeight
-
-                    Rectangle {
-                        anchors.fill: parent
-                        anchors.margins: 4
-                        color: Theme.sigCell
-                        border.width: tile.sel ? 2 : 1
-                        border.color: tile.sel ? Theme.sigHot : Theme.sigRule
-
-                        Thumb {
-                            visible: tile.isFile
-                            anchors.fill: parent
-                            anchors.margins: tile.sel ? 2 : 1
-                            entry: tile.isFile ? tile.modelData : null
-                            rev: win.thumbRev
-                            fallbackFont: Theme.mono
-                            fallbackColor: Theme.sigLabel
-                            dim: !tile.sel
-                        }
-
-                        // A folder: the first picture inside, barely there behind
-                        // a drawn folder, its name, and how many it holds.
-                        Thumb {
-                            visible: tile.modelData.type === "folder"
-                            anchors.fill: parent
-                            anchors.margins: tile.sel ? 2 : 1
-                            opacity: tile.sel ? 0.22 : 0.12
-                            entry: visible ? tile.modelData : null
-                            rev: win.thumbRev
-                            fallbackColor: "transparent"
-                        }
-                        Column {
-                            visible: !tile.isFile
-                            anchors.centerIn: parent
-                            spacing: 7
-                            FolderGlyph {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                width: 46
-                                height: 34
-                                line: tile.sel ? Theme.sigHot : Theme.sigLabel
-                                fill: Theme.sigCell
-                                label: tile.modelData.type === "up" ? ".." : ""
-                            }
-                            Text {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                width: Math.min(implicitWidth, tile.width - 30)
-                                elide: Text.ElideMiddle
-                                text: (tile.modelData.type === "up" ? "UP" : tile.modelData.name).toUpperCase()
-                                font.family: Theme.mono
-                                font.pixelSize: 10
-                                font.weight: Font.Bold
-                                font.letterSpacing: 1.4
-                                color: tile.sel ? Theme.sigValue : Theme.subtext0
-                            }
-                            Text {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                width: Math.min(implicitWidth, tile.width - 30)
-                                elide: Text.ElideLeft
-                                text: tile.modelData.type === "up"
-                                      ? "TO " + (tile.modelData.dir === "" ? "TOP" : tile.modelData.dir.split("/").pop().toUpperCase())
-                                      : Theme.pad(tile.modelData.count || 0, 3, "0") + " " + tile.modelData.kind.toUpperCase()
-                                font.family: Theme.mono
-                                font.pixelSize: 8
-                                font.letterSpacing: 1.2
-                                color: Theme.sigLabel
-                            }
-                        }
-
-                        Rectangle {   // status tags, top-left
-                            visible: tile.now || (tile.isFile && tile.modelData.kind === "live")
-                            x: 6
-                            y: 6
-                            width: tagText.implicitWidth + 10
-                            height: 15
-                            color: Theme.sigFill
-                            Text {
-                                id: tagText
-                                anchors.centerIn: parent
-                                text: tile.now ? "● NOW" : "▶ LIVE"
-                                font.family: Theme.mono
-                                font.pixelSize: 8
-                                font.weight: Font.Bold
-                                font.letterSpacing: 1.2
-                                color: tile.now ? Theme.sigHot : Theme.sigLabel
-                            }
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onEntered: win.cursor = tile.index
-                        onClicked: win.apply(tile.index, false)
-                    }
-                }
-
-                Text {
-                    anchors.centerIn: parent
-                    visible: win.results.length === 0
-                    text: lister.running ? "READING…" : "NO MATCH"
-                    font.family: Theme.mono
-                    font.pixelSize: 10
-                    font.letterSpacing: 1.6
-                    color: Theme.surface2
-                }
-            }
-
-            Item { width: 1; height: 6 }
-            Rectangle { width: parent.width; height: 1; color: Theme.sigRule }
-
-            // footer: the name under the cursor, the keys
-            Item {
-                width: parent.width
-                height: 28
-                Text {
-                    x: 14
-                    width: parent.width * 0.5
-                    anchors.verticalCenter: parent.verticalCenter
-                    elide: Text.ElideMiddle
-                    text: win.caption(win.picked)
-                    font.family: Theme.mono
-                    font.pixelSize: 10
-                    color: Theme.sigValue
-                }
-                Text {
-                    anchors.right: parent.right
-                    anchors.rightMargin: 14
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: win.hints
-                    font.family: Theme.mono
-                    font.pixelSize: 9
-                    color: Theme.surface2
-                }
-            }
+        // footer: the name under the cursor, the keys
+        FooterBar {
+            leftText: win.caption(win.picked)
+            leftRole: "caption"
+            leftWidth: width * 0.5
+            rightText: win.hints
+            rightRole: "fine"
         }
     }
-
 }

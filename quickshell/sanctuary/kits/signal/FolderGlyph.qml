@@ -1,6 +1,7 @@
 import QtQuick
+import ".."
 
-// A folder, drawn — not an icon-font glyph (DESIGN-BRIEF §4: square line work
+// KIT · FolderGlyph — a folder, drawn — not an icon-font glyph (DESIGN-BRIEF §4: square line work
 // over icon fonts). Two outlined rectangles: a short tab, and the body laid
 // over the tab's bottom edge so the two read as one shape. `label` sits inside
 // the body (".." for the way up). Used by WallPicker.qml in both styles; the

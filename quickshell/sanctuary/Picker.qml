@@ -1,6 +1,6 @@
 import QtQuick
 import Quickshell
-import Quickshell.Wayland
+import "kit"
 
 // The style picker — Mod+Shift+T. Drawn by Quickshell itself, in the style it
 // is currently wearing. Picking restarts Quickshell in the new style (via
@@ -11,21 +11,15 @@ import Quickshell.Wayland
 //
 //   j k ↑ ↓  move     1 2 3  pick directly     enter  pick     esc q  close
 //   click a row to pick it; click outside to close
-PanelWindow {
+Popup {
     id: win
 
-    visible: Ui.pickerOpen
-    color: "transparent"
-    anchors {
-        top: true
-        bottom: true
-        left: true
-        right: true
-    }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.namespace: "sanctuary-picker"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    name: "picker"
+    open: Ui.pickerOpen
+    onDismissed: Ui.pickerOpen = false
+    cardWidth: 420
+    count: styles.length
+    onChosen: i => choose(i)
 
     // Order = the picker's rows. `word` is what shell.sh set takes.
     readonly property var styles: [
@@ -33,7 +27,6 @@ PanelWindow {
         { word: "flare",  name: "Flare",  desc: "signal in daylight · parchment + ember" }
     ]
     readonly property int current: Math.max(0, styles.findIndex(s => s.word === Theme.word))
-    property int cursor: current
 
     onVisibleChanged: if (visible) cursor = current
 
@@ -45,146 +38,25 @@ PanelWindow {
                                  "set", styles[i].word]);
     }
 
-    MouseArea {   // scrim: click outside = close
-        anchors.fill: parent
-        acceptedButtons: Qt.AllButtons
-        onClicked: Ui.pickerOpen = false
-    }
+    Panel {
+        width: parent.width
+        title: "STYLE"
+        hint: "j k move · enter pick · esc close"
 
-    Item {
-        id: card
-        anchors.centerIn: parent
-        width: 420
-        height: sig.height
-        focus: true
-
-        Keys.onPressed: event => {
-            const k = event.key;
-            if (k === Qt.Key_Escape || k === Qt.Key_Q)
-                Ui.pickerOpen = false;
-            else if (k === Qt.Key_J || k === Qt.Key_Down)
-                win.cursor = (win.cursor + 1) % win.styles.length;
-            else if (k === Qt.Key_K || k === Qt.Key_Up)
-                win.cursor = (win.cursor + win.styles.length - 1) % win.styles.length;
-            else if (k === Qt.Key_Return || k === Qt.Key_Enter || k === Qt.Key_L)
-                win.choose(win.cursor);
-            else if (k >= Qt.Key_1 && k < Qt.Key_1 + win.styles.length)
-                win.choose(k - Qt.Key_1);
-            else
-                return;
-            event.accepted = true;
-        }
-
-        MouseArea {   // swallow clicks on the card
-            anchors.fill: parent
-            acceptedButtons: Qt.AllButtons
-        }
-
-        // ══ Signal ═══════════════════════════════════════════════════
-        Rectangle {
-            id: sig
-            width: parent.width
-            height: sigCol.implicitHeight + 24
-            color: Theme.sigFill
-            border.width: 1
-            border.color: Theme.sigRule
-
-            SignalTicks {
-                anchors.fill: parent
-                anchors.margins: -3
-            }
-
-            Column {
-                id: sigCol
-                x: 1
-                y: 12
-                width: parent.width - 2
-                spacing: 2
-
-                Text {
-                    x: 14
-                    bottomPadding: 8
-                    text: "STYLE"
-                    font.family: Theme.mono
-                    font.pixelSize: 9
-                    font.weight: Font.Bold
-                    font.letterSpacing: 2
-                    color: Theme.sigHot
-                }
-
-                Repeater {
-                    model: win.styles
-                    delegate: Rectangle {
-                        id: row
-                        required property var modelData
-                        required property int index
-                        readonly property bool here: index === win.current
-                        readonly property bool sel: index === win.cursor
-                        width: sigCol.width
-                        height: 30
-                        color: sel ? Theme.sigCell : "transparent"
-
-                        Rectangle {
-                            width: 2
-                            height: parent.height
-                            color: Theme.sigHot
-                            visible: row.sel
-                        }
-                        Row {
-                            x: 14
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: 12
-                            Text {
-                                text: String(row.index + 1)
-                                font.family: Theme.mono
-                                font.pixelSize: 10
-                                color: Theme.surface2
-                            }
-                            Text {
-                                width: 70
-                                text: row.modelData.name
-                                font.family: Theme.mono
-                                font.pixelSize: 12
-                                font.weight: Font.Bold
-                                color: row.here ? Theme.sigHot : Theme.sigValue
-                            }
-                            Text {
-                                text: row.modelData.desc
-                                font.family: Theme.mono
-                                font.pixelSize: 10
-                                color: Theme.sigLabel
-                            }
-                        }
-                        Text {
-                            anchors.right: parent.right
-                            anchors.rightMargin: 14
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: row.here ? "● LIVE" : ""
-                            font.family: Theme.mono
-                            font.pixelSize: 9
-                            font.letterSpacing: 1.2
-                            color: Theme.sigHot
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onEntered: win.cursor = row.index
-                            onClicked: win.choose(row.index)
-                        }
-                    }
-                }
-
-                Text {
-                    x: 14
-                    topPadding: 8
-                    text: "j k move · enter pick · esc close"
-                    font.family: Theme.mono
-                    font.pixelSize: 9
-                    color: Theme.surface2
-                }
+        Repeater {
+            model: win.styles
+            delegate: MenuRow {
+                required property var modelData
+                required property int index
+                number: index + 1
+                name: modelData.name
+                desc: modelData.desc
+                selected: index === win.cursor
+                current: index === win.current
+                detail: current ? "● LIVE" : ""
+                onHovered: win.cursor = index
+                onClicked: win.choose(index)
             }
         }
-
     }
 }

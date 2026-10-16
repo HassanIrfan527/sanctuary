@@ -1,6 +1,5 @@
 import QtQuick
-import Quickshell
-import Quickshell.Wayland
+import "kit"
 
 // RIG — the recorders, Mod+U (or click the ◉ cell on the bar). One letter per
 // action, so it is two keypresses and never a menu to walk (DESIGN-BRIEF §1).
@@ -13,44 +12,46 @@ import Quickshell.Wayland
 //   audio on      M  STOP AUDIO  41:05          P  PAUSE / RESUME AUDIO
 //
 //   letter  act     j k ↑ ↓  move     enter  act     esc q  close
-PanelWindow {
+Popup {
     id: win
 
-    visible: Ui.rigOpen
-    color: "transparent"
-    anchors {
-        top: true
-        bottom: true
-        left: true
-        right: true
+    name: "rig"
+    open: Ui.rigOpen
+    onDismissed: Ui.rigOpen = false
+    cardWidth: 400
+    count: rows.length
+    tabMoves: true
+    numberKeys: false
+    onChosen: i => run(rows[i].act)
+    onKeyPressed: event => {
+        const row = rows.find(r => r.key === event.text.toUpperCase());
+        if (row) {
+            run(row.act);
+            event.accepted = true;
+        }
     }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.namespace: "sanctuary-rig"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-    // key: the letter · name/desc: the words · hot: "rec" red, "warn" yellow,
-    // "" normal · act: what it does.
+    // key: the letter · name/desc: the words · state: "alarm" = recording,
+    // "warn" = paused / saving, "" = idle · act: what it does.
     readonly property var rows: {
         const r = [];
         if (!Rec.scrActive) {
-            r.push({ key: "S", name: "SCREEN", desc: "drag a region · mic on, sys off", hot: "", act: "screen" });
+            r.push({ key: "S", name: "SCREEN", desc: "drag a region · mic on, sys off", state: "", act: "screen" });
         } else if (Rec.scrSaving) {
-            r.push({ key: "S", name: "SAVING", desc: "joining the recording…", hot: "warn", act: "" });
+            r.push({ key: "S", name: "SAVING", desc: "joining the recording…", state: "warn", act: "" });
         } else {
-            r.push({ key: "S", name: "STOP SCREEN", desc: Rec.clock(Rec.scrMs) + " · saves to Videos/Recordings", hot: "rec", act: "scr-stop" });
-            r.push({ key: "D", name: Rec.scrPaused ? "RESUME SCREEN" : "PAUSE SCREEN", desc: Rec.scrPaused ? "paused" : "Ctrl+Alt+Print", hot: Rec.scrPaused ? "warn" : "", act: "scr-pause" });
+            r.push({ key: "S", name: "STOP SCREEN", desc: Rec.clock(Rec.scrMs) + " · saves to Videos/Recordings", state: "alarm", act: "scr-stop" });
+            r.push({ key: "D", name: Rec.scrPaused ? "RESUME SCREEN" : "PAUSE SCREEN", desc: Rec.scrPaused ? "paused" : "Ctrl+Alt+Print", state: Rec.scrPaused ? "warn" : "", act: "scr-pause" });
         }
         if (!Rec.audActive) {
-            r.push({ key: "M", name: "MEETING", desc: "you + them, two files", hot: "", act: "meeting" });
-            r.push({ key: "P", name: "PRACTICE", desc: "mic only", hot: "", act: "practice" });
+            r.push({ key: "M", name: "MEETING", desc: "you + them, two files", state: "", act: "meeting" });
+            r.push({ key: "P", name: "PRACTICE", desc: "mic only", state: "", act: "practice" });
         } else {
-            r.push({ key: "M", name: "STOP AUDIO", desc: Rec.clock(Rec.audMs) + (Rec.audSolo ? " · practice" : " · meeting"), hot: "rec", act: "aud-stop" });
-            r.push({ key: "P", name: Rec.audPaused ? "RESUME AUDIO" : "PAUSE AUDIO", desc: Rec.audPaused ? "paused" : "stop joins the parts", hot: Rec.audPaused ? "warn" : "", act: "aud-pause" });
+            r.push({ key: "M", name: "STOP AUDIO", desc: Rec.clock(Rec.audMs) + (Rec.audSolo ? " · practice" : " · meeting"), state: "alarm", act: "aud-stop" });
+            r.push({ key: "P", name: Rec.audPaused ? "RESUME AUDIO" : "PAUSE AUDIO", desc: Rec.audPaused ? "paused" : "stop joins the parts", state: Rec.audPaused ? "warn" : "", act: "aud-pause" });
         }
         return r;
     }
-    property int cursor: 0
 
     onVisibleChanged: if (visible) cursor = 0
 
@@ -74,158 +75,29 @@ PanelWindow {
             Rec.audio(["pause-toggle"]);
     }
 
-    function hotColor(h) {
-        return h === "rec" ? Theme.red : h === "warn" ? Theme.yellow : Theme.sigHot;
-    }
+    Panel {
+        width: parent.width
+        title: "RIG"
+        tone: Rec.any ? "alarm" : ""
+        detailTone: tone
+        detail: Rec.any ? "● REC" : "STANDBY"
+        hint: "letter act · j k move · esc close"
 
-    MouseArea {   // scrim: click outside = close
-        anchors.fill: parent
-        acceptedButtons: Qt.AllButtons
-        onClicked: Ui.rigOpen = false
-    }
-
-    Item {
-        id: card
-        anchors.centerIn: parent
-        width: 400
-        height: sig.height
-        focus: true
-
-        Keys.onPressed: event => {
-            const k = event.key;
-            const n = win.rows.length;
-            if (k === Qt.Key_Escape || k === Qt.Key_Q)
-                Ui.rigOpen = false;
-            else if (k === Qt.Key_J || k === Qt.Key_Down || k === Qt.Key_Tab)
-                win.cursor = (win.cursor + 1) % n;
-            else if (k === Qt.Key_K || k === Qt.Key_Up || k === Qt.Key_Backtab)
-                win.cursor = (win.cursor + n - 1) % n;
-            else if (k === Qt.Key_Return || k === Qt.Key_Enter || k === Qt.Key_L)
-                win.run(win.rows[win.cursor].act);
-            else {
-                const letter = event.text.toUpperCase();
-                const row = win.rows.find(r => r.key === letter);
-                if (!row)
-                    return;
-                win.run(row.act);
-            }
-            event.accepted = true;
-        }
-
-        MouseArea {   // swallow clicks on the card
-            anchors.fill: parent
-            acceptedButtons: Qt.AllButtons
-        }
-
-        // ══ Signal ═══════════════════════════════════════════════════
-        Rectangle {
-            id: sig
-            width: parent.width
-            height: sigCol.implicitHeight + 24
-            color: Theme.sigFill
-            border.width: 1
-            border.color: Theme.sigRule
-
-            SignalTicks {
-                anchors.fill: parent
-                anchors.margins: -3
-                color: Rec.any ? Theme.sigAlarm : Theme.sigHot
-            }
-
-            Column {
-                id: sigCol
-                x: 1
-                y: 12
-                width: parent.width - 2
-                spacing: 2
-
-                Item {
-                    width: parent.width
-                    height: 20
-                    Text {
-                        x: 14
-                        text: "RIG"
-                        font.family: Theme.mono
-                        font.pixelSize: 9
-                        font.weight: Font.Bold
-                        font.letterSpacing: 2
-                        color: Theme.sigHot
-                    }
-                    Text {
-                        anchors.right: parent.right
-                        anchors.rightMargin: 14
-                        text: Rec.any ? "● REC" : "STANDBY"
-                        font.family: Theme.mono
-                        font.pixelSize: 9
-                        font.letterSpacing: 1.4
-                        color: Rec.any ? Theme.sigAlarm : Theme.sigLabel
-                    }
-                }
-
-                Repeater {
-                    model: win.rows
-                    delegate: Rectangle {
-                        id: row
-                        required property var modelData
-                        required property int index
-                        readonly property bool sel: index === win.cursor
-                        readonly property color hot: win.hotColor(modelData.hot)
-                        width: sigCol.width
-                        height: 30
-                        color: sel ? Theme.sigCell : "transparent"
-
-                        Rectangle {
-                            width: 2
-                            height: parent.height
-                            color: row.hot
-                            visible: row.sel
-                        }
-                        Row {
-                            x: 14
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: 12
-                            Text {
-                                text: row.modelData.key
-                                font.family: Theme.mono
-                                font.pixelSize: 10
-                                font.weight: Font.Bold
-                                color: row.sel ? row.hot : Theme.surface2
-                            }
-                            Text {
-                                width: 120
-                                text: row.modelData.name
-                                font.family: Theme.mono
-                                font.pixelSize: 12
-                                font.weight: Font.Bold
-                                color: row.modelData.hot !== "" ? row.hot : row.sel ? row.hot : Theme.sigValue
-                            }
-                            Text {
-                                text: row.modelData.desc
-                                font.family: Theme.mono
-                                font.pixelSize: 10
-                                color: Theme.sigLabel
-                            }
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onEntered: win.cursor = row.index
-                            onClicked: win.run(row.modelData.act)
-                        }
-                    }
-                }
-
-                Text {
-                    x: 14
-                    topPadding: 8
-                    text: "letter act · j k move · esc close"
-                    font.family: Theme.mono
-                    font.pixelSize: 9
-                    color: Theme.surface2
-                }
+        Repeater {
+            model: win.rows
+            delegate: MenuRow {
+                required property var modelData
+                required property int index
+                key: modelData.key
+                name: modelData.name
+                desc: modelData.desc
+                nameWidth: 120
+                status: modelData.state
+                selected: index === win.cursor
+                litWhenSelected: true
+                onHovered: win.cursor = index
+                onClicked: win.run(modelData.act)
             }
         }
-
     }
 }

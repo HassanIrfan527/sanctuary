@@ -1,6 +1,5 @@
 import QtQuick
-import Quickshell
-import Quickshell.Wayland
+import "kit"
 
 // The layout picker — Mod+Ctrl+Space, Mango only. Sets the layout of the tag
 // you are looking at (Mango keeps one per tag; the others stay as they are).
@@ -12,23 +11,21 @@ import Quickshell.Wayland
 //
 //   j k ↑ ↓  move     1-9  pick directly     v  horizontal / vertical
 //   enter l  pick     esc q  close           click a row to pick it
-//
-// Signal only, like Mango's look (look-signal.conf); other styles come later.
-PanelWindow {
+Popup {
     id: win
 
-    visible: Ui.layoutOpen
-    color: "transparent"
-    anchors {
-        top: true
-        bottom: true
-        left: true
-        right: true
+    name: "layouts"
+    open: Ui.layoutOpen
+    onDismissed: Ui.layoutOpen = false
+    cardWidth: 460
+    count: rows.length
+    onChosen: i => choose(i)
+    onKeyPressed: event => {
+        if (event.key === Qt.Key_V) {
+            vert = !vert;
+            event.accepted = true;
+        }
     }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.namespace: "sanctuary-layouts"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     // h / v: Mango's layout names (setlayout takes these). hs / vs: the
     // symbols mmsg reports per tag, to light the live one. word: the bar's
@@ -58,7 +55,6 @@ PanelWindow {
     readonly property var tag: Wm.focusedWorkspace
     readonly property string sym: tag && tag.layout ? tag.layout : ""
     readonly property int current: rows.findIndex(r => r.hs === sym || r.vs === sym)
-    property int cursor: 0
     property bool vert: false
 
     onVisibleChanged: if (visible) {
@@ -76,209 +72,49 @@ PanelWindow {
             Wm.setLayout(nameOf(r));
     }
 
-    MouseArea {   // scrim: click outside = close
-        anchors.fill: parent
-        acceptedButtons: Qt.AllButtons
-        onClicked: Ui.layoutOpen = false
-    }
-
-    Item {
-        id: card
-        anchors.centerIn: parent
-        width: 460
-        height: sig.height
-        focus: true
-
-        Keys.onPressed: event => {
-            const k = event.key;
-            if (k === Qt.Key_Escape || k === Qt.Key_Q)
-                Ui.layoutOpen = false;
-            else if (k === Qt.Key_J || k === Qt.Key_Down)
-                win.cursor = (win.cursor + 1) % win.rows.length;
-            else if (k === Qt.Key_K || k === Qt.Key_Up)
-                win.cursor = (win.cursor + win.rows.length - 1) % win.rows.length;
-            else if (k === Qt.Key_V)
-                win.vert = !win.vert;
-            else if (k === Qt.Key_Return || k === Qt.Key_Enter || k === Qt.Key_L)
-                win.choose(win.cursor);
-            else if (k >= Qt.Key_1 && k <= Qt.Key_9)
-                win.choose(k - Qt.Key_1);
-            else
-                return;
-            event.accepted = true;
-        }
-
-        MouseArea {   // swallow clicks on the card
-            anchors.fill: parent
-            acceptedButtons: Qt.AllButtons
-        }
-
-        Rectangle {
-            id: sig
-            width: parent.width
-            height: sigCol.implicitHeight + 24
-            color: Theme.sigFill
-            border.width: 1
-            border.color: Theme.sigRule
-
-            SignalTicks {
-                anchors.fill: parent
-                anchors.margins: -3
+    // LAYOUT · TAG 3                         HORIZ │ VERT
+    Panel {
+        width: parent.width
+        title: "LAYOUT" + (win.tag ? "  ·  TAG " + win.tag.idx : "")
+        headerHeight: 22
+        hint: "j k move · 1-9 pick · v vertical · enter pick · esc close"
+        headerItems: Repeater {
+            model: [{ label: "HORIZ", v: false }, { label: "VERT", v: true }]
+            delegate: Tab {
+                required property var modelData
+                text: modelData.label
+                on: win.vert === modelData.v
+                onClicked: win.vert = modelData.v
             }
+        }
 
-            Column {
-                id: sigCol
-                x: 1
-                y: 12
-                width: parent.width - 2
-                spacing: 2
-
-                // LAYOUT · TAG 3                         HORIZ │ VERT
-                Item {
-                    width: parent.width
-                    height: 22
-
-                    Text {
-                        x: 14
-                        anchors.top: parent.top
-                        text: "LAYOUT" + (win.tag ? "  ·  TAG " + win.tag.idx : "")
-                        font.family: Theme.mono
-                        font.pixelSize: 9
-                        font.weight: Font.Bold
-                        font.letterSpacing: 2
-                        color: Theme.sigHot
-                    }
-                    Row {
-                        anchors.right: parent.right
-                        anchors.rightMargin: 14
-                        anchors.top: parent.top
-                        spacing: 8
-                        Repeater {
-                            model: [{ label: "HORIZ", v: false }, { label: "VERT", v: true }]
-                            delegate: Text {
-                                required property var modelData
-                                text: modelData.label
-                                font.family: Theme.mono
-                                font.pixelSize: 9
-                                font.weight: Font.Bold
-                                font.letterSpacing: 1.4
-                                color: win.vert === modelData.v ? Theme.sigHot : Theme.surface2
-                                MouseArea {
-                                    anchors.fill: parent
-                                    anchors.margins: -4
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: win.vert = parent.modelData.v
-                                }
-                            }
-                        }
-                    }
+        Repeater {
+            model: win.rows
+            delegate: MenuRow {
+                id: row
+                required property var modelData
+                required property int index
+                // in VERT, rows with no vertical twin stay pickable (they
+                // pick their one version) but step back
+                readonly property bool flat: win.vert && !modelData.v
+                height: 34
+                centred: true
+                opacity: flat && !selected ? 0.45 : 1
+                number: index + 1
+                name: win.wordOf(modelData)
+                desc: flat ? "no vertical · picks as is" : modelData.desc
+                nameWidth: 76
+                selected: index === win.cursor
+                current: (win.vert && modelData.v ? modelData.vs : modelData.hs) === win.sym
+                detail: current ? "● LIVE" : ""
+                // the glyph: what the tag will look like
+                lead: Boxes {
+                    boxes: row.modelData.g
+                    turn: win.vert && !!row.modelData.v
+                    lit: row.current || row.selected
                 }
-
-                Repeater {
-                    model: win.rows
-                    delegate: Rectangle {
-                        id: row
-                        required property var modelData
-                        required property int index
-                        // in VERT, rows with no vertical twin stay pickable
-                        // (they pick their one version) but step back
-                        readonly property bool flat: win.vert && !modelData.v
-                        readonly property bool here: (win.vert && modelData.v ? modelData.vs : modelData.hs) === win.sym
-                        readonly property bool sel: index === win.cursor
-                        width: sigCol.width
-                        height: 34
-                        color: sel ? Theme.sigCell : "transparent"
-                        opacity: flat && !sel ? 0.45 : 1
-
-                        Rectangle {
-                            width: 2
-                            height: parent.height
-                            color: Theme.sigHot
-                            visible: row.sel
-                        }
-                        Row {
-                            x: 14
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: 12
-                            Text {
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: String(row.index + 1)
-                                font.family: Theme.mono
-                                font.pixelSize: 10
-                                color: Theme.surface2
-                            }
-                            // the glyph: what the tag will look like
-                            Item {
-                                id: glyph
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: 34
-                                height: 20
-                                clip: true
-                                readonly property bool turn: win.vert && !!row.modelData.v
-                                readonly property color ink: row.here || row.sel ? Theme.sigHot : Theme.sigLabel
-                                Repeater {
-                                    model: row.modelData.g
-                                    delegate: Rectangle {
-                                        required property var modelData
-                                        required property int index
-                                        readonly property var b: glyph.turn
-                                            ? [modelData[1], modelData[0], modelData[3], modelData[2]]
-                                            : modelData
-                                        x: Math.round(b[0] * glyph.width)
-                                        y: Math.round(b[1] * glyph.height)
-                                        width: Math.max(2, Math.round(b[2] * glyph.width))
-                                        height: Math.max(2, Math.round(b[3] * glyph.height))
-                                        color: index === 0 ? Qt.rgba(glyph.ink.r, glyph.ink.g, glyph.ink.b, 0.25) : Theme.sigFill
-                                        border.width: 1
-                                        border.color: glyph.ink
-                                    }
-                                }
-                            }
-                            Text {
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: 76
-                                text: win.wordOf(row.modelData)
-                                font.family: Theme.mono
-                                font.pixelSize: 12
-                                font.weight: Font.Bold
-                                color: row.here ? Theme.sigHot : Theme.sigValue
-                            }
-                            Text {
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: row.flat ? "no vertical · picks as is" : row.modelData.desc
-                                font.family: Theme.mono
-                                font.pixelSize: 10
-                                color: Theme.sigLabel
-                            }
-                        }
-                        Text {
-                            anchors.right: parent.right
-                            anchors.rightMargin: 14
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: row.here ? "● LIVE" : ""
-                            font.family: Theme.mono
-                            font.pixelSize: 9
-                            font.letterSpacing: 1.2
-                            color: Theme.sigHot
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onEntered: win.cursor = row.index
-                            onClicked: win.choose(row.index)
-                        }
-                    }
-                }
-
-                Text {
-                    x: 14
-                    topPadding: 8
-                    text: "j k move · 1-9 pick · v vertical · enter pick · esc close"
-                    font.family: Theme.mono
-                    font.pixelSize: 9
-                    color: Theme.surface2
-                }
+                onHovered: win.cursor = index
+                onClicked: win.choose(index)
             }
         }
     }

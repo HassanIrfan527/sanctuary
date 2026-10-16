@@ -1,6 +1,7 @@
 import QtQuick
+import ".."
 
-// Registration marks: a short L at each corner, in the trace colour. The one
+// KIT · Ticks — registration marks: a short L at each corner, in the trace colour. The one
 // decoration Signal allows itself — it frames a surface the way a HUD reticle
 // frames a reading, and it says "instrument" before you read anything.
 Item {

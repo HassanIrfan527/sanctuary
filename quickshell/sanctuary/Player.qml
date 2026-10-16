@@ -1,6 +1,5 @@
 import QtQuick
-import Quickshell
-import Quickshell.Wayland
+import "kit"
 
 // The music player card — right-click the music module to open it.
 //
@@ -11,21 +10,30 @@ import Quickshell.Wayland
 //
 //   space  play / pause      h ←  previous      l →  next      esc q  close
 //   click the progress line to seek (when the player allows it)
-PanelWindow {
+Popup {
     id: win
 
-    visible: Ui.playerOpen && Media.hasTrack
-    color: "transparent"
-    anchors {
-        top: true
-        bottom: true
-        left: true
-        right: true
+    name: "player"
+    open: Ui.playerOpen && Media.hasTrack
+    onDismissed: Ui.playerOpen = false
+    cardWidth: 380
+    // Hung under the music module. Opened without a click (IPC / a keybind)
+    // there is no module x, so it sits right, where the module usually is.
+    centred: false
+    cardX: Math.max(8, Math.min(width - cardWidth - 16, (Ui.playerX > 0 ? Ui.playerX : width) - cardWidth / 2))
+    cardY: Theme.barH + 4
+    onKeyPressed: event => {
+        const k = event.key;
+        if (k === Qt.Key_Space)
+            Media.toggle();
+        else if (k === Qt.Key_H || k === Qt.Key_Left)
+            Media.previous();
+        else if (k === Qt.Key_L || k === Qt.Key_Right)
+            Media.next();
+        else
+            return;
+        event.accepted = true;
     }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.namespace: "sanctuary-player"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     // The track ending / the player quitting closes it too.
     Connections {
@@ -36,245 +44,89 @@ PanelWindow {
         }
     }
 
-    readonly property int cardW: 380
-    readonly property int cardTop: Theme.sigBarH + 4
+    Fade {
+        shown: win.visible
 
-    MouseArea {   // the scrim: click outside = close
-        anchors.fill: parent
-        acceptedButtons: Qt.AllButtons
-        onClicked: Ui.playerOpen = false
-    }
-
-    Item {
-        id: card
-        focus: true
-        // Hung under the music module. Opened without a click (IPC / a keybind)
-        // there is no module x, so it sits right, where the module usually is.
-        x: Math.max(8, Math.min(win.width - win.cardW - 16,
-                                (Ui.playerX > 0 ? Ui.playerX : win.width) - win.cardW / 2))
-        y: win.cardTop
-        width: win.cardW
-        height: sigCard.height
-
-        Keys.onPressed: event => {
-            const k = event.key;
-            if (k === Qt.Key_Escape || k === Qt.Key_Q)
-                Ui.playerOpen = false;
-            else if (k === Qt.Key_Space)
-                Media.toggle();
-            else if (k === Qt.Key_H || k === Qt.Key_Left)
-                Media.previous();
-            else if (k === Qt.Key_L || k === Qt.Key_Right)
-                Media.next();
-            else
-                return;
-            event.accepted = true;
-        }
-
-        // Swallow clicks on the card so they don't reach the scrim.
-        MouseArea {
-            anchors.fill: parent
-            acceptedButtons: Qt.AllButtons
-        }
-
-        opacity: win.visible ? 1 : 0
-        Behavior on opacity { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
-
-        // ══ Signal ═══════════════════════════════════════════════════
-        Rectangle {
-            id: sigCard
+        Panel {
             width: parent.width
-            height: sigCol.implicitHeight + 28
-            color: Theme.sigFill
-            border.width: 1
-            border.color: Theme.sigRule
-
-            SignalTicks {
-                anchors.fill: parent
-                anchors.margins: -3
+            pad: 14
+            vpad: 14
+            inset: 0
+            spacing: 10
+            headerHeight: 12
+            title: (Media.playing ? "PLAY" : "HOLD") + "  ·  " + Media.identity.toUpperCase()
+            titleRole: "status"
+            titleTone: Media.playing ? "" : "dim"
+            headerItems: Label {
+                width: implicitWidth
+                role: "fine"
+                text: "esc"
             }
 
-            Column {
-                id: sigCol
-                x: 14
-                y: 14
-                width: parent.width - 28
-                spacing: 10
+            Row {
+                width: parent.width
+                spacing: 12
 
+                Picture {
+                    source: Media.art
+                }
+                Column {
+                    width: parent.width - (Media.art !== "" ? 96 : 0)
+                    spacing: 4
+                    Label {
+                        role: "headline"
+                        text: Media.title
+                    }
+                    Label {
+                        role: "sub"
+                        visible: text !== ""
+                        text: Media.artist
+                    }
+                    Label {
+                        role: "note"
+                        oneLine: true
+                        visible: text !== ""
+                        text: Media.album
+                    }
+                }
+            }
+
+            // position: a line you can click to seek
+            Column {
+                width: parent.width
+                spacing: 4
+                visible: Media.length > 0
+                Progress {
+                    value: Media.progress
+                    seekable: Media.canSeek
+                    onSeek: f => Media.seek(f)
+                }
                 Item {
                     width: parent.width
-                    height: sigHead.implicitHeight
-                    Text {
-                        id: sigHead
-                        text: (Media.playing ? "PLAY" : "HOLD") + "  ·  " + Media.identity.toUpperCase()
-                        font.family: Theme.mono
-                        font.pixelSize: 9
-                        font.weight: Font.Bold
-                        font.letterSpacing: 1.4
-                        color: Media.playing ? Theme.sigHot : Theme.sigLabel
+                    height: 12
+                    Label {
+                        width: implicitWidth
+                        role: "small"
+                        text: Media.clock(Media.position)
                     }
-                    Text {
+                    Label {
                         anchors.right: parent.right
-                        text: "esc"
-                        font.family: Theme.mono
-                        font.pixelSize: 9
-                        color: Theme.surface2
+                        width: implicitWidth
+                        role: "small"
+                        text: Media.clock(Media.length)
                     }
                 }
-
-                Row {
-                    width: parent.width
-                    spacing: 12
-
-                    Rectangle {
-                        visible: Media.art !== ""
-                        width: visible ? 84 : 0
-                        height: 84
-                        color: Theme.sigCell
-                        border.width: 1
-                        border.color: Theme.sigRule
-                        Image {
-                            anchors.fill: parent
-                            anchors.margins: 1
-                            source: Media.art
-                            fillMode: Image.PreserveAspectCrop
-                            asynchronous: true
-                            sourceSize.width: 168
-                            sourceSize.height: 168
-                        }
-                    }
-
-                    Column {
-                        width: parent.width - (Media.art !== "" ? 96 : 0)
-                        spacing: 4
-                        Text {
-                            width: parent.width
-                            text: Media.title
-                            wrapMode: Text.Wrap
-                            maximumLineCount: 2
-                            elide: Text.ElideRight
-                            font.family: Theme.mono
-                            font.pixelSize: 13
-                            font.weight: Font.Bold
-                            color: Theme.sigValue
-                        }
-                        Text {
-                            width: parent.width
-                            visible: text !== ""
-                            text: Media.artist
-                            elide: Text.ElideRight
-                            font.family: Theme.mono
-                            font.pixelSize: 11
-                            color: Theme.subtext0
-                        }
-                        Text {
-                            width: parent.width
-                            visible: text !== ""
-                            text: Media.album
-                            elide: Text.ElideRight
-                            font.family: Theme.mono
-                            font.pixelSize: 10
-                            color: Theme.sigLabel
-                        }
-                    }
-                }
-
-                // position: a hairline you can click to seek
-                Column {
-                    width: parent.width
-                    spacing: 4
-                    visible: Media.length > 0
-                    Item {
-                        width: parent.width
-                        height: 10
-                        Rectangle {
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: parent.width
-                            height: 2
-                            color: Theme.surface0
-                            Rectangle {
-                                width: parent.width * Media.progress
-                                height: 2
-                                color: Theme.sigHot
-                            }
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            enabled: Media.canSeek
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: mouse => Media.seek(mouse.x / width)
-                        }
-                    }
-                    Item {
-                        width: parent.width
-                        height: 12
-                        Text {
-                            text: Media.clock(Media.position)
-                            font.family: Theme.mono
-                            font.pixelSize: 9
-                            color: Theme.sigLabel
-                        }
-                        Text {
-                            anchors.right: parent.right
-                            text: Media.clock(Media.length)
-                            font.family: Theme.mono
-                            font.pixelSize: 9
-                            color: Theme.sigLabel
-                        }
-                    }
-                }
-
-                Row {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 22
-                    Repeater {
-                        model: [
-                            { t: "|◀", hint: "h", act: () => Media.previous() },
-                            { t: Media.playing ? "‖" : "▶", hint: "spc", act: () => Media.toggle() },
-                            { t: "▶|", hint: "l", act: () => Media.next() }
-                        ]
-                        delegate: Item {
-                            id: btn
-                            required property var modelData
-                            width: 52
-                            height: 30
-                            Rectangle {
-                                anchors.fill: parent
-                                color: ba.containsMouse ? Theme.sigCell : "transparent"
-                                border.width: 1
-                                border.color: ba.containsMouse ? Theme.sigHot : Theme.sigRule
-                            }
-                            Text {
-                                anchors.centerIn: parent
-                                text: btn.modelData.t
-                                font.family: Theme.mono
-                                font.pixelSize: 13
-                                font.weight: Font.Bold
-                                color: Theme.sigValue
-                            }
-                            Text {
-                                anchors.top: parent.bottom
-                                anchors.topMargin: 2
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                text: btn.modelData.hint
-                                font.family: Theme.mono
-                                font.pixelSize: 8
-                                color: Theme.surface2
-                            }
-                            MouseArea {
-                                id: ba
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: btn.modelData.act()
-                            }
-                        }
-                    }
-                }
-
-                Item { width: 1; height: 4 }   // room for the key hints
             }
-        }
 
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 22
+                Button { text: "|◀"; hint: "h"; onClicked: Media.previous() }
+                Button { text: Media.playing ? "‖" : "▶"; hint: "spc"; onClicked: Media.toggle() }
+                Button { text: "▶|"; hint: "l"; onClicked: Media.next() }
+            }
+
+            Item { width: 1; height: 4 }   // room for the key hints
+        }
     }
 }

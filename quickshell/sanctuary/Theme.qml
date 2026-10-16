@@ -71,4 +71,6 @@ Singleton {
     readonly property color sigAlarm: red
     readonly property int sigStripH: 35           // was 30; +5 on 2026-10-03, Harry's call
     readonly property int sigBarH: 47             // 6 top + 35 strip + 6 air
+    readonly property int barH: sigBarH           // what modules use: where things hang below the bar
+    readonly property color desk: crust           // what modules use: behind everything (the lock surface)
 }

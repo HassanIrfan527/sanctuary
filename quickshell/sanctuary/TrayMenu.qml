@@ -1,7 +1,6 @@
 import QtQuick
 import Quickshell
-import Quickshell.Wayland
-import Quickshell.Widgets
+import "kit"
 
 // A tray app's menu — right-click its icon (Tray.qml). Drawn by us, in the
 // current style. The tray item's own `display()` hands the menu to Qt's native
@@ -15,32 +14,47 @@ import Quickshell.Widgets
 // Same full-screen see-through layer as Player.qml: a click anywhere outside the
 // card closes it, and the card gets the keyboard.
 //
+//   ┌───────────────────────────┐
+//   │ ‹ BACK                     │  ← only inside a submenu
+//   │▌■ Show window              │
+//   │ ─────────────────────────  │
+//   │   Preferences            › │
+//   │   Quit                     │
+//   └───────────────────────────┘
+//
 //   j k ↑ ↓  move     enter l →  pick / open submenu     h ← backspace  back
 //   esc q  close
-PanelWindow {
+Popup {
     id: win
 
-    visible: Ui.trayMenu !== null
-    color: "transparent"
-    anchors {
-        top: true
-        bottom: true
-        left: true
-        right: true
+    name: "traymenu"
+    open: Ui.trayMenu !== null
+    onDismissed: close()
+    cardWidth: measure.cardWidth
+    // Hung under the icon, kept on screen.
+    centred: false
+    cardX: Math.max(8, Math.min(width - cardWidth - 16, Ui.trayX - cardWidth / 2))
+    cardY: Theme.barH + 4
+    cursor: -1
+    onKeyPressed: event => {
+        const k = event.key;
+        if (k === Qt.Key_J || k === Qt.Key_Down || k === Qt.Key_Tab)
+            step(1);
+        else if (k === Qt.Key_K || k === Qt.Key_Up || k === Qt.Key_Backtab)
+            step(-1);
+        else if (k === Qt.Key_Return || k === Qt.Key_Enter || k === Qt.Key_L || k === Qt.Key_Right)
+            activate(cursor);
+        else if (k === Qt.Key_H || k === Qt.Key_Left || k === Qt.Key_Backspace)
+            back();
+        else
+            return;
+        event.accepted = true;
     }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.namespace: "sanctuary-traymenu"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     // Submenus walked into, innermost last. The menu on screen is the top one.
     property var stack: []
     readonly property var menu: stack.length ? stack[stack.length - 1] : Ui.trayMenu
     readonly property var entries: opener.children ? opener.children.values : []
-    property int cursor: -1
-
-    readonly property int cardTop: Theme.sigBarH + 4
-    readonly property int rowH: 28
 
     QsMenuOpener {
         id: opener
@@ -72,10 +86,10 @@ PanelWindow {
             return s;
         return Quickshell.iconPath(s.substring(13).split("?")[0], true);
     }
-    // The left gutters exist only when some entry in this menu uses them.
-    readonly property bool hasChecks: entries.some(e => e.buttonType !== QsMenuButtonType.None)
-    readonly property bool hasIcons: entries.some(e => iconOf(e) !== "")
-    readonly property int textX: 14 + (hasChecks ? 16 : 0) + (hasIcons ? 24 : 0)
+    function checkOf(e) {
+        return e.buttonType === QsMenuButtonType.RadioButton ? "radio"
+             : e.buttonType !== QsMenuButtonType.None ? "box" : "none";
+    }
 
     // Apps send separators carelessly (nm-applet ends on one). Draw one only
     // between two real entries.
@@ -129,215 +143,62 @@ PanelWindow {
         }
     }
 
-    MouseArea {   // scrim: click outside = close
-        anchors.fill: parent
-        acceptedButtons: Qt.AllButtons
-        onClicked: win.close()
+    Measure {
+        id: measure
+        texts: win.entries.map(e => win.label(e))
+        checks: win.entries.some(e => e.buttonType !== QsMenuButtonType.None)
+        icons: win.entries.some(e => win.iconOf(e) !== "")
     }
 
-    // Widest label, measured off-screen — the card fits its longest entry
-    // (within limits) instead of a fixed width that clips or swims.
-    Column {
-        id: measure
-        visible: false
+    Panel {
+        width: parent.width
+        vpad: 6
+        spacing: 0
+
+        BackRow {
+            visible: win.stack.length > 0
+            text: win.stack.length ? win.label(win.stack[win.stack.length - 1]) : ""
+            onClicked: win.back()
+        }
+
         Repeater {
             model: win.entries
-            Text {
+            delegate: Item {
+                id: row
                 required property var modelData
-                text: win.label(modelData)
-                font.family: Theme.mono
-                font.pixelSize: 12
-                font.weight: Font.Normal
-            }
-        }
-    }
+                required property int index
+                width: parent.width
+                visible: !win.strayRule(index)
+                height: visible ? (modelData.isSeparator ? 9 : 28) : 0
 
-    Item {
-        id: card
-        focus: true
-        // Text + check + icon + submenu arrow + padding.
-        width: Math.max(200, Math.min(420, measure.width + win.textX + 48))
-        height: sig.height
-        // Hung under the icon, kept on screen.
-        x: Math.max(8, Math.min(win.width - width - 16, Ui.trayX - width / 2))
-        y: win.cardTop
-
-        Keys.onPressed: event => {
-            const k = event.key;
-            if (k === Qt.Key_Escape || k === Qt.Key_Q)
-                win.close();
-            else if (k === Qt.Key_J || k === Qt.Key_Down || k === Qt.Key_Tab)
-                win.step(1);
-            else if (k === Qt.Key_K || k === Qt.Key_Up || k === Qt.Key_Backtab)
-                win.step(-1);
-            else if (k === Qt.Key_Return || k === Qt.Key_Enter || k === Qt.Key_L || k === Qt.Key_Right)
-                win.activate(win.cursor);
-            else if (k === Qt.Key_H || k === Qt.Key_Left || k === Qt.Key_Backspace)
-                win.back();
-            else
-                return;
-            event.accepted = true;
-        }
-
-        MouseArea {   // swallow clicks on the card
-            anchors.fill: parent
-            acceptedButtons: Qt.AllButtons
-        }
-
-        // ══ Signal ═══════════════════════════════════════════════════
-        //
-        //   ┌───────────────────────────┐
-        //   │ ‹ BACK                     │  ← only inside a submenu
-        //   │▌■ Show window              │
-        //   │ ─────────────────────────  │
-        //   │   Preferences            › │
-        //   │   Quit                     │
-        //   └───────────────────────────┘
-        Rectangle {
-            id: sig
-            width: parent.width
-            height: sigCol.implicitHeight + 12
-            color: Theme.sigFill
-            border.width: 1
-            border.color: Theme.sigRule
-
-            SignalTicks {
-                anchors.fill: parent
-                anchors.margins: -3
-            }
-
-            Column {
-                id: sigCol
-                x: 1
-                y: 6
-                width: parent.width - 2
-
-                // back row, inside a submenu
-                Rectangle {
-                    visible: win.stack.length > 0
-                    width: parent.width
-                    height: win.rowH
-                    color: backHover.containsMouse ? Theme.sigCell : "transparent"
-                    Text {
-                        x: 14
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: "‹ " + (win.stack.length ? win.label(win.stack[win.stack.length - 1]).toUpperCase() : "")
-                        font.family: Theme.mono
-                        font.pixelSize: 9
-                        font.weight: Font.Bold
-                        font.letterSpacing: 1.6
-                        color: Theme.sigHot
-                    }
-                    MouseArea {
-                        id: backHover
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: win.back()
-                    }
+                Rule {
+                    visible: row.modelData.isSeparator
                 }
-
-                Repeater {
-                    model: win.entries
-                    delegate: Item {
-                        id: row
-                        required property var modelData
-                        required property int index
-                        readonly property bool sel: index === win.cursor
-                        readonly property bool on: win.usable(modelData)
-                        width: sigCol.width
-                        visible: !win.strayRule(index)
-                        height: visible ? (modelData.isSeparator ? 9 : win.rowH) : 0
-
-                        Rectangle {   // separator
-                            visible: row.modelData.isSeparator
-                            x: 14
-                            width: parent.width - 28
-                            height: 1
-                            anchors.verticalCenter: parent.verticalCenter
-                            color: Theme.sigRule
-                        }
-
-                        Rectangle {
-                            visible: !row.modelData.isSeparator
-                            anchors.fill: parent
-                            color: row.sel ? Theme.sigCell : "transparent"
-
-                            Rectangle {
-                                width: 2
-                                height: parent.height
-                                color: Theme.sigHot
-                                visible: row.sel
-                            }
-
-                            // Check / radio state: a small square lamp, lit when on.
-                            Rectangle {
-                                x: 14
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: row.modelData.buttonType !== QsMenuButtonType.None
-                                width: 7
-                                height: 7
-                                radius: row.modelData.buttonType === QsMenuButtonType.RadioButton ? 4 : 0
-                                color: row.modelData.checkState === Qt.Checked ? Theme.sigHot : "transparent"
-                                border.width: 1
-                                border.color: row.modelData.checkState === Qt.Checked ? Theme.sigHot : Theme.surface2
-                            }
-                            IconImage {
-                                x: 14 + (win.hasChecks ? 16 : 0)
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: source != ""
-                                implicitSize: 14
-                                source: win.iconOf(row.modelData)
-                                asynchronous: true
-                                opacity: row.on ? 1 : 0.4
-                            }
-                            Text {
-                                x: win.textX
-                                width: parent.width - win.textX - 30
-                                anchors.verticalCenter: parent.verticalCenter
-                                elide: Text.ElideRight
-                                text: win.label(row.modelData)
-                                font.family: Theme.mono
-                                font.pixelSize: 12
-                                font.weight: row.sel ? Font.Bold : Font.Normal
-                                color: !row.on ? Theme.surface2 : row.sel ? Theme.sigHot : Theme.sigValue
-                            }
-                            Text {
-                                anchors.right: parent.right
-                                anchors.rightMargin: 14
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: row.modelData.hasChildren
-                                text: "›"
-                                font.family: Theme.mono
-                                font.pixelSize: 13
-                                color: row.sel ? Theme.sigHot : Theme.sigLabel
-                            }
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            enabled: row.on
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onEntered: win.cursor = row.index
-                            onClicked: win.activate(row.index)
-                        }
-                    }
-                }
-
-                Text {
-                    visible: win.entries.length === 0
-                    x: 14
-                    height: win.rowH
-                    verticalAlignment: Text.AlignVCenter
-                    text: "NO ENTRIES"
-                    font.family: Theme.mono
-                    font.pixelSize: 9
-                    font.letterSpacing: 1.6
-                    color: Theme.surface2
+                MenuItem {
+                    visible: !row.modelData.isSeparator
+                    text: win.label(row.modelData)
+                    check: win.checkOf(row.modelData)
+                    checked: row.modelData.checkState === Qt.Checked
+                    icon: win.iconOf(row.modelData)
+                    usable: win.usable(row.modelData)
+                    submenu: row.modelData.hasChildren
+                    selected: row.index === win.cursor
+                    hasChecks: measure.checks
+                    textX: measure.textX
+                    onHovered: win.cursor = row.index
+                    onClicked: win.activate(row.index)
                 }
             }
         }
 
+        Label {
+            visible: win.entries.length === 0
+            x: 14
+            width: implicitWidth
+            height: 28
+            verticalAlignment: Text.AlignVCenter
+            role: "none"
+            text: "NO ENTRIES"
+        }
     }
 }

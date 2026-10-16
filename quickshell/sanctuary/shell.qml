@@ -23,22 +23,18 @@ ShellRoot {
     // toast window happens to read it.
     readonly property bool _notifsUp: Notifs.dnd || true
 
-    // ── Signal ────────────────────────────────────────────────────────
+    // ── The bar (one per screen), toasts, the centre ──────────────────
     Variants {
-        model: Theme.signal ? Quickshell.screens : []
-        SignalBar {}
+        model: Quickshell.screens
+        Bar {}
     }
     LazyLoader {
-        active: Theme.signal
-        Toasts {
-            toastWidth: 380
-            gap: 8
-            delegate: Component { SignalToast {} }
-        }
+        active: true
+        Toasts {}
     }
     LazyLoader {
-        active: Theme.signal
-        SignalCentre {}
+        active: true
+        Centre {}
     }
 
     // ── Every style: volume pop-up, music card ────────────────────────
@@ -98,7 +94,7 @@ ShellRoot {
         active: true
         CommsCard {}
     }
-    // The lock screen (all styles draw LockSignal for now). Lock.qml is a Scope
+    // The lock screen (each style draws its own face: the kit's LockFace). Lock.qml is a Scope
     // with its own IpcHandler `lock`.
     Lock {}
 

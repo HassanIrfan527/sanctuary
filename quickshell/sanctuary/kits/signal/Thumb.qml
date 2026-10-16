@@ -1,6 +1,7 @@
 import QtQuick
+import ".."
 
-// One wallpaper tile's picture (WallPicker.qml). Loads the cached thumbnail
+// KIT · Thumb — one contact-sheet tile's picture (PhotoTile). Loads the cached thumbnail
 // only — never the original: a missing thumbnail shows the file's name
 // instead, and `rev` going up (new thumbnails made) makes it try again.
 Item {

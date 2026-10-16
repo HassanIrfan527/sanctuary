@@ -1,13 +1,18 @@
 import QtQuick
+import ".."
 
-// A trace: the last N samples as a line with a faint fill under it. Newest on
-// the right, like every scope and every stock ticker.
+// KIT · Trace — the last N samples of a load as a line with a faint fill under
+// it, newest on the right, coloured by the current `level` (the same
+// thresholds as Reading). Signal: a scope trace.
 Canvas {
     id: spark
     property var values: []
+    property real level: 0
     property real max: 1          // 0 = scale to the largest sample in view
-    property color line: Theme.sigHot
 
+    readonly property color line: level >= 0.85 ? Theme.sigAlarm : level >= 0.65 ? Theme.sigWarn : Theme.sigHot
+
+    anchors.verticalCenter: parent ? parent.verticalCenter : undefined
     implicitWidth: 36
     implicitHeight: 16
 

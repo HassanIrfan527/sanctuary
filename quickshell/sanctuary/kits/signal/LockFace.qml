@@ -2,8 +2,10 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
+import ".."
 
-// Signal's lock face — the instrument panel, powered down to STANDBY.
+// KIT · LockFace — Signal's lock screen: the instrument panel, powered down to
+// STANDBY. (Lock.qml owns the session lock and the password; this is the look.)
 //
 //   ┌ SANCTUARY · CITADEL ─────── ● SESSION LOCKED ─────── LOCKED 00:12:41 ┐
 //   │                                                                     │
@@ -30,7 +32,7 @@ Item {
     required property var ctl
 
     readonly property string phase: ctl.phase
-    readonly property color state: phase === "denied" ? Theme.sigAlarm
+    readonly property color stateColor: phase === "denied" ? Theme.sigAlarm
                                  : phase === "verify" ? Theme.sigWarn
                                  : Theme.sigHot
     readonly property string stateWord: phase === "denied" ? "DENIED"
@@ -179,14 +181,14 @@ Item {
             border.width: 1
             border.color: Theme.sigRule
         }
-        SignalTicks {
+        Ticks {
             x: panel.inset - 4
             y: panel.inset - 4
             width: parent.width - panel.inset * 2 + 8
             height: parent.height - panel.inset * 2 + 8
             len: 22
             w: 2
-            color: face.state
+            color: face.stateColor
             Behavior on color { ColorAnimation { duration: Theme.duration } }
         }
 
@@ -228,7 +230,7 @@ Item {
                     width: 6
                     height: 6
                     radius: 3
-                    color: face.state
+                    color: face.stateColor
                     opacity: beat.on ? 1 : 0.25
                 }
                 Text {
@@ -383,14 +385,14 @@ Item {
                 color: Qt.rgba(Theme.crust.r, Theme.crust.g, Theme.crust.b, 0.92)   // was literal #12121c ≈ crust
                 border.width: 1
                 border.color: face.phase === "denied" ? Theme.sigAlarm
-                            : face.phase === "idle" ? Theme.sigRule : Qt.darker(face.state, 1.6)
+                            : face.phase === "idle" ? Theme.sigRule : Qt.darker(face.stateColor, 1.6)
                 Behavior on border.color { ColorAnimation { duration: Theme.duration } }
 
-                SignalTicks {
+                Ticks {
                     anchors.fill: parent
                     anchors.margins: -4
                     len: 9
-                    color: face.state
+                    color: face.stateColor
                 }
 
                 Text {
@@ -402,7 +404,7 @@ Item {
                     font.pixelSize: 9
                     font.weight: Font.Bold
                     font.letterSpacing: 2
-                    color: face.phase === "idle" ? Theme.sigLabel : face.state
+                    color: face.phase === "idle" ? Theme.sigLabel : face.stateColor
                 }
 
                 // The slots: one cell per character, 24 of them; past that a
@@ -448,7 +450,7 @@ Item {
                     font.pixelSize: 11
                     font.weight: Font.Bold
                     font.letterSpacing: 2
-                    color: face.phase === "idle" ? Theme.sigLabel : face.state
+                    color: face.phase === "idle" ? Theme.sigLabel : face.stateColor
                 }
             }
 
@@ -566,7 +568,7 @@ Item {
                 x: 1
                 height: parent.height
 
-                SignalCell {
+                Cell {
                     label: "CPU"
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
@@ -575,12 +577,12 @@ Item {
                         font.pixelSize: 11
                         color: Theme.sigValue
                     }
-                    Sparkline {
+                    Trace {
                         anchors.verticalCenter: parent.verticalCenter
                         values: Sys.cpuHist
                     }
                 }
-                SignalCell {
+                Cell {
                     label: "MEM"
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
@@ -591,10 +593,10 @@ Item {
                     }
                 }
                 // Mic matters most here: a live mic on a locked desk is worth seeing.
-                SignalCell {
+                Cell {
                     label: "MIC"
                     visible: Media.micKnown
-                    labelColor: Media.micOn ? Theme.sigHot : Theme.sigLabel
+                    labelTone: Media.micOn ? "hot" : ""
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         text: Media.micOn ? "LIVE" : "MUTE"
@@ -604,10 +606,10 @@ Item {
                         color: Media.micOn ? Theme.sigHot : Theme.surface2
                     }
                 }
-                SignalCell {
+                Cell {
                     visible: Rec.scrActive
                     label: "SCR"
-                    labelColor: Theme.sigAlarm
+                    labelTone: "alarm"
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         text: (Rec.scrPaused ? "‖ " : "● ") + Rec.clock(Rec.scrMs)
@@ -617,10 +619,10 @@ Item {
                         color: Rec.scrPaused ? Theme.sigWarn : Theme.sigAlarm
                     }
                 }
-                SignalCell {
+                Cell {
                     visible: Rec.audActive
                     label: Rec.audSolo ? "AUD·1" : "AUD·2"
-                    labelColor: Theme.peach
+                    labelTone: "second"
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         text: (Rec.audPaused ? "‖ " : "● ") + Rec.clock(Rec.audMs)
@@ -630,7 +632,7 @@ Item {
                         color: Rec.audPaused ? Theme.sigWarn : Theme.peach
                     }
                 }
-                SignalCell {
+                Cell {
                     visible: Media.hasTrack
                     label: Media.playing ? "PLAY" : "HOLD"
                     Text {
@@ -644,7 +646,7 @@ Item {
                     }
                 }
                 // What arrived while you were away.
-                SignalCell {
+                Cell {
                     id: msgCell
                     readonly property int fresh: Math.max(0, Notifs.count - face.ctl.msgsAtLock)
                     label: "MSG"

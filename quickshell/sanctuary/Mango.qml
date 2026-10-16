@@ -10,7 +10,7 @@ import Quickshell.Io
 // Mango has TAGS, not workspaces. Here a tag is dressed as a niri workspace:
 //   id    "<output>:<tag>"   (tags are per monitor, so the output is part of it)
 //   idx   the tag number, 1–9
-// so SignalBar's WS cell and Columns work unchanged.
+// so the bar's WS cell and Columns work unchanged.
 //
 // Each `mmsg watch` prints the FULL current state as its first line, then one
 // full line per change (src/ipc/ipc.c in mangowc). So unlike niri there are no

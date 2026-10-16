@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import Quickshell.Wayland
+import "kit"
 
 // The power menu — Mod+Shift+Escape (scripts/sanctuary/power.sh open). Drawn in
 // the current style; when Quickshell is down the same key opens the fzf menu.
@@ -13,24 +13,20 @@ import Quickshell.Wayland
 //
 //   j k ↑ ↓  move     1-5  pick directly     enter  pick     esc q  close
 //   click a row to pick it; click outside to close
-PanelWindow {
+Popup {
     id: win
 
-    visible: Ui.powerOpen
-    color: "transparent"
-    anchors {
-        top: true
-        bottom: true
-        left: true
-        right: true
-    }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.namespace: "sanctuary-power"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    name: "power"
+    open: Ui.powerOpen
+    onDismissed: Ui.powerOpen = false
+    cardWidth: 400
+    count: rows.length
+    tabMoves: true
+    onChosen: i => choose(i)
 
     // `verb` is what `power.sh do` takes. `danger` = ends the session: drawn
-    // red when the cursor is on it, so the last look before Enter says so.
+    // in the alarm colour when the cursor is on it, so the last look before
+    // Enter says so.
     readonly property var rows: [
         { verb: "lock",     name: "Lock",      desc: "back in with your password",       danger: false },
         { verb: "suspend",  name: "Suspend",   desc: "sleep, resume where you left off", danger: false },
@@ -38,7 +34,6 @@ PanelWindow {
         { verb: "reboot",   name: "Reboot",    desc: "restart now",                      danger: true },
         { verb: "poweroff", name: "Shut down", desc: "power off now",                    danger: true }
     ]
-    property int cursor: 0
     property string uptime: ""
 
     onVisibleChanged: {
@@ -48,7 +43,7 @@ PanelWindow {
         }
     }
 
-    // Signal's header readout. /proc/uptime: "seconds idle-seconds".
+    // The header readout. /proc/uptime: "seconds idle-seconds".
     FileView {
         id: uptimeFile
         path: "/proc/uptime"
@@ -66,154 +61,31 @@ PanelWindow {
                                  "do", rows[i].verb]);
     }
 
-    MouseArea {   // scrim: click outside = close
-        anchors.fill: parent
-        acceptedButtons: Qt.AllButtons
-        onClicked: Ui.powerOpen = false
-    }
+    //   ┌ POWER ─────────────────────── UP 3H 12M ┐
+    //   │▌1  LOCK       back in with your password │
+    //   │ 2  SUSPEND    sleep, resume where you…   │
+    //   └ j k move · enter act · esc close ────────┘
+    Panel {
+        width: parent.width
+        title: "POWER"
+        detail: win.uptime ? "UP " + win.uptime : ""
+        hint: "j k move · enter act · esc close"
 
-    Item {
-        id: card
-        anchors.centerIn: parent
-        width: 400
-        height: sig.height
-        focus: true
-
-        Keys.onPressed: event => {
-            const k = event.key;
-            if (k === Qt.Key_Escape || k === Qt.Key_Q)
-                Ui.powerOpen = false;
-            else if (k === Qt.Key_J || k === Qt.Key_Down || k === Qt.Key_Tab)
-                win.cursor = (win.cursor + 1) % win.rows.length;
-            else if (k === Qt.Key_K || k === Qt.Key_Up || k === Qt.Key_Backtab)
-                win.cursor = (win.cursor + win.rows.length - 1) % win.rows.length;
-            else if (k === Qt.Key_Return || k === Qt.Key_Enter || k === Qt.Key_L)
-                win.choose(win.cursor);
-            else if (k >= Qt.Key_1 && k < Qt.Key_1 + win.rows.length)
-                win.choose(k - Qt.Key_1);
-            else
-                return;
-            event.accepted = true;
-        }
-
-        MouseArea {   // swallow clicks on the card
-            anchors.fill: parent
-            acceptedButtons: Qt.AllButtons
-        }
-
-        // ══ Signal ═══════════════════════════════════════════════════
-        //
-        //   ┌ POWER ─────────────────────── UP 3H 12M ┐
-        //   │▌1  LOCK       back in with your password │
-        //   │ 2  SUSPEND    sleep, resume where you…   │
-        //   │ …                                        │
-        //   └ j k move · enter act · esc close ────────┘
-        Rectangle {
-            id: sig
-            width: parent.width
-            height: sigCol.implicitHeight + 24
-            color: Theme.sigFill
-            border.width: 1
-            border.color: Theme.sigRule
-
-            SignalTicks {
-                anchors.fill: parent
-                anchors.margins: -3
-            }
-
-            Column {
-                id: sigCol
-                x: 1
-                y: 12
-                width: parent.width - 2
-                spacing: 2
-
-                Item {
-                    width: parent.width
-                    height: 20
-                    Text {
-                        x: 14
-                        text: "POWER"
-                        font.family: Theme.mono
-                        font.pixelSize: 9
-                        font.weight: Font.Bold
-                        font.letterSpacing: 2
-                        color: Theme.sigHot
-                    }
-                    Text {
-                        anchors.right: parent.right
-                        anchors.rightMargin: 14
-                        text: win.uptime ? "UP " + win.uptime : ""
-                        font.family: Theme.mono
-                        font.pixelSize: 9
-                        font.letterSpacing: 1.4
-                        color: Theme.sigLabel
-                    }
-                }
-
-                Repeater {
-                    model: win.rows
-                    delegate: Rectangle {
-                        id: row
-                        required property var modelData
-                        required property int index
-                        readonly property bool sel: index === win.cursor
-                        readonly property color hot: modelData.danger ? Theme.sigAlarm : Theme.sigHot
-                        width: sigCol.width
-                        height: 30
-                        color: sel ? Theme.sigCell : "transparent"
-
-                        Rectangle {
-                            width: 2
-                            height: parent.height
-                            color: row.hot
-                            visible: row.sel
-                        }
-                        Row {
-                            x: 14
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: 12
-                            Text {
-                                text: String(row.index + 1)
-                                font.family: Theme.mono
-                                font.pixelSize: 10
-                                color: Theme.surface2
-                            }
-                            Text {
-                                width: 90
-                                text: row.modelData.name.toUpperCase()
-                                font.family: Theme.mono
-                                font.pixelSize: 12
-                                font.weight: Font.Bold
-                                color: row.sel ? row.hot : Theme.sigValue
-                            }
-                            Text {
-                                text: row.modelData.desc
-                                font.family: Theme.mono
-                                font.pixelSize: 10
-                                color: Theme.sigLabel
-                            }
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onEntered: win.cursor = row.index
-                            onClicked: win.choose(row.index)
-                        }
-                    }
-                }
-
-                Text {
-                    x: 14
-                    topPadding: 8
-                    text: "j k move · enter act · esc close"
-                    font.family: Theme.mono
-                    font.pixelSize: 9
-                    color: Theme.surface2
-                }
+        Repeater {
+            model: win.rows
+            delegate: MenuRow {
+                required property var modelData
+                required property int index
+                number: index + 1
+                name: modelData.name.toUpperCase()
+                desc: modelData.desc
+                nameWidth: 90
+                danger: modelData.danger
+                selected: index === win.cursor
+                litWhenSelected: true
+                onHovered: win.cursor = index
+                onClicked: win.choose(index)
             }
         }
-
     }
 }

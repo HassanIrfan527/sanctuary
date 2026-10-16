@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Services.Pam
+import "kit"
 
 // The lock screen. A real ext-session-lock (WlSessionLock): niri itself keeps
 // the session locked until THIS unlocks it — if Quickshell dies mid-lock the
@@ -18,7 +19,7 @@ import Quickshell.Services.Pam
 // Password: PAM, service "swaylock" (/etc/pam.d/swaylock → login), the same
 // stack swaylock has always used here.
 //
-// The face is LockSignal.qml (every style, for now).
+// The face is the kit's LockFace (each style draws its own).
 //
 //   qs.sh call lock lock        lock now (lock.sh does this)
 //   qs.sh call lock secure      true once niri confirms the lock
@@ -154,8 +155,8 @@ Scope {
     WlSessionLock {
         id: lock
         WlSessionLockSurface {
-            color: Theme.crust
-            LockSignal {
+            color: Theme.desk
+            LockFace {
                 anchors.fill: parent
                 ctl: root
             }
@@ -165,7 +166,7 @@ Scope {
     LazyLoader {
         active: root.preview
         PanelWindow {
-            color: Theme.crust
+            color: Theme.desk
             anchors {
                 top: true
                 bottom: true
@@ -176,7 +177,7 @@ Scope {
             WlrLayershell.namespace: "sanctuary-lock-preview"
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
-            LockSignal {
+            LockFace {
                 anchors.fill: parent
                 ctl: root
             }
