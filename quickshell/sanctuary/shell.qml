@@ -5,7 +5,7 @@ import Quickshell.Io
 import Quickshell.Services.SystemTray
 
 // The Sanctuary in Quickshell — one process that is the bar, the toasts and the
-// notification centre, for the QS modes (Ink, Signal).
+// notification centre, for the QS styles (Signal, Flare).
 //
 // Started at login by scripts/sanctuary/shell.sh (niri startup.kdl), which also
 // owns style switches (Mod+Shift+T → Picker.qml → `shell.sh set <style>`) and
@@ -22,24 +22,6 @@ ShellRoot {
     // server must claim org.freedesktop.Notifications now — not when the first
     // toast window happens to read it.
     readonly property bool _notifsUp: Notifs.dnd || true
-
-    // ── Ink ───────────────────────────────────────────────────────────
-    Variants {
-        model: Theme.ink ? Quickshell.screens : []
-        InkBar {}
-    }
-    LazyLoader {
-        active: Theme.ink
-        Toasts {
-            toastWidth: 360
-            gap: 4
-            delegate: Component { InkToast {} }
-        }
-    }
-    LazyLoader {
-        active: Theme.ink
-        InkCentre {}
-    }
 
     // ── Signal ────────────────────────────────────────────────────────
     Variants {

@@ -47,7 +47,7 @@ Singleton {
             ["SUPER ALT M", "mixer · wiremix"],
             ["SUPER V", "clipboard"],
             ["SUPER SHIFT W", "wallpaper"],
-            ["SUPER SHIFT T", "style · signal ink paper flare"],
+            ["SUPER SHIFT T", "style · signal flare"],
             ["SUPER SHIFT A", "hide / show the bar"]
         ] },
         { col: 0, name: "NOTIFICATIONS", rows: [

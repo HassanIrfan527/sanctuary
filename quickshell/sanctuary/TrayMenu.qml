@@ -39,8 +39,8 @@ PanelWindow {
     readonly property var entries: opener.children ? opener.children.values : []
     property int cursor: -1
 
-    readonly property int cardTop: (Theme.signal ? Theme.sigBarH : Theme.inkBarH) + 4
-    readonly property int rowH: Theme.signal ? 28 : 34
+    readonly property int cardTop: Theme.sigBarH + 4
+    readonly property int rowH: 28
 
     QsMenuOpener {
         id: opener
@@ -75,7 +75,7 @@ PanelWindow {
     // The left gutters exist only when some entry in this menu uses them.
     readonly property bool hasChecks: entries.some(e => e.buttonType !== QsMenuButtonType.None)
     readonly property bool hasIcons: entries.some(e => iconOf(e) !== "")
-    readonly property int textX: (Theme.signal ? 14 : 10) + (hasChecks ? 16 : 0) + (hasIcons ? 24 : 0)
+    readonly property int textX: 14 + (hasChecks ? 16 : 0) + (hasIcons ? 24 : 0)
 
     // Apps send separators carelessly (nm-applet ends on one). Draw one only
     // between two real entries.
@@ -145,9 +145,9 @@ PanelWindow {
             Text {
                 required property var modelData
                 text: win.label(modelData)
-                font.family: Theme.signal ? Theme.mono : Theme.sans
-                font.pixelSize: Theme.signal ? 12 : 13
-                font.weight: Theme.signal ? Font.Normal : Font.Bold
+                font.family: Theme.mono
+                font.pixelSize: 12
+                font.weight: Font.Normal
             }
         }
     }
@@ -156,8 +156,8 @@ PanelWindow {
         id: card
         focus: true
         // Text + check + icon + submenu arrow + padding.
-        width: Math.max(200, Math.min(420, measure.width + win.textX + (Theme.signal ? 48 : 64)))
-        height: Theme.signal ? sig.height : inkCard.height + 6
+        width: Math.max(200, Math.min(420, measure.width + win.textX + 48))
+        height: sig.height
         // Hung under the icon, kept on screen.
         x: Math.max(8, Math.min(win.width - width - 16, Ui.trayX - width / 2))
         y: win.cardTop
@@ -195,7 +195,6 @@ PanelWindow {
         //   └───────────────────────────┘
         Rectangle {
             id: sig
-            visible: Theme.signal
             width: parent.width
             height: sigCol.implicitHeight + 12
             color: Theme.sigFill
@@ -239,7 +238,7 @@ PanelWindow {
                 }
 
                 Repeater {
-                    model: Theme.signal ? win.entries : []
+                    model: win.entries
                     delegate: Item {
                         id: row
                         required property var modelData
@@ -340,164 +339,5 @@ PanelWindow {
             }
         }
 
-        // ══ Ink / Paper ══════════════════════════════════════════════
-        // A narrow panel with the hard mauve shadow. Rows are flat on the page;
-        // the selected one is inked solid with paper-coloured lettering — the
-        // same move as the focused workspace on the bar.
-        Item {
-            id: inkCard
-            visible: Theme.ink
-            width: parent.width - 6
-            height: inkCol.implicitHeight + 16
-
-            Rectangle {
-                x: 6
-                y: 6
-                width: parent.width
-                height: parent.height
-                color: Theme.mauve
-            }
-            Rectangle {
-                anchors.fill: parent
-                color: Theme.paper
-                border.width: Theme.inkStroke
-                border.color: Theme.inkLine
-            }
-
-            Column {
-                id: inkCol
-                x: 8
-                y: 8
-                width: parent.width - 16
-
-                Item {
-                    visible: win.stack.length > 0
-                    width: parent.width
-                    height: win.rowH
-                    Rectangle {
-                        anchors.fill: parent
-                        color: inkBack.containsMouse ? Theme.paperHover : "transparent"
-                    }
-                    Text {
-                        x: 10
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: "‹ " + (win.stack.length ? win.label(win.stack[win.stack.length - 1]).toUpperCase() : "")
-                        font.family: Theme.sans
-                        font.weight: Font.Black
-                        font.pixelSize: 11
-                        font.letterSpacing: 0.6
-                        color: Theme.inkSoft
-                    }
-                    Rectangle {
-                        anchors.bottom: parent.bottom
-                        width: parent.width
-                        height: 2
-                        color: Theme.inkLine
-                    }
-                    MouseArea {
-                        id: inkBack
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: win.back()
-                    }
-                }
-
-                Repeater {
-                    model: Theme.ink ? win.entries : []
-                    delegate: Item {
-                        id: irow
-                        required property var modelData
-                        required property int index
-                        readonly property bool sel: index === win.cursor
-                        readonly property bool on: win.usable(modelData)
-                        width: inkCol.width
-                        visible: !win.strayRule(index)
-                        height: visible ? (modelData.isSeparator ? 10 : win.rowH) : 0
-
-                        Rectangle {   // separator: a ruled ink line
-                            visible: irow.modelData.isSeparator
-                            x: 6
-                            width: parent.width - 12
-                            height: 2
-                            anchors.verticalCenter: parent.verticalCenter
-                            color: Theme.inkMuted
-                        }
-
-                        Rectangle {
-                            visible: !irow.modelData.isSeparator
-                            anchors.fill: parent
-                            color: irow.sel ? Theme.inkLine : "transparent"
-
-                            // Check / radio: a small inked box, filled when on.
-                            Rectangle {
-                                x: 10
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: irow.modelData.buttonType !== QsMenuButtonType.None
-                                width: 10
-                                height: 10
-                                radius: irow.modelData.buttonType === QsMenuButtonType.RadioButton ? 5 : 0
-                                color: irow.modelData.checkState === Qt.Checked
-                                       ? (irow.sel ? Theme.paper : Theme.inkLine) : "transparent"
-                                border.width: 2
-                                border.color: irow.sel ? Theme.paper : Theme.inkLine
-                            }
-                            IconImage {
-                                x: 10 + (win.hasChecks ? 16 : 0)
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: source != ""
-                                implicitSize: 16
-                                source: win.iconOf(irow.modelData)
-                                asynchronous: true
-                                opacity: irow.on ? 1 : 0.4
-                            }
-                            Text {
-                                x: win.textX
-                                width: parent.width - win.textX - 28
-                                anchors.verticalCenter: parent.verticalCenter
-                                elide: Text.ElideRight
-                                text: win.label(irow.modelData)
-                                font.family: Theme.sans
-                                font.weight: Font.Bold
-                                font.pixelSize: 13
-                                color: !irow.on ? Theme.inkMuted : irow.sel ? Theme.paper : Theme.inkLine
-                            }
-                            Text {
-                                anchors.right: parent.right
-                                anchors.rightMargin: 10
-                                anchors.verticalCenter: parent.verticalCenter
-                                visible: irow.modelData.hasChildren
-                                text: "›"
-                                font.family: Theme.sans
-                                font.weight: Font.Black
-                                font.pixelSize: 16
-                                color: irow.sel ? Theme.paper : Theme.inkSoft
-                            }
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            enabled: irow.on
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onEntered: win.cursor = irow.index
-                            onClicked: win.activate(irow.index)
-                        }
-                    }
-                }
-
-                Text {
-                    visible: win.entries.length === 0
-                    x: 10
-                    height: win.rowH
-                    verticalAlignment: Text.AlignVCenter
-                    text: "NOTHING HERE."
-                    font.family: Theme.sans
-                    font.weight: Font.Black
-                    font.pixelSize: 11
-                    color: Theme.inkMuted
-                }
-            }
-        }
     }
 }

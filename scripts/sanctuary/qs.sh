@@ -20,7 +20,7 @@
 #          can claim the name.
 #
 # ── Adding a style ────────────────────────────────────────────────────
-# A style is <Name>Bar.qml in the config dir (InkBar.qml → `ink`), plus its
+# A style is <Name>Bar.qml in the config dir (SignalBar.qml → `signal`), plus its
 # branch in Theme.qml and shell.qml. `styles` lists whatever *Bar.qml exists,
 # plus the VARIANTS below (same files, different palette in Theme.qml).
 set -uo pipefail
@@ -49,7 +49,7 @@ need_qs() {
 
 # Variants: a second printing of an existing style, palette chosen inside
 # Theme.qml. `word:base` — the word is valid only if <Base>Bar.qml exists.
-VARIANTS=(paper:ink flare:signal)
+VARIANTS=(flare:signal)
 
 styles() {
   local f v

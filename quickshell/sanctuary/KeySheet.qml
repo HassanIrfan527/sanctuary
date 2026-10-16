@@ -61,8 +61,8 @@ PanelWindow {
     Item {
         id: card
         anchors.centerIn: parent
-        width: Theme.signal ? sig.width : inkCard.width + 6
-        height: Theme.signal ? sig.height : inkCard.height + 6
+        width: sig.width
+        height: sig.height
         focus: true
 
         Keys.onPressed: event => {
@@ -84,7 +84,6 @@ PanelWindow {
         // ══ Signal ═══════════════════════════════════════════════════
         Rectangle {
             id: sig
-            visible: Theme.signal
             width: sigBody.implicitWidth + 2 * 18
             height: sigCol.implicitHeight + 24
             color: Theme.sigFill
@@ -203,143 +202,5 @@ PanelWindow {
             }
         }
 
-        // ══ Ink / Paper ══════════════════════════════════════════════
-        Item {
-            id: inkCard
-            visible: Theme.ink
-            width: inkBody.implicitWidth + 2 * 22
-            height: inkCol.implicitHeight + 36
-
-            Rectangle {   // the shadow carries identity (§4)
-                x: 6
-                y: 6
-                width: parent.width
-                height: parent.height
-                color: Theme.teal
-            }
-            Rectangle {
-                anchors.fill: parent
-                color: Theme.paper
-                border.width: Theme.inkStroke
-                border.color: Theme.inkLine
-            }
-
-            Column {
-                id: inkCol
-                x: 22
-                y: 16
-                width: parent.width - 44
-                spacing: 12
-
-                Item {
-                    width: parent.width
-                    height: 34
-                    InkHalftone {
-                        anchors.fill: parent
-                        from: 0.5
-                        strength: 0.25
-                        step: 6
-                    }
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: "KEYS"
-                        font.family: Theme.display
-                        font.weight: Theme.displayWeight
-                        font.pixelSize: Theme.hasBangers ? 30 : 24
-                        color: Theme.inkLine
-                    }
-                    Text {
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: win.filter === "" ? "type to filter" : "› " + win.filter
-                        font.family: Theme.sans
-                        font.weight: win.filter === "" ? Font.Medium : Font.Black
-                        font.pixelSize: win.filter === "" ? 11 : 14
-                        color: win.filter === "" ? Theme.inkMuted : Theme.inkLine
-                    }
-                }
-
-                Row {
-                    id: inkBody
-                    spacing: 28
-
-                    Repeater {
-                        model: 3
-                        delegate: Column {
-                            id: inkColumn
-                            required property int index
-                            spacing: 14
-
-                            Repeater {
-                                model: win.sectionsIn(inkColumn.index)
-                                delegate: Column {
-                                    id: isec
-                                    required property var modelData
-                                    readonly property bool lit: win.filter !== "" && win.anyHit(modelData)
-                                    spacing: 3
-
-                                    Item {   // section name on a peach underline when it holds a match
-                                        width: ihead.implicitWidth
-                                        height: ihead.implicitHeight + 3
-                                        Rectangle {
-                                            anchors.bottom: parent.bottom
-                                            width: parent.width
-                                            height: 4
-                                            color: Theme.peach
-                                            visible: isec.lit
-                                        }
-                                        Text {
-                                            id: ihead
-                                            text: isec.modelData.name
-                                            font.family: Theme.sans
-                                            font.weight: Font.Black
-                                            font.pixelSize: 12
-                                            font.letterSpacing: 0.8
-                                            color: Theme.inkLine
-                                        }
-                                    }
-
-                                    Repeater {
-                                        model: isec.modelData.rows
-                                        delegate: Row {
-                                            id: irow
-                                            required property var modelData
-                                            readonly property bool on: win.hit(isec.modelData, modelData)
-                                            spacing: 12
-                                            opacity: on ? 1 : 0.25
-                                            Text {
-                                                width: win.keyW
-                                                text: irow.modelData[0]
-                                                font.family: Theme.mono
-                                                font.pixelSize: 10
-                                                font.weight: Font.Bold
-                                                color: Theme.inkLine
-                                            }
-                                            Text {
-                                                width: win.descW
-                                                elide: Text.ElideRight
-                                                text: irow.modelData[1]
-                                                font.family: Theme.sans
-                                                font.weight: Font.Medium
-                                                font.pixelSize: 11
-                                                color: Theme.inkSoft
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Text {
-                    text: "type to filter · backspace · esc close"
-                    font.family: Theme.sans
-                    font.weight: Font.Medium
-                    font.pixelSize: 10
-                    color: Theme.inkMuted
-                }
-            }
-        }
     }
 }

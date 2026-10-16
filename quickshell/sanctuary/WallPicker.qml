@@ -10,15 +10,24 @@ import Quickshell.Wayland
 // (~/Videos/Wallpapers, played by mpvpaper through livewall.sh). Setting a still
 // stops a live one — it is a layer above awww and would hide the change.
 //
+// Each shelf is a folder tree. Off search you see one folder at a time: its
+// subfolders first (drawn folder tiles, FolderGlyph.qml), then the pictures
+// directly in it, with a ".." tile at the head once you are inside. Typing
+// searches every picture in every folder at once, folders matched by path too
+// ("jjk" finds all of jjk/). The tree is built here from the file paths, so a
+// folder with no pictures anywhere below it simply never appears.
+//
 // wallpaper.sh does the file work: `list` names every file and its thumbnail,
 // `thumbs` makes the missing ones (480x270, cached in ~/.cache/sanctuary). A
 // file with no thumbnail yet shows its name on a blank tile rather than
 // decoding a 4K original on the spot — the first open after adding a folder of
 // wallpapers fills in as they are made.
 //
-//   type  filter by name     ← → ↑ ↓ · ctrl-h j k l  move     tab  still / live
-//   enter  set + close       shift-enter  set, stay open (try a few)     esc  close
-//   click a tile to set it; click outside to close
+//   type  search all folders     ← → ↑ ↓ · ctrl-h j k l  move     tab  still / live
+//   enter  open folder / set + close     shift-enter  set, stay open (try a few)
+//   backspace  up a folder — only on an empty search box, and never on key
+//              repeat: holding it to clear a word stops at the empty box
+//   esc  close     click a tile to open / set it; click outside to close
 PanelWindow {
     id: win
 
@@ -37,10 +46,12 @@ PanelWindow {
 
     readonly property string scripts: Quickshell.env("HOME") + "/.dotfiles/scripts/sanctuary/"
 
-    property var all: []              // { kind, path, thumb, name }
+    property var all: []              // { type: "file", kind, path, thumb, name, dir }
+    property var roots: ({ still: "", live: "" })
     property string currentKind: "still"
     property string currentPath: ""
     property string kind: "still"     // the shelf on show
+    property string folder: ""        // where you are on it, relative to its root; "" = top
     property string query: ""
     property int cursor: 0
     property int thumbRev: 0          // bumped when new thumbnails land → tiles retry
@@ -49,23 +60,52 @@ PanelWindow {
     readonly property int shown: 3    // rows visible before scrolling
     readonly property int stillCount: all.filter(w => w.kind === "still").length
     readonly property int liveCount: all.filter(w => w.kind === "live").length
+    readonly property bool searching: query.trim() !== ""
+    // What the grid shows: search hits, or the folder's ".." / subfolders / files.
     readonly property var results: {
-        const words = query.trim().toLowerCase().split(/\s+/).filter(w => w);
-        return all.filter(w => w.kind === kind && words.every(q => w.name.toLowerCase().indexOf(q) >= 0));
+        const shelf = all.filter(w => w.kind === kind);
+        if (searching) {
+            const words = query.trim().toLowerCase().split(/\s+/);
+            return shelf.filter(w => {
+                const hay = (w.dir + "/" + w.name).toLowerCase();
+                return words.every(q => hay.indexOf(q) >= 0);
+            });
+        }
+        const prefix = folder === "" ? "" : folder + "/";
+        const nowDir = kind === currentKind ? dirOf(kind, currentPath) : null;
+        const subs = {}, files = [];
+        for (const w of shelf) {
+            if (w.dir === folder) {
+                files.push(w);
+            } else if (w.dir.startsWith(prefix)) {
+                const name = w.dir.substring(prefix.length).split("/")[0];
+                const dir = prefix + name;
+                if (!subs[dir])
+                    subs[dir] = { type: "folder", kind: kind, dir: dir, name: name, thumb: w.thumb, path: "", count: 0,
+                                  now: nowDir !== null && (nowDir === dir || nowDir.startsWith(dir + "/")) };
+                subs[dir].count++;
+            }
+        }
+        const folders = Object.values(subs).sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+        const up = folder === "" ? [] : [{ type: "up", kind: kind, dir: parentOf(folder), name: "..", thumb: "", path: "" }];
+        return up.concat(folders, files);
     }
     readonly property var picked: results[cursor] || null
+    readonly property string hints: (picked && picked.type !== "file" ? "enter open" : "enter set · shift-enter try")
+                                    + (!searching && folder !== "" ? " · ⌫ up" : "") + " · tab still/live · esc close"
+    // "/ dynamic-wallpapers / dark" — where you are, for the header
+    readonly property string crumb: searching ? "all folders" : "/" + (folder === "" ? "" : " " + folder.split("/").join(" / "))
 
     onVisibleChanged: {
         if (visible) {
             sigInput.text = "";
-            inkInput.text = "";
             lister.running = true;
-            Qt.callLater(() => (Theme.signal ? sigInput : inkInput).forceActiveFocus());
+            Qt.callLater(() => sigInput.forceActiveFocus());
         }
     }
     onQueryChanged: cursor = 0
-    onKindChanged: cursor = Math.max(0, kind === currentKind ? results.findIndex(w => w.path === currentPath) : 0)
-    onCursorChanged: (Theme.signal ? sigGrid : inkGrid).positionViewAtIndex(cursor, GridView.Contain)
+    onKindChanged: land()
+    onCursorChanged: sigGrid.positionViewAtIndex(cursor, GridView.Contain)
 
     // ── data ──────────────────────────────────────────────────────────
     Process {
@@ -89,30 +129,84 @@ PanelWindow {
     }
 
     function parse(text) {
-        const out = [];
+        const out = [], r = {};
         for (const l of text.split("\n")) {
             const f = l.split("\t");
             if (f[0] === "current") {
                 currentKind = f[1];
                 currentPath = f[2] || "";
+            } else if (f[0] === "root") {
+                r[f[1]] = f[2] || "";
+                roots = r;   // before the files below: dirOf reads it
             } else if (f.length === 3) {
                 const base = f[1].substring(f[1].lastIndexOf("/") + 1);
-                out.push({ kind: f[0], path: f[1], thumb: f[2], name: base.replace(/\.[^.]+$/, "") });
+                out.push({ type: "file", kind: f[0], path: f[1], thumb: f[2], name: base.replace(/\.[^.]+$/, ""),
+                           dir: dirOf(f[0], f[1]) });
             }
         }
         all = out;
-        // Open on the wallpaper you have now, on its shelf.
-        kind = currentKind;
-        cursor = Math.max(0, results.findIndex(w => w.path === currentPath));
-        (Theme.signal ? sigGrid : inkGrid).positionViewAtIndex(cursor, GridView.Center);
+        // Open on the wallpaper you have now: its shelf, its folder.
+        if (kind === currentKind)
+            land();
+        else
+            kind = currentKind;   // → onKindChanged → land()
+        sigGrid.positionViewAtIndex(cursor, GridView.Center);
         if (!thumber.running)
             thumber.running = true;
     }
 
+    // The footer line for the tile under the cursor. Search hits say which
+    // folder they came from, since they are mixed together.
+    function caption(w) {
+        if (!w)
+            return "";
+        if (w.type === "up")
+            return ".. back to " + (w.dir === "" ? "the top" : w.dir);
+        if (w.type === "folder")
+            return w.name + "/  · " + w.count;
+        return searching && w.dir !== "" ? w.dir + "/" + w.name : w.name;
+    }
+
+    // A file's folder relative to its shelf's root: "" at the top, "a/b" deeper.
+    function dirOf(k, path) {
+        const root = roots[k] || "";
+        if (!root || !path.startsWith(root + "/"))
+            return "";
+        const rel = path.substring(root.length + 1);
+        const cut = rel.lastIndexOf("/");
+        return cut < 0 ? "" : rel.substring(0, cut);
+    }
+    function parentOf(dir) {
+        const cut = dir.lastIndexOf("/");
+        return cut < 0 ? "" : dir.substring(0, cut);
+    }
+
+    // On the shelf's current wallpaper if it has one, else the top of the shelf.
+    function land() {
+        const here = kind === currentKind;
+        folder = here ? dirOf(kind, currentPath) : "";
+        cursor = Math.max(0, here ? results.findIndex(w => w.path === currentPath) : 0);
+    }
+    function enter(dir) {
+        folder = dir;
+        // past the ".." tile, onto the first thing actually in the folder
+        cursor = results.length > 1 ? 1 : 0;
+    }
+    function up() {
+        const from = folder;
+        folder = parentOf(folder);
+        cursor = Math.max(0, results.findIndex(w => w.type === "folder" && w.dir === from));
+    }
+
+    // Tile i: folders open, ".." climbs, pictures get set.
     function apply(i, stay) {
         const w = results[i];
         if (!w)
             return;
+        if (w.type === "folder")
+            return enter(w.dir);
+        if (w.type === "up")
+            return up();
         if (w.kind === "live")
             Quickshell.execDetached([scripts + "livewall.sh", "start", w.path]);
         else
@@ -131,7 +225,10 @@ PanelWindow {
             Ui.wallOpen = false;
         else if (k === Qt.Key_Return || k === Qt.Key_Enter)
             apply(cursor, event.modifiers & Qt.ShiftModifier);
-        else if (k === Qt.Key_Tab || k === Qt.Key_Backtab)
+        else if (k === Qt.Key_Backspace && query === "" && folder !== "") {
+            if (!event.isAutoRepeat)
+                up();
+        } else if (k === Qt.Key_Tab || k === Qt.Key_Backtab)
             kind = kind === "still" ? "live" : "still";
         else if (k === Qt.Key_Right || (ctrl && k === Qt.Key_L))
             move(1);
@@ -158,17 +255,17 @@ PanelWindow {
 
     // ══ Signal: a contact sheet on the instrument ════════════════════
     //
-    //   ┌ WALLPAPER   STILL 402 · LIVE 23 ─────────────── 007/402 ┐
-    //   │ ▸ anime▌                                                 │
-    //   ├──────────────────────────────────────────────────────────┤
-    //   │ ┏━━━━━━━┓ ┌───────┐ ┌───────┐ ┌───────┐                  │
-    //   │ ┃ ● NOW ┃ │       │ │       │ │       │                  │
-    //   │ ┗━━━━━━━┛ └───────┘ └───────┘ └───────┘                  │
-    //   │ aesthetic_deer                                           │
-    //   └ enter set · shift-enter try · tab still/live · esc ──────┘
+    //   ┌ WALLPAPER   STILL 445 · LIVE 21   / DYNAMIC-WALLPAPERS ── 002/003 ┐
+    //   │ ▸ filter by name▌                                                  │
+    //   ├────────────────────────────────────────────────────────────────────┤
+    //   │ ┌───────┐ ┏━━━━━━━┓ ┌───────┐                                      │
+    //   │ │ ┌┐ .. │ ┃ ┌┐    ┃ │ ┌┐    │      ← folder tiles: a drawn folder, │
+    //   │ │ └──┘UP│ ┃ DARK  ┃ │ LIGHT │        the name, how many inside     │
+    //   │ └───────┘ ┗━━━━━━━┛ └───────┘                                      │
+    //   │ Dark/  · 15                                                        │
+    //   └ enter open · ⌫ up · shift-enter try · tab still/live · esc ────────┘
     Rectangle {
         id: sig
-        visible: Theme.signal
         anchors.centerIn: parent
         width: 1000
         height: sigCol.implicitHeight
@@ -222,6 +319,15 @@ PanelWindow {
                             }
                         }
                     }
+                    Text {   // where you are
+                        width: Math.min(implicitWidth, 460)
+                        elide: Text.ElideLeft
+                        text: win.crumb.toUpperCase()
+                        font.family: Theme.mono
+                        font.pixelSize: 9
+                        font.letterSpacing: 1.4
+                        color: win.searching ? Theme.sigWarn : Theme.sigLabel
+                    }
                 }
                 Text {
                     anchors.right: parent.right
@@ -269,7 +375,7 @@ PanelWindow {
                     anchors.leftMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
                     visible: win.query === ""
-                    text: "filter by name"
+                    text: "search all folders"
                     font.family: Theme.mono
                     font.pixelSize: 13
                     color: Theme.surface2
@@ -290,7 +396,7 @@ PanelWindow {
                 snapMode: GridView.SnapToRow
                 cellWidth: Math.floor(width / win.cols)
                 cellHeight: Math.round(cellWidth * 9 / 16)
-                model: Theme.signal ? win.results : []
+                model: win.results
                 currentIndex: win.cursor
                 boundsBehavior: Flickable.StopAtBounds
                 cacheBuffer: cellHeight * 2
@@ -300,7 +406,8 @@ PanelWindow {
                     required property var modelData
                     required property int index
                     readonly property bool sel: index === win.cursor
-                    readonly property bool now: modelData.path === win.currentPath
+                    readonly property bool isFile: modelData.type === "file"
+                    readonly property bool now: isFile ? modelData.path === win.currentPath : !!modelData.now
                     width: sigGrid.cellWidth
                     height: sigGrid.cellHeight
 
@@ -312,17 +419,66 @@ PanelWindow {
                         border.color: tile.sel ? Theme.sigHot : Theme.sigRule
 
                         Thumb {
+                            visible: tile.isFile
                             anchors.fill: parent
                             anchors.margins: tile.sel ? 2 : 1
-                            entry: tile.modelData
+                            entry: tile.isFile ? tile.modelData : null
                             rev: win.thumbRev
                             fallbackFont: Theme.mono
                             fallbackColor: Theme.sigLabel
                             dim: !tile.sel
                         }
 
+                        // A folder: the first picture inside, barely there behind
+                        // a drawn folder, its name, and how many it holds.
+                        Thumb {
+                            visible: tile.modelData.type === "folder"
+                            anchors.fill: parent
+                            anchors.margins: tile.sel ? 2 : 1
+                            opacity: tile.sel ? 0.22 : 0.12
+                            entry: visible ? tile.modelData : null
+                            rev: win.thumbRev
+                            fallbackColor: "transparent"
+                        }
+                        Column {
+                            visible: !tile.isFile
+                            anchors.centerIn: parent
+                            spacing: 7
+                            FolderGlyph {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                width: 46
+                                height: 34
+                                line: tile.sel ? Theme.sigHot : Theme.sigLabel
+                                fill: Theme.sigCell
+                                label: tile.modelData.type === "up" ? ".." : ""
+                            }
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                width: Math.min(implicitWidth, tile.width - 30)
+                                elide: Text.ElideMiddle
+                                text: (tile.modelData.type === "up" ? "UP" : tile.modelData.name).toUpperCase()
+                                font.family: Theme.mono
+                                font.pixelSize: 10
+                                font.weight: Font.Bold
+                                font.letterSpacing: 1.4
+                                color: tile.sel ? Theme.sigValue : Theme.subtext0
+                            }
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                width: Math.min(implicitWidth, tile.width - 30)
+                                elide: Text.ElideLeft
+                                text: tile.modelData.type === "up"
+                                      ? "TO " + (tile.modelData.dir === "" ? "TOP" : tile.modelData.dir.split("/").pop().toUpperCase())
+                                      : Theme.pad(tile.modelData.count || 0, 3, "0") + " " + tile.modelData.kind.toUpperCase()
+                                font.family: Theme.mono
+                                font.pixelSize: 8
+                                font.letterSpacing: 1.2
+                                color: Theme.sigLabel
+                            }
+                        }
+
                         Rectangle {   // status tags, top-left
-                            visible: tile.now || tile.modelData.kind === "live"
+                            visible: tile.now || (tile.isFile && tile.modelData.kind === "live")
                             x: 6
                             y: 6
                             width: tagText.implicitWidth + 10
@@ -373,7 +529,7 @@ PanelWindow {
                     width: parent.width * 0.5
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideMiddle
-                    text: win.picked ? win.picked.name : ""
+                    text: win.caption(win.picked)
                     font.family: Theme.mono
                     font.pixelSize: 10
                     color: Theme.sigValue
@@ -382,7 +538,7 @@ PanelWindow {
                     anchors.right: parent.right
                     anchors.rightMargin: 14
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "enter set · shift-enter try · tab still/live · esc close"
+                    text: win.hints
                     font.family: Theme.mono
                     font.pixelSize: 9
                     color: Theme.surface2
@@ -391,259 +547,4 @@ PanelWindow {
         }
     }
 
-    // ══ Ink / Paper: a page of panels ════════════════════════════════
-    //
-    //   ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-    //   ┃ WALLPAPER  [STILL] [LIVE]      ┌ filter ───────┐ ┃
-    //   ┃ ┏━━━━━┓▉ ┌─────┐ ┌─────┐ ┌─────┐               ┃  ← selected: thick
-    //   ┃ ┗━━━━━┛▉ └─────┘ └─────┘ └─────┘               ┃    ink + peach shadow
-    //   ┃ AESTHETIC_DEER                        7 / 402  ┃
-    //   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-    Item {
-        id: ink
-        visible: Theme.ink
-        anchors.centerIn: parent
-        width: 1000
-        height: inkCol.implicitHeight + 36
-
-        MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons }   // swallow
-
-        Rectangle {   // hard shadow
-            x: 7
-            y: 7
-            width: parent.width
-            height: parent.height
-            color: Theme.mauve
-        }
-        Rectangle {
-            anchors.fill: parent
-            color: Theme.paper
-            border.width: Theme.inkStroke
-            border.color: Theme.inkLine
-        }
-
-        Column {
-            id: inkCol
-            x: 20
-            y: 16
-            width: parent.width - 40
-            spacing: 12
-
-            // masthead: title, shelves, filter
-            Item {
-                width: parent.width
-                height: 40
-                InkHalftone {
-                    anchors.fill: parent
-                    from: 0.35
-                    strength: 0.22
-                    step: 6
-                }
-                Row {
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 16
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: "WALLPAPER"
-                        font.family: Theme.display
-                        font.weight: Theme.displayWeight
-                        font.pixelSize: Theme.hasBangers ? 34 : 26
-                        color: Theme.inkLine
-                    }
-                    Repeater {
-                        model: [{ k: "still", n: win.stillCount }, { k: "live", n: win.liveCount }]
-                        delegate: Item {
-                            id: shelf
-                            required property var modelData
-                            readonly property bool on: win.kind === modelData.k
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: shelfText.implicitWidth + 20
-                            height: 26
-                            Rectangle {
-                                x: 3
-                                y: 3
-                                width: parent.width
-                                height: parent.height
-                                color: shelf.on ? Theme.peach : Theme.paperShade
-                            }
-                            Rectangle {
-                                anchors.fill: parent
-                                color: shelf.on ? Theme.inkLine : Theme.paper
-                                border.width: 2
-                                border.color: Theme.inkLine
-                                Text {
-                                    id: shelfText
-                                    anchors.centerIn: parent
-                                    text: shelf.modelData.k.toUpperCase() + " " + shelf.modelData.n
-                                    font.family: Theme.sans
-                                    font.weight: Font.Black
-                                    font.pixelSize: 11
-                                    color: shelf.on ? Theme.paper : Theme.inkLine
-                                }
-                            }
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: win.kind = shelf.modelData.k
-                            }
-                        }
-                    }
-                }
-                // the filter, in a small inked box on the right
-                Rectangle {
-                    anchors.right: parent.right
-                    anchors.rightMargin: 4
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 280
-                    height: 32
-                    color: Theme.paper
-                    border.width: 2
-                    border.color: Theme.inkLine
-                    TextInput {
-                        id: inkInput
-                        x: 12
-                        width: parent.width - 24
-                        anchors.verticalCenter: parent.verticalCenter
-                        onTextChanged: win.query = text
-                        font.family: Theme.sans
-                        font.weight: Font.Black
-                        font.pixelSize: 14
-                        color: Theme.inkLine
-                        selectionColor: Theme.paperShade
-                        cursorDelegate: Rectangle { width: 3; color: Theme.inkLine }
-                        Keys.onPressed: event => win.key(event)
-                        clip: true
-                    }
-                    Text {
-                        x: 12
-                        anchors.verticalCenter: parent.verticalCenter
-                        visible: win.query === ""
-                        text: "find one…"
-                        font.family: Theme.sans
-                        font.weight: Font.Bold
-                        font.pixelSize: 13
-                        color: Theme.inkMuted
-                    }
-                }
-            }
-
-            GridView {
-                id: inkGrid
-                width: parent.width
-                height: cellHeight * win.shown
-                clip: true
-                snapMode: GridView.SnapToRow
-                cellWidth: Math.floor(width / win.cols)
-                cellHeight: Math.round((cellWidth - 14) * 9 / 16) + 14
-                model: Theme.ink ? win.results : []
-                currentIndex: win.cursor
-                boundsBehavior: Flickable.StopAtBounds
-                cacheBuffer: cellHeight * 2
-
-                delegate: Item {
-                    id: itile
-                    required property var modelData
-                    required property int index
-                    readonly property bool sel: index === win.cursor
-                    readonly property bool now: modelData.path === win.currentPath
-                    width: inkGrid.cellWidth
-                    height: inkGrid.cellHeight
-
-                    Item {
-                        x: 3
-                        y: 3
-                        width: parent.width - 14
-                        height: parent.height - 14
-
-                        Rectangle {   // hard shadow
-                            x: itile.sel ? 6 : 3
-                            y: itile.sel ? 6 : 3
-                            width: parent.width
-                            height: parent.height
-                            color: itile.sel ? Theme.peach : Theme.paperShade
-                        }
-                        Rectangle {
-                            anchors.fill: parent
-                            color: Theme.paperDim
-                            border.width: itile.sel ? Theme.inkStroke + 1 : 2
-                            border.color: Theme.inkLine
-
-                            Thumb {
-                                anchors.fill: parent
-                                anchors.margins: parent.border.width
-                                entry: itile.modelData
-                                rev: win.thumbRev
-                                fallbackFont: Theme.sans
-                                fallbackColor: Theme.inkMuted
-                            }
-                        }
-                        Rectangle {   // NOW / LIVE: a lettered tag stuck on the panel
-                            visible: itile.now || itile.modelData.kind === "live"
-                            x: -2
-                            y: -2
-                            width: itag.implicitWidth + 12
-                            height: 18
-                            color: itile.now ? Theme.inkLine : Theme.paper
-                            border.width: 2
-                            border.color: Theme.inkLine
-                            Text {
-                                id: itag
-                                anchors.centerIn: parent
-                                text: itile.now ? "NOW" : "LIVE"
-                                font.family: Theme.sans
-                                font.weight: Font.Black
-                                font.pixelSize: 9
-                                font.letterSpacing: 0.8
-                                color: itile.now ? Theme.paper : Theme.inkLine
-                            }
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onEntered: win.cursor = itile.index
-                        onClicked: win.apply(itile.index, false)
-                    }
-                }
-
-                Text {
-                    anchors.centerIn: parent
-                    visible: win.results.length === 0
-                    text: lister.running ? "HOLD ON…" : "NOTHING BY THAT NAME."
-                    font.family: Theme.display
-                    font.weight: Theme.displayWeight
-                    font.pixelSize: Theme.hasBangers ? 22 : 17
-                    color: Theme.inkMuted
-                }
-            }
-
-            // caption: the name under the cursor, and where you are
-            Item {
-                width: parent.width
-                height: 18
-                Text {
-                    width: parent.width * 0.6
-                    anchors.verticalCenter: parent.verticalCenter
-                    elide: Text.ElideMiddle
-                    text: win.picked ? win.picked.name.toUpperCase() : ""
-                    font.family: Theme.sans
-                    font.weight: Font.Black
-                    font.pixelSize: 12
-                    color: Theme.inkLine
-                }
-                Text {
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: (win.results.length ? win.cursor + 1 : 0) + " / " + win.results.length
-                          + "   ·   enter set · shift-enter try · tab still/live"
-                    font.family: Theme.sans
-                    font.weight: Font.Bold
-                    font.pixelSize: 10
-                    color: Theme.inkSoft
-                }
-            }
-        }
-    }
 }

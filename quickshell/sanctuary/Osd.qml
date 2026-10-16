@@ -6,8 +6,7 @@ import Quickshell.Wayland
 // mute changes, holds for 1.4s, goes. It takes no input — the pointer passes
 // straight through it — because it is a readout, never a control (§1).
 //
-//   Signal       a hairline gauge: VOL ▕██████████░░░░░░░░░░▏ 52%
-//   Ink / Paper  a manga panel: VOL, ten chunky blocks, the number lettered big
+//   a hairline gauge: VOL ▕██████████░░░░░░░░░░▏ 52%
 PanelWindow {
     id: osd
 
@@ -19,8 +18,8 @@ PanelWindow {
     margins.top: 8
     exclusionMode: ExclusionMode.Normal   // below the bar
     exclusiveZone: 0
-    implicitWidth: (Theme.signal ? sig.width : ink.width) + 16
-    implicitHeight: (Theme.signal ? sig.height : ink.height) + 16
+    implicitWidth: sig.width + 16
+    implicitHeight: sig.height + 16
 
     WlrLayershell.namespace: "sanctuary-osd"
     WlrLayershell.layer: WlrLayer.Overlay
@@ -34,8 +33,6 @@ PanelWindow {
         function onTouched() {
             osd.shown = true;
             hold.restart();
-            if (Theme.ink)
-                slam.restart();
         }
     }
     Timer {
@@ -56,7 +53,6 @@ PanelWindow {
         // ── Signal ────────────────────────────────────────────────────
         Rectangle {
             id: sig
-            visible: Theme.signal
             width: sigRow.implicitWidth + 28
             height: 34
             color: Theme.sigFill
@@ -106,65 +102,6 @@ PanelWindow {
                     color: Media.muted ? Theme.surface2 : Theme.sigValue
                 }
             }
-        }
-
-        // ── Ink / Paper ───────────────────────────────────────────────
-        InkPanel {
-            id: ink
-            visible: Theme.ink
-            accent: Media.muted ? Theme.surface1 : Theme.lavender
-            face: Media.muted ? Theme.paperDim : Theme.paper
-            padX: 14
-            implicitHeight: 40
-            transformOrigin: Item.Top
-
-            Row {
-                spacing: 10
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: Media.muted ? "MUTE" : "VOL"
-                    font.family: Theme.sans
-                    font.weight: Font.Black
-                    font.pixelSize: 11
-                    font.letterSpacing: 1
-                    color: Theme.inkLine
-                }
-                Row {
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 3
-                    Repeater {
-                        model: 10
-                        delegate: Rectangle {
-                            required property int index
-                            width: 12
-                            height: 16
-                            border.width: 2
-                            border.color: Theme.inkLine
-                            color: !Media.muted && osd.level > index / 10 ? Theme.inkLine : Theme.paper
-                        }
-                    }
-                }
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 44
-                    horizontalAlignment: Text.AlignRight
-                    text: String(osd.pctNum)
-                    font.family: Theme.display
-                    font.weight: Theme.displayWeight
-                    font.pixelSize: Theme.hasBangers ? 24 : 19
-                    color: Media.muted ? Theme.inkMuted : Theme.inkLine
-                }
-            }
-        }
-
-        NumberAnimation {
-            id: slam
-            target: ink
-            property: "scale"
-            from: 1.12
-            to: 1
-            duration: Theme.quick
-            easing.type: Easing.OutCubic
         }
     }
 }

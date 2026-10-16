@@ -2,8 +2,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 
-// The toast column, top-right, under the bar. Shared by both styles; only the
-// delegate differs (InkToast / SignalToast).
+// The toast column, top-right, under the bar. The style passes its delegate
+// (SignalToast today).
 //
 // ScriptModel diffs the popups array by identity, so a new toast arriving
 // creates ONE delegate — the ones already on screen keep their state and don't

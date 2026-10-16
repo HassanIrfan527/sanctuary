@@ -3,7 +3,6 @@ import Quickshell
 import Quickshell.Bluetooth
 import Quickshell.Io
 import Quickshell.Wayland
-import Quickshell.Widgets
 
 // The launcher — Mod+Space (scripts/sanctuary/launcher.sh). Drawn in the
 // current style; when Quickshell is down (fallback) the same key opens fsel.
@@ -58,7 +57,7 @@ PanelWindow {
     property string query: ""
     property string mode: "apps"
     property int cursor: 0
-    readonly property int rows: Theme.signal ? 13 : 9
+    readonly property int rows: 13
     // First result shown: the list scrolls so the cursor is always on screen.
     property int top: 0
     onCursorChanged: {
@@ -89,7 +88,7 @@ PanelWindow {
         setMode(modes[(i + step + modes.length) % modes.length].id);
     }
     function field() {
-        return Theme.signal ? sigInput : inkInput;
+        return sigInput;
     }
     // Both inputs feed this. A prefix typed into an empty APPS field switches
     // the mode and is removed again.
@@ -119,7 +118,6 @@ PanelWindow {
             // the moment you type, and the old query would come back next time.
             mode = "apps";
             sigInput.text = "";
-            inkInput.text = "";
             cursor = 0;
             uptimeFile.reload();
             pinnedAppsFile.reload();
@@ -274,7 +272,7 @@ PanelWindow {
         { do: "clip",    glyph: "⎘", name: "Clipboard",          desc: "history · Mod+V",                           keywords: ["clipboard", "paste", "copy", "history"] },
         { do: "wall",    glyph: "▤", name: "Wallpaper",          desc: "stills and live · Mod+Shift+W",             keywords: ["wallpaper", "background"] },
         { do: "layout",  glyph: "▥", name: "Layout",             desc: "this tag — scroller, tile, grid … · Mod+Ctrl+Space", mango: true, keywords: ["layout", "tile", "tiling", "scroller", "grid", "monocle", "deck", "dwindle", "fair", "tag", "mango"] },
-        { do: "style",   glyph: "◐", name: "Style",              desc: "Signal · Ink · Paper · Flare · Mod+Shift+T", keywords: ["theme", "style", "signal", "ink", "paper", "flare", "light", "look"] },
+        { do: "style",   glyph: "◐", name: "Style",              desc: "Signal · Flare · Mod+Shift+T", keywords: ["theme", "style", "signal", "flare", "light", "look"] },
         { do: "notifs",  glyph: "☰", name: "Notifications",      desc: "the centre · Mod+Shift+D",                  keywords: ["notifications", "centre", "center"] },
         { do: "dnd",     glyph: "◌", name: "Do not disturb",     desc: "toggle · Mod+Alt+D",                        keywords: ["dnd", "quiet", "silence", "notifications"] },
         { do: "warmer",  glyph: "☾", name: "Night light warmer", desc: "less blue",                                 keywords: ["night", "light", "warm", "gamma", "blue"] },
@@ -602,7 +600,7 @@ PanelWindow {
         function kick() { energy = Math.min(1.6, energy + 0.55); }
     }
     Timer {
-        running: win.visible && Theme.signal
+        running: win.visible
         interval: 33
         repeat: true
         onTriggered: {
@@ -626,7 +624,6 @@ PanelWindow {
     //   └────────────────────────────────────────────────────────────┘
     Rectangle {
         id: sig
-        visible: Theme.signal
         anchors.horizontalCenter: parent.horizontalCenter
         y: Math.round(parent.height * 0.14)
         width: 680
@@ -873,7 +870,7 @@ PanelWindow {
 
             // ── rows ──
             Repeater {
-                model: Theme.signal ? win.results.slice(win.top, win.top + win.rows) : []
+                model: win.results.slice(win.top, win.top + win.rows)
                 delegate: Rectangle {
                     id: row
                     required property var modelData
@@ -985,323 +982,4 @@ PanelWindow {
         }
     }
 
-    // ══ Ink / Paper: a manga page ════════════════════════════════════
-    //
-    //   ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-    //   ┃ INK!                       ░░▒▒▓▓ 19:06 ┃  ← the style, lettered, offset-printed
-    //   ┃ [APPS] [* PINNED] [= CALC] [: DESK] [? WEB] ┃  ← mode chips
-    //   ┃   ╭────────────────────────────╮       ┃
-    //   ┃   │ fir▌                       │       ┃  ← the query in a speech bubble
-    //   ┃   ╰──╲─────────────────────────╯       ┃
-    //   ┃ ┌──┐ FIREFOX   web browser           ▉┃  ← selected: hard peach shadow
-    //   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-    Item {
-        id: ink
-        visible: Theme.ink
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: Math.round(parent.height * 0.12)
-        width: 580
-        height: inkCol.implicitHeight + 40
-
-        MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons }   // swallow
-
-        Rectangle {   // hard shadow
-            x: 7
-            y: 7
-            width: parent.width
-            height: parent.height
-            color: Theme.mauve
-        }
-        Rectangle {
-            anchors.fill: parent
-            color: Theme.paper
-            border.width: Theme.inkStroke
-            border.color: Theme.inkLine
-        }
-
-        Column {
-            id: inkCol
-            x: 22
-            y: 18
-            width: parent.width - 44
-            spacing: 12
-
-            // masthead: the style's name, lettered big, on a halftone sky
-            Item {
-                width: parent.width
-                height: 58
-                InkHalftone {
-                    anchors.fill: parent
-                    from: 0.3
-                    strength: 0.35
-                    step: 6
-                }
-                Text {   // misregistered second print, in peach, behind
-                    x: 4
-                    y: 4
-                    text: Theme.word.toUpperCase() + "!"
-                    font.family: Theme.display
-                    font.weight: Theme.displayWeight
-                    font.pixelSize: Theme.hasBangers ? 54 : 42
-                    font.letterSpacing: 2
-                    color: Theme.peach
-                }
-                Text {
-                    text: Theme.word.toUpperCase() + "!"
-                    font.family: Theme.display
-                    font.weight: Theme.displayWeight
-                    font.pixelSize: Theme.hasBangers ? 54 : 42
-                    font.letterSpacing: 2
-                    color: Theme.inkLine
-                }
-                Column {
-                    anchors.right: parent.right
-                    anchors.rightMargin: 6
-                    anchors.verticalCenter: parent.verticalCenter
-                    Text {
-                        anchors.right: parent.right
-                        text: Qt.formatTime(win.now, "HH:mm")
-                        font.family: Theme.display
-                        font.weight: Theme.displayWeight
-                        font.pixelSize: Theme.hasBangers ? 26 : 20
-                        color: Theme.inkLine
-                    }
-                    Text {
-                        anchors.right: parent.right
-                        text: "UP " + win.uptime
-                        font.family: Theme.sans
-                        font.weight: Font.Black
-                        font.pixelSize: 9
-                        color: Theme.inkSoft
-                    }
-                }
-            }
-
-            // mode chips
-            Row {
-                spacing: 8
-                Repeater {
-                    model: win.modes
-                    delegate: Item {
-                        id: chip
-                        required property var modelData
-                        readonly property bool on: modelData.id === win.mode
-                        width: chipText.implicitWidth + 18
-                        height: 24
-                        Rectangle {
-                            x: 3
-                            y: 3
-                            width: parent.width
-                            height: parent.height
-                            color: Theme.peach
-                            visible: chip.on
-                        }
-                        Rectangle {
-                            anchors.fill: parent
-                            color: chip.on ? Theme.inkLine : Theme.paper
-                            border.width: 2
-                            border.color: Theme.inkLine
-                        }
-                        Text {
-                            id: chipText
-                            anchors.centerIn: parent
-                            text: (chip.modelData.pre ? chip.modelData.pre + " " : "") + chip.modelData.name
-                            font.family: Theme.sans
-                            font.weight: Font.Black
-                            font.pixelSize: 11
-                            color: chip.on ? Theme.paper : Theme.inkLine
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                win.setMode(chip.modelData.id);
-                                win.field().forceActiveFocus();
-                            }
-                        }
-                    }
-                }
-            }
-
-            // the query, in a speech bubble
-            Item {
-                width: parent.width
-                height: 46 + 12
-                InkBubbleShape {
-                    x: 4 + Theme.inkShadow
-                    y: 12 + Theme.inkShadow
-                    width: parent.width - 12
-                    height: 46
-                    tail: 12
-                    tailX: 70
-                    fill: Theme.peach
-                    stroke: "transparent"
-                }
-                InkBubbleShape {
-                    x: 4
-                    y: 12
-                    width: parent.width - 12
-                    height: 46
-                    tail: 12
-                    tailX: 70
-                }
-                TextInput {
-                    id: inkInput
-                    x: 24
-                    y: 12 + (46 - height) / 2
-                    width: parent.width - 60
-                    onTextChanged: win.edited(text)
-                    font.family: Theme.sans
-                    font.weight: Font.Black
-                    font.pixelSize: 17
-                    color: Theme.inkLine
-                    selectionColor: Theme.paperShade
-                    cursorDelegate: Rectangle { width: 3; color: Theme.inkLine }
-                    Keys.onPressed: event => win.key(event)
-                }
-                Text {
-                    x: 24
-                    y: 12 + (46 - height) / 2
-                    visible: inkInput.text === ""
-                    text: win.mode === "apps" ? "what are we opening?"
-                        : win.mode === "calc" ? "do the maths!"
-                        : win.mode === "desk" ? "what should the desk do?"
-                        : win.mode === "pinned" ? "which pin? (or ~/path to pin)"
-                        : "what are we looking up?"
-                    font.family: Theme.sans
-                    font.weight: Font.Bold
-                    font.pixelSize: 15
-                    color: Theme.inkMuted
-                }
-            }
-
-            // results: small panels
-            Column {
-                width: parent.width
-                spacing: 9
-                Repeater {
-                    model: Theme.ink ? win.results.slice(win.top, win.top + win.rows) : []
-                    delegate: Item {
-                        id: irow
-                        required property var modelData
-                        required property int index
-                        readonly property bool sel: win.top + index === win.cursor && modelData.kind !== "hint"
-                        readonly property bool big: modelData.kind === "calc"
-                        width: parent.width - 6
-                        height: big ? 54 : 44
-
-                        Rectangle {
-                            x: irow.sel ? 5 : 2
-                            y: irow.sel ? 5 : 2
-                            width: parent.width
-                            height: parent.height
-                            color: irow.sel ? Theme.peach : Theme.paperShade
-                        }
-                        Rectangle {
-                            anchors.fill: parent
-                            color: Theme.paper
-                            border.width: irow.sel ? Theme.inkStroke : 2
-                            border.color: Theme.inkLine
-
-                            Row {
-                                x: 8
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: 12
-
-                                Rectangle {   // the icon (or glyph), in its own little panel
-                                    width: 30
-                                    height: 30
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    readonly property bool iconic: irow.modelData.kind === "app" || irow.modelData.kind === "file"
-                                    color: iconic ? Theme.paper : Theme.inkLine
-                                    border.width: 2
-                                    border.color: Theme.inkLine
-                                    IconImage {
-                                        id: rowIcon
-                                        visible: parent.iconic
-                                        anchors.centerIn: parent
-                                        implicitSize: 20
-                                        // iconPath(…, true) answers "" for a missing icon; fall
-                                        // back by hand (the string-fallback form didn't resolve).
-                                        source: !parent.iconic ? ""
-                                              : Quickshell.iconPath(irow.modelData.icon, true)
-                                                || (irow.modelData.mimeicon ? Quickshell.iconPath(irow.modelData.mimeicon, true) : "")
-                                                || Quickshell.iconPath(irow.modelData.generic || "application-x-executable", true)
-                                        asynchronous: true
-                                    }
-                                    Text {
-                                        visible: !parent.iconic || String(rowIcon.source) === ""
-                                        anchors.centerIn: parent
-                                        text: irow.modelData.glyph
-                                        font.family: Theme.sans
-                                        font.weight: Font.Black
-                                        font.pixelSize: 15
-                                        color: parent.iconic ? Theme.inkLine : Theme.paper
-                                    }
-                                }
-                                Text {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: irow.big ? 240 : 200
-                                    elide: Text.ElideRight
-                                    text: irow.big ? irow.modelData.title : irow.modelData.title.toUpperCase()
-                                    font.family: irow.big ? Theme.display : Theme.sans
-                                    font.weight: irow.big ? Theme.displayWeight : Font.Black
-                                    font.pixelSize: irow.big ? (Theme.hasBangers ? 30 : 22) : 13
-                                    font.letterSpacing: 0.4
-                                    color: irow.modelData.kind === "hint" ? Theme.inkMuted : Theme.inkLine
-                                }
-                                Text {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    // leaves room for the tag on the right
-                                    width: irow.big ? 150 : 190
-                                    elide: Text.ElideRight
-                                    text: irow.modelData.sub
-                                    font.family: Theme.sans
-                                    font.weight: Font.Medium
-                                    font.pixelSize: 11
-                                    color: Theme.inkSoft
-                                }
-                            }
-                            Text {
-                                anchors.right: parent.right
-                                anchors.rightMargin: 12
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: irow.modelData.kind === "app" && !irow.modelData.pinned ? "" : irow.modelData.tag
-                                font.family: Theme.sans
-                                font.weight: Font.Black
-                                font.pixelSize: 10
-                                color: irow.modelData.pinned ? Theme.inkLine : Theme.inkMuted
-                            }
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: irow.modelData.kind === "hint" ? Qt.ArrowCursor : Qt.PointingHandCursor
-                            onEntered: win.cursor = win.top + irow.index
-                            onClicked: mouse => win.launch(win.top + irow.index, mouse.modifiers & Qt.ShiftModifier)
-                        }
-                    }
-                }
-
-                Text {
-                    visible: win.results.length === 0
-                    text: "NOTHING BY THAT NAME."
-                    font.family: Theme.display
-                    font.weight: Theme.displayWeight
-                    font.pixelSize: Theme.hasBangers ? 22 : 17
-                    color: Theme.inkMuted
-                }
-            }
-
-            Text {
-                text: win.modeNow.hint.toUpperCase() + " · TAB MODE · CTRL-J/K MOVE · ESC"
-                elide: Text.ElideRight
-                width: parent.width
-                font.family: Theme.sans
-                font.weight: Font.Bold
-                font.pixelSize: 10
-                color: Theme.inkMuted
-            }
-        }
-    }
 }

@@ -8,8 +8,7 @@ import Quickshell.Services.Notifications
 // A cockpit has dozens of gauges and ONE light you are trained to look at:
 // when anything goes wrong it comes on, and the gauges tell you what. Here the
 // gauges are the bar's cells; this is the light. Every QS style shows it its own
-// way (Signal: red registration marks + red seconds + a lamp; Ink/Paper: the
-// clock's shadow goes red + a "!!" panel).
+// way (Signal: red registration marks + red seconds + a lamp).
 //
 // Pressing the lamp ACKNOWLEDGES it: it goes dark while the same reasons
 // persist, and comes back the moment a NEW reason appears. A reason that clears

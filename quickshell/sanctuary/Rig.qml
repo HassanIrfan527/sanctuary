@@ -75,7 +75,7 @@ PanelWindow {
     }
 
     function hotColor(h) {
-        return h === "rec" ? Theme.red : h === "warn" ? Theme.yellow : Theme.signal ? Theme.sigHot : Theme.peach;
+        return h === "rec" ? Theme.red : h === "warn" ? Theme.yellow : Theme.sigHot;
     }
 
     MouseArea {   // scrim: click outside = close
@@ -88,7 +88,7 @@ PanelWindow {
         id: card
         anchors.centerIn: parent
         width: 400
-        height: Theme.signal ? sig.height : inkCard.height + 6
+        height: sig.height
         focus: true
 
         Keys.onPressed: event => {
@@ -120,7 +120,6 @@ PanelWindow {
         // ══ Signal ═══════════════════════════════════════════════════
         Rectangle {
             id: sig
-            visible: Theme.signal
             width: parent.width
             height: sigCol.implicitHeight + 24
             color: Theme.sigFill
@@ -228,120 +227,5 @@ PanelWindow {
             }
         }
 
-        // ══ Ink / Paper ══════════════════════════════════════════════
-        Item {
-            id: inkCard
-            visible: Theme.ink
-            width: parent.width - 6
-            height: inkCol.implicitHeight + 36
-
-            Rectangle {
-                x: 6
-                y: 6
-                width: parent.width
-                height: parent.height
-                color: Rec.any ? Theme.red : Theme.teal
-            }
-            Rectangle {
-                anchors.fill: parent
-                color: Theme.paper
-                border.width: Theme.inkStroke
-                border.color: Theme.inkLine
-            }
-
-            Column {
-                id: inkCol
-                x: 18
-                y: 16
-                width: parent.width - 36
-                spacing: 10
-
-                Item {
-                    width: parent.width
-                    height: 34
-                    InkHalftone {
-                        anchors.fill: parent
-                        from: 0.5
-                        strength: 0.25
-                        step: 6
-                    }
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: "RIG"
-                        font.family: Theme.display
-                        font.weight: Theme.displayWeight
-                        font.pixelSize: Theme.hasBangers ? 30 : 24
-                        color: Theme.inkLine
-                    }
-                }
-
-                Repeater {
-                    model: win.rows
-                    delegate: Item {
-                        id: irow
-                        required property var modelData
-                        required property int index
-                        readonly property bool sel: index === win.cursor
-                        width: inkCol.width - 4
-                        height: 40
-
-                        Rectangle {
-                            x: irow.sel ? 4 : 2
-                            y: irow.sel ? 4 : 2
-                            width: parent.width
-                            height: parent.height
-                            color: irow.modelData.hot !== "" ? win.hotColor(irow.modelData.hot)
-                                 : irow.sel ? Theme.peach : Theme.paperShade
-                        }
-                        Rectangle {
-                            anchors.fill: parent
-                            color: Theme.paper
-                            border.width: irow.sel ? Theme.inkStroke : 2
-                            border.color: Theme.inkLine
-
-                            Row {
-                                x: 14
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: 12
-                                Text {
-                                    width: 124
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text: irow.modelData.name
-                                    font.family: Theme.sans
-                                    font.weight: Font.Black
-                                    font.pixelSize: 14
-                                    color: Theme.inkLine
-                                }
-                                Text {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text: irow.modelData.desc
-                                    font.family: Theme.sans
-                                    font.weight: Font.Medium
-                                    font.pixelSize: 11
-                                    color: Theme.inkSoft
-                                }
-                            }
-                            Text {
-                                anchors.right: parent.right
-                                anchors.rightMargin: 12
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: irow.modelData.key
-                                font.family: Theme.sans
-                                font.weight: Font.Black
-                                font.pixelSize: 11
-                                color: Theme.inkMuted
-                            }
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onEntered: win.cursor = irow.index
-                            onClicked: win.run(irow.modelData.act)
-                        }
-                    }
-                }
-            }
-        }
     }
 }

@@ -79,7 +79,7 @@ PanelWindow {
         id: card
         anchors.centerIn: parent
         width: 440
-        height: Theme.signal ? sig.height : inkCard.height + 6
+        height: sig.height
 
         // ══ Signal ═══════════════════════════════════════════════════
         //   ┌ AUTH ─────────────────────── ADMIN ┐
@@ -89,7 +89,6 @@ PanelWindow {
         //   └ enter submit · esc cancel ─────────┘
         Rectangle {
             id: sig
-            visible: Theme.signal
             width: parent.width
             height: sigCol.implicitHeight + 28
             color: Theme.sigFill
@@ -182,92 +181,21 @@ PanelWindow {
             }
         }
 
-        // ══ Ink / Paper ══════════════════════════════════════════════
-        Item {
-            id: inkCard
-            visible: Theme.ink
-            width: parent.width - 6
-            height: inkCol.implicitHeight + 36
 
-            Rectangle {
-                x: 6
-                y: 6
-                width: parent.width
-                height: parent.height
-                color: win.error ? Theme.red : Theme.yellow
-            }
-            Rectangle {
-                anchors.fill: parent
-                color: Theme.paper
-                border.width: Theme.inkStroke
-                border.color: Theme.inkLine
-            }
-            Column {
-                id: inkCol
-                x: 18
-                y: 16
-                width: parent.width - 36
-                spacing: 10
-
-                Text {
-                    text: "PASSWORD!"
-                    font.family: Theme.display
-                    font.weight: Theme.displayWeight
-                    font.pixelSize: Theme.hasBangers ? 28 : 22
-                    color: Theme.inkLine
-                }
-                Text {
-                    width: parent.width
-                    wrapMode: Text.Wrap
-                    text: win.flow ? win.flow.message : ""
-                    font.family: Theme.sans
-                    font.weight: Font.Bold
-                    font.pixelSize: 13
-                    color: Theme.inkLine
-                }
-                Rectangle {
-                    id: inkBox
-                    width: parent.width
-                    height: 36
-                    color: Theme.paper
-                    border.width: 2
-                    border.color: Theme.inkLine
-                }
-                Text {
-                    visible: text !== ""
-                    width: parent.width
-                    wrapMode: Text.Wrap
-                    text: win.note
-                    font.family: Theme.sans
-                    font.weight: Font.Bold
-                    font.pixelSize: 11
-                    color: win.error ? Theme.red : Theme.inkSoft
-                }
-                Text {
-                    text: "ENTER submit · ESC cancel"
-                    font.family: Theme.sans
-                    font.weight: Font.Bold
-                    font.pixelSize: 10
-                    color: Theme.inkMuted
-                }
-            }
-        }
-
-        // One input for both styles, laid over whichever box is showing.
+        // The one input, laid over the prompt box.
         TextInput {
             id: input
-            readonly property Item box: Theme.signal ? sigBox : inkBox
-            x: (Theme.signal ? sig.x + sigCol.x + box.x + sigPrompt.x + sigPrompt.implicitWidth + 12
-                             : inkCard.x + inkCol.x + box.x + 12)
-            y: (Theme.signal ? sigCol.y : inkCol.y) + box.y + (box.height - height) / 2
-            width: (Theme.signal ? box.width - sigPrompt.implicitWidth - 34 : box.width - 24)
+            readonly property Item box: sigBox
+            x: sig.x + sigCol.x + box.x + sigPrompt.x + sigPrompt.implicitWidth + 12
+            y: sigCol.y + box.y + (box.height - height) / 2
+            width: box.width - sigPrompt.implicitWidth - 34
             focus: true
             enabled: win.flow !== null && win.flow.isResponseRequired
             echoMode: win.flow && win.flow.responseVisible ? TextInput.Normal : TextInput.Password
             passwordCharacter: "•"
-            font.family: Theme.signal ? Theme.mono : Theme.sans
+            font.family: Theme.mono
             font.pixelSize: 14
-            color: Theme.signal ? Theme.sigValue : Theme.inkLine
+            color: Theme.sigValue
             selectionColor: Theme.surface1
             clip: true
             Keys.onReturnPressed: win.submit()

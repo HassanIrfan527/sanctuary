@@ -66,9 +66,9 @@ PanelWindow {
     }
 
     function stateColor() {
-        return live ? (Theme.signal ? Theme.sigHot : Theme.green)
+        return live ? Theme.sigHot
              : (word === "MUTE" || word === "DEAF") ? Theme.red
-             : Theme.signal ? Theme.sigLabel : Theme.inkMuted;
+             : Theme.sigLabel;
     }
     // A person's right-hand mark: speaking dot, or what they've switched off.
     function mark(m) {
@@ -85,7 +85,7 @@ PanelWindow {
         id: card
         anchors.centerIn: parent
         width: 400
-        height: Theme.signal ? sig.height : inkCard.height + 6
+        height: sig.height
         focus: true
 
         Keys.onPressed: event => {
@@ -116,7 +116,6 @@ PanelWindow {
         // ══ Signal ═══════════════════════════════════════════════════
         Rectangle {
             id: sig
-            visible: Theme.signal
             width: parent.width
             height: sigCol.implicitHeight + 24
             color: Theme.sigFill
@@ -305,185 +304,5 @@ PanelWindow {
             }
         }
 
-        // ══ Ink / Paper ══════════════════════════════════════════════
-        Item {
-            id: inkCard
-            visible: Theme.ink
-            width: parent.width - 6
-            height: inkCol.implicitHeight + 36
-
-            Rectangle {   // shadow = state: green live, red muted, grey otherwise
-                x: 6
-                y: 6
-                width: parent.width
-                height: parent.height
-                color: win.live ? Theme.green
-                     : (win.word === "MUTE" || win.word === "DEAF") ? Theme.red : Theme.surface1
-            }
-            Rectangle {
-                anchors.fill: parent
-                color: Theme.paper
-                border.width: Theme.inkStroke
-                border.color: Theme.inkLine
-            }
-
-            Column {
-                id: inkCol
-                x: 18
-                y: 16
-                width: parent.width - 36
-                spacing: 10
-
-                Item {
-                    width: parent.width
-                    height: 34
-                    InkHalftone {
-                        anchors.fill: parent
-                        from: 0.5
-                        strength: 0.25
-                        step: 6
-                    }
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: "COMMS"
-                        font.family: Theme.display
-                        font.weight: Theme.displayWeight
-                        font.pixelSize: Theme.hasBangers ? 30 : 24
-                        color: Theme.inkLine
-                    }
-                    Text {
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: win.word
-                        font.family: Theme.sans
-                        font.weight: Font.Black
-                        font.pixelSize: 12
-                        color: win.live ? Theme.inkLine : win.stateColor()
-                    }
-                }
-
-                Text {
-                    width: parent.width
-                    elide: Text.ElideRight
-                    text: Comms.inCall
-                          ? "#" + Comms.channel + (Comms.guild !== "" ? "  ·  " + Comms.guild : "") + "  ·  " + Comms.count
-                          : Comms.linked ? "join a voice channel in Vesktop" : "vesktop closed, or SanctuaryComms off"
-                    font.family: Theme.sans
-                    font.weight: Comms.inCall ? Font.Black : Font.Medium
-                    font.pixelSize: Comms.inCall ? 13 : 11
-                    color: Comms.inCall ? Theme.inkLine : Theme.inkSoft
-                }
-
-                Column {   // the room
-                    visible: Comms.inCall
-                    width: parent.width
-                    spacing: 2
-                    Repeater {
-                        model: Comms.inCall ? Comms.members : []
-                        delegate: Item {
-                            id: iwho
-                            required property var modelData
-                            width: parent.width
-                            height: 22
-                            Rectangle {   // speaking: a peach highlighter stroke under the name
-                                y: parent.height - 7
-                                width: iname.implicitWidth + 8
-                                height: 5
-                                x: 4
-                                color: Theme.peach
-                                visible: iwho.modelData.speaking
-                            }
-                            Text {
-                                id: iname
-                                x: 8
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: Math.min(implicitWidth, parent.width - 80)
-                                elide: Text.ElideRight
-                                text: iwho.modelData.name + (iwho.modelData.me ? "  · you" : "")
-                                font.family: Theme.sans
-                                font.weight: iwho.modelData.speaking ? Font.Black : Font.Bold
-                                font.pixelSize: 12
-                                color: Theme.inkLine
-                            }
-                            Text {
-                                anchors.right: parent.right
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: iwho.modelData.speaking && !iwho.modelData.mute && !iwho.modelData.deaf ? "" : win.mark(iwho.modelData)
-                                font.family: Theme.sans
-                                font.weight: Font.Black
-                                font.pixelSize: 10
-                                color: Theme.red
-                            }
-                        }
-                    }
-                }
-
-                Repeater {   // the actions
-                    model: win.rows
-                    delegate: Item {
-                        id: irow
-                        required property var modelData
-                        required property int index
-                        readonly property bool sel: index === win.cursor
-                        width: inkCol.width - 4
-                        height: 40
-
-                        Rectangle {
-                            x: irow.sel ? 4 : 2
-                            y: irow.sel ? 4 : 2
-                            width: parent.width
-                            height: parent.height
-                            color: irow.sel ? Theme.peach : Theme.paperShade
-                        }
-                        Rectangle {
-                            anchors.fill: parent
-                            color: Theme.paper
-                            border.width: irow.sel ? Theme.inkStroke : 2
-                            border.color: Theme.inkLine
-
-                            Row {
-                                x: 14
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: 12
-                                Text {
-                                    width: 100
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text: irow.modelData.name
-                                    font.family: Theme.sans
-                                    font.weight: Font.Black
-                                    font.pixelSize: 14
-                                    color: Theme.inkLine
-                                }
-                                Text {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text: irow.modelData.desc
-                                    font.family: Theme.sans
-                                    font.weight: Font.Medium
-                                    font.pixelSize: 11
-                                    color: Theme.inkSoft
-                                }
-                            }
-                            Text {
-                                anchors.right: parent.right
-                                anchors.rightMargin: 12
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: irow.modelData.key
-                                font.family: Theme.sans
-                                font.weight: Font.Black
-                                font.pixelSize: 11
-                                color: Theme.inkMuted
-                            }
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onEntered: win.cursor = irow.index
-                            onClicked: win.run(irow.modelData.act)
-                        }
-                    }
-                }
-            }
-        }
     }
 }

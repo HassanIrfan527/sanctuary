@@ -140,7 +140,7 @@ PanelWindow {
     readonly property bool drawDim: !launching && (selecting || recRegion)
     readonly property color frameColor: Rec.scrPaused ? Theme.yellow
                                       : Rec.scrActive ? Theme.red
-                                      : Theme.signal ? Theme.sigHot : Theme.inkLine
+                                      : Theme.sigHot
 
     // ── dim: four slabs around the region (or one, before there is one) ──
     Item {
@@ -278,12 +278,11 @@ PanelWindow {
         x: win.hasRegion ? Math.max(8, Math.min(win.rx - 3, win.width - width - 8))
                          : (win.width - width) / 2
         y: Math.max(0, win.stripY)
-        width: row.implicitWidth + (Theme.signal ? 2 : 0)
-        height: (Theme.signal ? 32 : 30) + (Theme.signal ? 2 : 0)
+        width: row.implicitWidth + 2
+        height: 32 + 2
 
-        // Signal: a strip like the bar's. Ink: the buttons float as panels.
+        // A strip like the bar's.
         Rectangle {
-            visible: Theme.signal
             anchors.fill: parent
             color: Theme.sigFill
             border.width: 1
@@ -297,22 +296,15 @@ PanelWindow {
 
         Row {
             id: row
-            x: Theme.signal ? 1 : 0
-            y: Theme.signal ? 1 : 0
-            spacing: Theme.signal ? 0 : 8
+            x: 1
+            y: 1
+            spacing: 0
 
             // ── recording: the readout ──
             Item {
                 visible: Rec.scrActive
                 width: readout.implicitWidth + 24
-                height: Theme.signal ? 32 : 30
-                Rectangle {
-                    visible: Theme.ink
-                    anchors.fill: parent
-                    color: Rec.scrPaused ? Theme.yellow : Theme.red
-                    border.width: 2
-                    border.color: Theme.inkLine
-                }
+                height: 32
                 Text {
                     id: readout
                     anchors.centerIn: parent
@@ -320,10 +312,9 @@ PanelWindow {
                     font.family: Theme.mono
                     font.pixelSize: 12
                     font.weight: Font.Bold
-                    color: Theme.ink ? Theme.crust : Rec.scrPaused ? Theme.sigWarn : Theme.sigAlarm
+                    color: Rec.scrPaused ? Theme.sigWarn : Theme.sigAlarm
                 }
                 Rectangle {
-                    visible: Theme.signal
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     width: 1
@@ -343,16 +334,16 @@ PanelWindow {
             Item {
                 visible: win.selecting && !win.hasRegion
                 width: hint.implicitWidth + 24
-                height: Theme.signal ? 32 : 30
+                height: 32
                 Text {
                     id: hint
                     anchors.centerIn: parent
                     text: "DRAG A REGION"
-                    font.family: Theme.signal ? Theme.mono : Theme.sans
+                    font.family: Theme.mono
                     font.pixelSize: 11
                     font.weight: Font.Bold
                     font.letterSpacing: 1.2
-                    color: Theme.signal ? Theme.sigValue : "#ffffff"
+                    color: Theme.sigValue
                 }
             }
 

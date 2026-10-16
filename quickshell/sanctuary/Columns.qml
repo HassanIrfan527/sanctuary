@@ -79,8 +79,6 @@ PanelWindow {
             const i = cols.findIndex(c => c.index === focusedCol);
             cursor = Math.max(0, i);
             idle.restart();
-            if (Theme.ink)
-                slam.restart();
         }
     }
 
@@ -124,8 +122,8 @@ PanelWindow {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 56
-        width: Theme.signal ? sig.width : inkCol.width
-        height: Theme.signal ? sig.height : inkCol.height
+        width: sig.width
+        height: sig.height
         opacity: win.visible ? 1 : 0
         Behavior on opacity { NumberAnimation { duration: Theme.duration; easing.type: Easing.OutCubic } }
 
@@ -141,8 +139,6 @@ PanelWindow {
         // ══ Signal: a channel strip ═══════════════════════════════════
         Rectangle {
             id: sig
-            visible: Theme.signal
-            // One or two columns make a strip narrower than the peek's hint line.
             width: Math.max(sigRow.implicitWidth, win.peek ? sigHint.implicitWidth + 24 : 0) + 2
             height: sigCol.implicitHeight + (win.peek ? 20 : 2)
             color: Theme.sigFill
@@ -189,7 +185,7 @@ PanelWindow {
                     id: sigRow
                     anchors.horizontalCenter: parent.horizontalCenter
                     Repeater {
-                        model: Theme.signal ? win.cols : []
+                        model: win.cols
                         delegate: Item {
                             id: cell
                             required property var modelData
@@ -300,106 +296,6 @@ PanelWindow {
                     color: Theme.sigLabel
                 }
             }
-        }
-
-        // ══ Ink / Paper: a row of panels, a comic strip ═══════════════
-        Column {
-            id: inkCol
-            visible: Theme.ink
-            spacing: 10
-
-            Row {
-                id: inkRow
-                anchors.horizontalCenter: parent.horizontalCenter
-                spacing: 10
-                transformOrigin: Item.Bottom
-
-                Repeater {
-                    model: Theme.ink ? win.cols : []
-                    delegate: InkPanel {
-                        id: icell
-                        required property var modelData
-                        required property int index
-                        readonly property var w: win.face(modelData)
-                        readonly property bool lit: modelData.index === win.focusedCol
-                        readonly property bool sel: win.peek && index === win.cursor
-                        accent: lit ? Theme.peach : sel ? Theme.lavender : Theme.surface1
-                        hot: lit || sel
-                        interactive: win.peek
-                        padX: 8
-                        implicitHeight: 66
-                        onClicked: win.go(modelData)
-
-                        Item {
-                            width: 76
-                            height: 54
-                            Text {
-                                text: win.num(icell.modelData)
-                                font.family: Theme.display
-                                font.weight: Theme.displayWeight
-                                font.pixelSize: Theme.hasBangers ? 24 : 18
-                                color: Theme.inkLine
-                            }
-                            Text {
-                                anchors.right: parent.right
-                                y: 2
-                                visible: icell.modelData.windows.length > 1
-                                text: "×" + icell.modelData.windows.length
-                                font.family: Theme.sans
-                                font.weight: Font.Black
-                                font.pixelSize: 10
-                                color: Theme.inkSoft
-                            }
-                            IconImage {
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                y: 4
-                                implicitSize: 28
-                                source: win.icon(icell.w)
-                            }
-                            Text {
-                                anchors.bottom: parent.bottom
-                                width: parent.width
-                                horizontalAlignment: Text.AlignHCenter
-                                elide: Text.ElideRight
-                                text: win.appName(icell.w).toUpperCase()
-                                font.family: Theme.sans
-                                font.weight: Font.Black
-                                font.pixelSize: 10
-                                color: icell.lit || icell.sel ? Theme.inkLine : Theme.inkSoft
-                            }
-                        }
-                        HoverHandler {
-                            enabled: win.peek
-                            onHoveredChanged: if (hovered) { win.cursor = icell.index; idle.restart(); }
-                        }
-                    }
-                }
-            }
-
-            InkPanel {
-                visible: win.peek
-                anchors.horizontalCenter: parent.horizontalCenter
-                accent: Theme.surface1
-                implicitHeight: 26
-                padX: 10
-                Text {
-                    text: win.cols.length ? "1-9 JUMP · H L MOVE · ENTER GO · ESC CLOSE" : "NO COLUMNS HERE!"
-                    font.family: Theme.sans
-                    font.weight: Font.Bold
-                    font.pixelSize: 10
-                    color: Theme.inkMuted
-                }
-            }
-        }
-
-        NumberAnimation {
-            id: slam
-            target: inkRow
-            property: "scale"
-            from: 1.08
-            to: 1
-            duration: Theme.quick
-            easing.type: Easing.OutCubic
         }
     }
 }

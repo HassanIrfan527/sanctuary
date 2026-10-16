@@ -18,7 +18,7 @@ import Quickshell.Services.Pam
 // Password: PAM, service "swaylock" (/etc/pam.d/swaylock → login), the same
 // stack swaylock has always used here.
 //
-// The face is LockSignal.qml (every style, for now — Ink/Paper get theirs later).
+// The face is LockSignal.qml (every style, for now).
 //
 //   qs.sh call lock lock        lock now (lock.sh does this)
 //   qs.sh call lock secure      true once niri confirms the lock

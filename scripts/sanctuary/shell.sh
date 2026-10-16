@@ -10,7 +10,7 @@
 #
 # ── The rule ──────────────────────────────────────────────────────────
 # Nothing here writes niri config or keybinds (2026-10-03). Window styling lives
-# in three HAND-KEPT files, niri/niri/layout-{signal,ink,paper,flare}.kdl; config.kdl
+# in HAND-KEPT files, niri/niri/layout-{signal,flare}.kdl; config.kdl
 # includes `layout.kdl`, a symlink to the active one. A style switch re-points
 # that symlink (validated first) and restarts Quickshell — it never writes a
 # byte of config. The old per-mode renderer is in archive/mode-system/.

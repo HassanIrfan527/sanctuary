@@ -1,8 +1,8 @@
 // ── Layout + shape · SIGNAL ───────────────────────────────────────────
 // Hand-maintained. Edit this file directly — nothing generates it.
 //
-// One of three hand-kept layout files: layout-signal.kdl, layout-ink.kdl,
-// layout-paper.kdl. config.kdl includes `layout.kdl`, a symlink to the active
+// One of the hand-kept layout files: layout-signal.kdl, layout-flare.kdl.
+// config.kdl includes `layout.kdl`, a symlink to the active
 // one. Picking a style (Mod+Shift+T → shell.sh set) only re-points that
 // symlink and reloads niri — no script ever writes config text (the
 // 2026-10-03 rule; the old per-mode renderer is in archive/mode-system/).

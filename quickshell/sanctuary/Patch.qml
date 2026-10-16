@@ -148,8 +148,8 @@ PanelWindow {
     Item {
         id: card
         anchors.centerIn: parent
-        width: Theme.signal ? 560 : 540
-        height: Theme.signal ? sig.height : inkCard.height + 6
+        width: 560
+        height: sig.height
         focus: true
         Keys.onPressed: event => win.key(event)
 
@@ -161,7 +161,6 @@ PanelWindow {
         // ══ Signal: a patch bay ═══════════════════════════════════════
         Rectangle {
             id: sig
-            visible: Theme.signal
             width: parent.width
             height: sigCol.implicitHeight + 24
             color: Theme.sigFill
@@ -204,7 +203,7 @@ PanelWindow {
                 }
 
                 Repeater {
-                    model: Theme.signal ? win.rows : []
+                    model: win.rows
                     delegate: Item {
                         id: row
                         required property var modelData
@@ -343,193 +342,5 @@ PanelWindow {
             }
         }
 
-        // ══ Ink / Paper ══════════════════════════════════════════════
-        Item {
-            id: inkCard
-            visible: Theme.ink
-            width: parent.width - 6
-            height: inkCol.implicitHeight + 36
-
-            Rectangle {
-                x: 6
-                y: 6
-                width: parent.width
-                height: parent.height
-                color: Theme.teal
-            }
-            Rectangle {
-                anchors.fill: parent
-                color: Theme.paper
-                border.width: Theme.inkStroke
-                border.color: Theme.inkLine
-            }
-
-            Column {
-                id: inkCol
-                x: 18
-                y: 16
-                width: parent.width - 36
-                spacing: 8
-
-                Item {
-                    width: parent.width
-                    height: 34
-                    InkHalftone {
-                        anchors.fill: parent
-                        from: 0.5
-                        strength: 0.25
-                        step: 6
-                    }
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: "PATCH!"
-                        font.family: Theme.display
-                        font.weight: Theme.displayWeight
-                        font.pixelSize: Theme.hasBangers ? 30 : 24
-                        color: Theme.inkLine
-                    }
-                    Text {
-                        anchors.right: parent.right
-                        anchors.rightMargin: 6
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: win.outs.length + " OUT · " + win.ins.length + " IN"
-                        font.family: Theme.sans
-                        font.weight: Font.Black
-                        font.pixelSize: 10
-                        color: Theme.inkSoft
-                    }
-                }
-
-                Repeater {
-                    model: Theme.ink ? win.rows : []
-                    delegate: Item {
-                        id: irow
-                        required property var modelData
-                        required property int index
-                        readonly property var node: modelData
-                        readonly property bool sel: index === win.cursor
-                        readonly property bool def: win.isDefault(node)
-                        readonly property bool muted: node.audio ? node.audio.muted : false
-                        readonly property bool first: index === 0 || win.rows[index - 1].isSink !== node.isSink
-                        width: inkCol.width - 4
-                        height: (first ? 24 : 0) + 42
-
-                        Text {
-                            visible: irow.first
-                            y: 2
-                            text: irow.node.isSink ? "OUT — WHERE IT PLAYS" : "IN — WHO'S LISTENING"
-                            font.family: Theme.sans
-                            font.weight: Font.Black
-                            font.pixelSize: 11
-                            font.letterSpacing: 0.6
-                            color: Theme.inkMuted
-                        }
-
-                        Item {
-                            y: irow.first ? 24 : 0
-                            width: parent.width
-                            height: 42
-
-                            Rectangle {   // shadow: peach = cursor, teal = the default
-                                x: irow.sel ? 4 : 2
-                                y: irow.sel ? 4 : 2
-                                width: parent.width
-                                height: parent.height
-                                color: irow.sel ? Theme.peach : irow.def ? Theme.teal : Theme.paperShade
-                            }
-                            Rectangle {
-                                anchors.fill: parent
-                                color: irow.def ? Theme.paper : Theme.paperDim
-                                border.width: irow.sel || irow.def ? Theme.inkStroke : 2
-                                border.color: Theme.inkLine
-
-                                Row {
-                                    x: 12
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    spacing: 10
-                                    Text {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        width: 14
-                                        text: irow.def ? "●" : "○"
-                                        font.family: Theme.sans
-                                        font.weight: Font.Black
-                                        font.pixelSize: 13
-                                        color: Theme.inkLine
-                                    }
-                                    Text {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        width: 240
-                                        elide: Text.ElideRight
-                                        text: win.label(irow.node).toUpperCase()
-                                        font.family: Theme.sans
-                                        font.weight: Font.Black
-                                        font.pixelSize: 12
-                                        color: Theme.inkLine
-                                    }
-                                    Text {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        text: win.bus(irow.node)
-                                        font.family: Theme.sans
-                                        font.weight: Font.Bold
-                                        font.pixelSize: 10
-                                        color: Theme.inkSoft
-                                    }
-                                }
-                                Row {
-                                    anchors.right: parent.right
-                                    anchors.rightMargin: 12
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    spacing: 8
-                                    Row {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        spacing: 2
-                                        visible: !irow.muted
-                                        Repeater {
-                                            model: 10
-                                            delegate: Rectangle {
-                                                required property int index
-                                                width: 6
-                                                height: 12
-                                                color: win.pct(irow.node) > index * 10 + 2 ? Theme.inkLine : "transparent"
-                                                border.width: 1
-                                                border.color: Theme.inkLine
-                                            }
-                                        }
-                                    }
-                                    Text {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        width: irow.muted ? implicitWidth : 28
-                                        horizontalAlignment: Text.AlignRight
-                                        text: irow.muted ? "MUTED!" : win.pct(irow.node)
-                                        font.family: irow.muted ? Theme.display : Theme.sans
-                                        font.weight: irow.muted ? Theme.displayWeight : Font.Black
-                                        font.pixelSize: irow.muted ? (Theme.hasBangers ? 18 : 13) : 12
-                                        color: irow.muted ? Theme.red : Theme.inkLine
-                                    }
-                                }
-                            }
-                            MouseArea {
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                acceptedButtons: Qt.LeftButton | Qt.RightButton
-                                cursorShape: Qt.PointingHandCursor
-                                onEntered: win.cursor = irow.index
-                                onClicked: mouse => mouse.button === Qt.RightButton ? win.mute(irow.node) : win.route(irow.node)
-                                onWheel: wheel => win.nudge(irow.node, wheel.angleDelta.y > 0 ? 0.05 : -0.05)
-                            }
-                        }
-                    }
-                }
-
-                Text {
-                    topPadding: 4
-                    text: "ENTER route · M mute · H L volume · TAB out/in · X mixer"
-                    font.family: Theme.sans
-                    font.weight: Font.Bold
-                    font.pixelSize: 10
-                    color: Theme.inkMuted
-                }
-            }
-        }
     }
 }

@@ -37,7 +37,7 @@ PanelWindow {
     }
 
     readonly property int cardW: 380
-    readonly property int cardTop: (Theme.signal ? Theme.sigBarH : Theme.inkBarH) + 4
+    readonly property int cardTop: Theme.sigBarH + 4
 
     MouseArea {   // the scrim: click outside = close
         anchors.fill: parent
@@ -54,7 +54,7 @@ PanelWindow {
                                 (Ui.playerX > 0 ? Ui.playerX : win.width) - win.cardW / 2))
         y: win.cardTop
         width: win.cardW
-        height: Theme.signal ? sigCard.height : inkCard.height + 6
+        height: sigCard.height
 
         Keys.onPressed: event => {
             const k = event.key;
@@ -83,7 +83,6 @@ PanelWindow {
         // ══ Signal ═══════════════════════════════════════════════════
         Rectangle {
             id: sigCard
-            visible: Theme.signal
             width: parent.width
             height: sigCol.implicitHeight + 28
             color: Theme.sigFill
@@ -277,220 +276,5 @@ PanelWindow {
             }
         }
 
-        // ══ Ink / Paper ══════════════════════════════════════════════
-        Item {
-            id: inkCard
-            visible: Theme.ink
-            width: parent.width - 6
-            height: inkCol.implicitHeight + 32
-
-            Rectangle {   // hard shadow
-                x: 6
-                y: 6
-                width: parent.width
-                height: parent.height
-                color: Theme.lavender
-            }
-            Rectangle {
-                anchors.fill: parent
-                color: Theme.paper
-                border.width: Theme.inkStroke
-                border.color: Theme.inkLine
-
-                InkHalftone {
-                    anchors.fill: parent
-                    anchors.margins: Theme.inkStroke
-                    from: 0.7
-                    strength: 0.18
-                }
-            }
-
-            // Caption tab, like the toasts: the player's name.
-            Rectangle {
-                x: 16
-                y: -height / 2
-                width: capTxt.implicitWidth + 12
-                height: capTxt.implicitHeight + 4
-                color: Theme.inkLine
-                Text {
-                    id: capTxt
-                    anchors.centerIn: parent
-                    text: (Media.playing ? "NOW PLAYING · " : "PAUSED · ") + Media.identity.toUpperCase()
-                    font.family: Theme.sans
-                    font.weight: Font.Black
-                    font.pixelSize: 9
-                    font.letterSpacing: 1
-                    color: Theme.paper
-                }
-            }
-
-            Column {
-                id: inkCol
-                x: 18
-                y: 18
-                width: parent.width - 36
-                spacing: 12
-
-                Row {
-                    width: parent.width
-                    spacing: 14
-
-                    Item {
-                        visible: Media.art !== ""
-                        width: visible ? 92 : 0
-                        height: 92
-                        Rectangle {
-                            x: 4
-                            y: 4
-                            width: parent.width
-                            height: parent.height
-                            color: Theme.peach
-                        }
-                        Rectangle {
-                            anchors.fill: parent
-                            color: Theme.paper
-                            border.width: Theme.inkStroke
-                            border.color: Theme.inkLine
-                            Image {
-                                anchors.fill: parent
-                                anchors.margins: Theme.inkStroke
-                                source: Media.art
-                                fillMode: Image.PreserveAspectCrop
-                                asynchronous: true
-                                sourceSize.width: 184
-                                sourceSize.height: 184
-                            }
-                        }
-                    }
-
-                    Column {
-                        width: parent.width - (Media.art !== "" ? 106 : 0)
-                        spacing: 4
-                        Text {
-                            width: parent.width
-                            text: Media.title.toUpperCase()
-                            wrapMode: Text.Wrap
-                            maximumLineCount: 2
-                            elide: Text.ElideRight
-                            font.family: Theme.sans
-                            font.weight: Font.Black
-                            font.pixelSize: 15
-                            color: Theme.inkLine
-                        }
-                        Text {
-                            width: parent.width
-                            visible: text !== ""
-                            text: Media.artist
-                            elide: Text.ElideRight
-                            font.family: Theme.sans
-                            font.weight: Font.Bold
-                            font.pixelSize: 12
-                            color: Theme.inkSoft
-                        }
-                        Text {
-                            width: parent.width
-                            visible: text !== ""
-                            text: Media.album
-                            elide: Text.ElideRight
-                            font.family: Theme.sans
-                            font.pixelSize: 11
-                            color: Theme.inkMuted
-                        }
-                    }
-                }
-
-                // position: a thick ink track, click to seek
-                Column {
-                    width: parent.width
-                    spacing: 4
-                    visible: Media.length > 0
-                    Rectangle {
-                        width: parent.width
-                        height: 10
-                        color: Theme.paper
-                        border.width: 2
-                        border.color: Theme.inkLine
-                        Rectangle {
-                            x: 2
-                            y: 2
-                            width: Math.max(0, (parent.width - 4) * Media.progress)
-                            height: parent.height - 4
-                            color: Theme.inkLine
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            anchors.margins: -4
-                            enabled: Media.canSeek
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: mouse => Media.seek((mouse.x - 4) / (width - 8))
-                        }
-                    }
-                    Item {
-                        width: parent.width
-                        height: 14
-                        Text {
-                            text: Media.clock(Media.position)
-                            font.family: Theme.sans
-                            font.weight: Font.Bold
-                            font.pixelSize: 10
-                            color: Theme.inkSoft
-                        }
-                        Text {
-                            anchors.right: parent.right
-                            text: Media.clock(Media.length)
-                            font.family: Theme.sans
-                            font.weight: Font.Bold
-                            font.pixelSize: 10
-                            color: Theme.inkSoft
-                        }
-                    }
-                }
-
-                Row {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 18
-                    Repeater {
-                        model: [
-                            { t: "|◀", act: () => Media.previous(), big: false },
-                            { t: Media.playing ? "‖" : "▶", act: () => Media.toggle(), big: true },
-                            { t: "▶|", act: () => Media.next(), big: false }
-                        ]
-                        delegate: Item {
-                            id: ib
-                            required property var modelData
-                            width: modelData.big ? 58 : 44
-                            height: 36
-                            Rectangle {
-                                x: iba.pressed ? 1 : 4
-                                y: iba.pressed ? 1 : 4
-                                width: parent.width
-                                height: parent.height
-                                color: ib.modelData.big ? Theme.peach : Theme.mauve
-                            }
-                            Rectangle {
-                                anchors.fill: parent
-                                color: ib.modelData.big ? Theme.inkLine : Theme.paper
-                                border.width: Theme.inkStroke
-                                border.color: Theme.inkLine
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: ib.modelData.t
-                                    font.family: Theme.sans
-                                    font.weight: Font.Black
-                                    font.pixelSize: ib.modelData.big ? 16 : 13
-                                    color: ib.modelData.big ? Theme.paper : Theme.inkLine
-                                }
-                            }
-                            MouseArea {
-                                id: iba
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: ib.modelData.act()
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 }
