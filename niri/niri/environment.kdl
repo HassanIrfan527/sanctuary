@@ -6,6 +6,8 @@ environment {
     QT_QPA_PLATFORM "wayland;xcb"
     QT_WAYLAND_DISABLE_WINDOWDECORATION "1"
     QT_AUTO_SCREEN_SCALE_FACTOR "1"
+    // Qt apps take style/colours/icons from qt6ct; qs.sh exempts Quickshell.
+    QT_QPA_PLATFORMTHEME "qt6ct"
     GDK_BACKEND "wayland,x11,*"
     MOZ_ENABLE_WAYLAND "1"
     ELECTRON_OZONE_PLATFORM_HINT "auto"

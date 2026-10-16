@@ -102,7 +102,7 @@ start() {
   # setsid + ignored HUP: whatever started us (niri, the picker's detached
   # process) may be gone a moment later; Quickshell must not go with it.
   trap '' HUP
-  SANCTUARY_QS="$style" setsid "$QS_BIN" -p "$QS_DIR" >"$LOG" 2>&1 </dev/null &
+  SANCTUARY_QS="$style" setsid env -u QT_QPA_PLATFORMTHEME "$QS_BIN" -p "$QS_DIR" >"$LOG" 2>&1 </dev/null &
   local i
   for i in $(seq 1 40); do          # ≤4s for the shell to come up and answer
     case "$(call notifs ping)" in pong*) return 0 ;; esac
