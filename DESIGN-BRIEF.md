@@ -6,6 +6,11 @@ Read this **before** writing any config, CSS, or theme file.
 Companion to `DESKTOP-PLAN.md` (what we're building, in what order). This file is
 **how it should look and behave**.
 
+**Building a module or a style?** Read `DESIGN-SYSTEM.md` first. It covers
+data / kit / module, colour roles, and the file budget, so a module is written
+once and works in every style. The saved pixel style plan (Lantern & Harvest) is in
+`docs/styles/lantern-harvest.md`.
+
 **Status:** direction settled. Bar, launcher, notifications, wallpaper, lock and night light built.
 Launcher is **walker** as of 2026-09-22 (a terminal launcher was built the same day and turned
 down — §3). fuzzel kept installed as the fallback. noctalia removed from every config. SDDM
@@ -96,6 +101,10 @@ layout is the hand-kept `niri/niri/layout.kdl`, and the mode renderer (`mode.sh`
 the mode files) is in `archive/mode-system/`. Sections below that describe modes, `mode.sh` or
 `mode.kdl` are history. Mod+Shift+T is now a Quickshell style picker (Signal / Ink / Paper) that
 changes the bar and notifications only.
+
+> **2026-10-16: Ink and Paper were removed** (never used after they were built). Only Signal
+> and Flare remain; Lantern & Harvest are next (`docs/styles/lantern-harvest.md`). The Ink
+> description below is history.
 
 **Two more languages, added 2026-10-03: Ink and Signal — the QS modes.** Both are drawn by
 Quickshell (`quickshell/sanctuary/`), which replaces waybar *and* swaync while either is active;
