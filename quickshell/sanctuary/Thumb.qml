@@ -20,7 +20,7 @@ Item {
     Image {
         id: img
         anchors.fill: parent
-        source: root.entry && !root.failed ? "file://" + root.entry.thumb : ""
+        source: root.entry && root.entry.thumb && !root.failed ? "file://" + root.entry.thumb : ""
         sourceSize.width: 480
         sourceSize.height: 270
         fillMode: Image.PreserveAspectCrop

@@ -10,7 +10,10 @@
 #   wallpaper.sh restore   re-apply what was last set (used at startup)
 #   wallpaper.sh list      what the Quickshell picker reads, tab-separated:
 #                            current <still|live> PATH      (first line)
+#                            root <still|live> DIR          (each shelf's top)
 #                            <still|live> PATH THUMB        (one per file)
+#                          Every depth: the picker builds its folder tree from
+#                          the paths, so a folder with no pictures never shows.
 #   wallpaper.sh thumbs    make any missing thumbnails; prints how many it made
 #
 # yazi runs in --chooser-file mode: Enter writes the selection and exits, so
@@ -54,13 +57,14 @@ ensure_daemon() {
   return 1
 }
 
+# Hidden folders (.git, .thumbnails…) are skipped; everything else, any depth.
 stills() {
-  find "$DIR" -maxdepth 2 -type f \( -iname '*.jpg' -o -iname '*.jpeg' \
-    -o -iname '*.png' -o -iname '*.webp' -o -iname '*.gif' \) 2>/dev/null | sort -f
+  find "$DIR" -name '.*' -prune -o -type f \( -iname '*.jpg' -o -iname '*.jpeg' \
+    -o -iname '*.png' -o -iname '*.webp' -o -iname '*.gif' \) -print 2>/dev/null | sort -f
 }
 lives() {
-  find "$LIVEDIR" -maxdepth 2 -type f \( -iname '*.mp4' -o -iname '*.mkv' \
-    -o -iname '*.webm' -o -iname '*.mov' \) 2>/dev/null | sort -f
+  find "$LIVEDIR" -name '.*' -prune -o -type f \( -iname '*.mp4' -o -iname '*.mkv' \
+    -o -iname '*.webm' -o -iname '*.mov' \) -print 2>/dev/null | sort -f
 }
 thumb_of() { printf '%s/%s.jpg' "$THUMBS" "$(printf '%s' "$1" | md5sum | cut -c1-32)"; }
 
@@ -132,6 +136,7 @@ case "${1:-pick}" in
     else
       printf 'current\tstill\t%s\n' "$(cat "$CURRENT" 2>/dev/null)"
     fi
+    printf 'root\tstill\t%s\nroot\tlive\t%s\n' "${DIR%/}" "${LIVEDIR%/}"
     # Hashed in one python pass, not an md5sum fork per file: ~400 files took
     # 2s that way, and the picker waits on this. Same name as thumb_of.
     { stills | sed 's/^/still\t/'; lives | sed 's/^/live\t/'; } | python3 -c '
