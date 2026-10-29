@@ -26,8 +26,28 @@ Singleton {
             } catch (e) {}
         }
     }
+    // The wallpaper overlay (WallFx.qml): off | vignette | scanlines | crt | haze.
+    // Ctrl+O in the wallpaper picker; remembered in ~/.local/state/sanctuary/wallfx.
+    readonly property var wallFxModes: ["off", "vignette", "scanlines", "crt", "haze"]
+    property string wallFx: "off"
+    function cycleWallFx() {
+        wallFx = wallFxModes[(wallFxModes.indexOf(wallFx) + 1) % wallFxModes.length];
+        wallFxFile.setText(wallFx + "\n");
+    }
+    FileView {
+        id: wallFxFile
+        path: Quickshell.env("HOME") + "/.local/state/sanctuary/wallfx"
+        blockLoading: true
+        printErrors: false
+        onLoaded: {
+            const w = wallFxFile.text().trim();
+            if (wallFxModes.indexOf(w) >= 0)
+                wallFx = w;
+        }
+    }
     property bool centreOpen: false // Mod+Shift+D
     property bool pickerOpen: false // Mod+Shift+T
+    property bool paletteOpen: false // Mod+Shift+C — Signal's colour palette (Palettes.qml)
     property bool launcherOpen: false // Mod+Space
     signal launcherType(string text)  // debug hooks — see shell.qml `debug`
     signal launcherEnter()
@@ -41,7 +61,7 @@ Singleton {
     property bool columnsOpen: false // Mod+Grave — the column strip, held open to pick from
     property bool keysOpen: false   // Mod+/ — the keybind cheat sheet (KeySheet.qml)
     property bool commsOpen: false  // Mod+C, or click the VC cell — Discord voice (CommsCard.qml)
-    property bool layoutOpen: false // Mod+Ctrl+Space (Mango only) — this tag's layout (LayoutPicker.qml)
+    property bool studyOpen: false  // Mod+S — the VU study portal (StudyCard.qml, data in Study.qml)
     // Right-click a tray icon: that app's menu, drawn by TrayMenu.qml.
     property var trayMenu: null     // the item's QsMenuHandle; null = closed
     property real trayX: 0          // screen x of the icon's centre — the menu hangs from it

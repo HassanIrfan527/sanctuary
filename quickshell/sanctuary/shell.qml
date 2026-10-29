@@ -28,6 +28,10 @@ ShellRoot {
         model: Quickshell.screens
         Bar {}
     }
+    Variants {   // the wallpaper overlay (Ctrl+O in the wallpaper picker)
+        model: Quickshell.screens
+        WallFx {}
+    }
     LazyLoader {
         active: true
         Toasts {}
@@ -50,9 +54,9 @@ ShellRoot {
         active: true
         Picker {}
     }
-    LazyLoader {   // Mango only: per-tag layouts are a Mango thing
-        active: Wm.isMango
-        LayoutPicker {}
+    LazyLoader {
+        active: true
+        Palettes {}
     }
     LazyLoader {
         active: true
@@ -93,6 +97,10 @@ ShellRoot {
     LazyLoader {
         active: true
         CommsCard {}
+    }
+    LazyLoader {
+        active: true
+        StudyCard {}
     }
     // The lock screen (each style draws its own face: the kit's LockFace). Lock.qml is a Scope
     // with its own IpcHandler `lock`.
@@ -168,6 +176,14 @@ ShellRoot {
         function state(): string { return Comms.linked ? (Comms.inCall ? "call " + Comms.count : "idle") : "unlinked"; }
     }
 
+    // Mod+S → `study toggle` — the VU study portal (StudyCard.qml)
+    IpcHandler {
+        target: "study"
+        function toggle(): void { Ui.studyOpen = !Ui.studyOpen; }
+        function close(): void { Ui.studyOpen = false; }
+        function next(): string { return Study.ready && Study.data.next ? Study.data.next.course + " " + Study.data.next.item : ""; }
+    }
+
     // Mod+/ → scripts/sanctuary/keys.sh → `keys toggle`
     IpcHandler {
         target: "keys"
@@ -189,16 +205,16 @@ ShellRoot {
         function state(): string { return (Tracker.running ? "running " : Tracker.idle ? "idle " : "stopped ") + Tracker.text; }
     }
 
-    // Mod+Ctrl+Space (Mango binds.conf) → `layouts toggle`
-    IpcHandler {
-        target: "layouts"
-        function toggle(): void { Ui.layoutOpen = Wm.isMango && !Ui.layoutOpen; }
-        function close(): void { Ui.layoutOpen = false; }
-    }
-
     IpcHandler {
         target: "picker"
         function toggle(): void { Ui.pickerOpen = !Ui.pickerOpen; }
+    }
+
+    IpcHandler {
+        target: "palettes"
+        function toggle(): void { Ui.paletteOpen = !Ui.paletteOpen; }
+        // What Quickshell is wearing: "<word> hot=<colour> of <n>" — a check without looking.
+        function current(): string { return Theme.paletteWord + " hot=" + Theme.sigHot + " of " + Theme.palettes.length; }
     }
 
     IpcHandler {

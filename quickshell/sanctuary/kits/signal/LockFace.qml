@@ -289,10 +289,15 @@ Item {
                     font.weight: Font.Light
                     font.letterSpacing: -4
                     color: Theme.sigValue
+                    layer.enabled: Theme.glow > 0
+                    layer.effect: Glow { tint: Theme.sigHot; strength: 0.8; flickers: true }
                 }
                 Text {
+                    id: lockSs
                     anchors.baseline: hm.baseline
                     leftPadding: 10
+                    layer.enabled: Theme.glow > 0
+                    layer.effect: Glow { tint: lockSs.color }
                     text: Qt.formatDateTime(clock.date, "ss")
                     font.family: Theme.mono
                     font.pixelSize: 44

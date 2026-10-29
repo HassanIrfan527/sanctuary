@@ -97,8 +97,14 @@ one of these files, each drawn in that style.
 | Rows | `MenuRow` (lists: launcher-style menus, picker, power, RIG, COMMS) · `MenuItem` (app menus) · `ResultRow` (launcher) · `ChannelRow` (patch bay) · `PersonRow` (a call) · `LogRow` (the centre) · `BackRow` · `Rule` |
 | Bar | `Cell` · `WsNumber` · `BarClock` · `CautionLamp` · `TrackLine` · `Trace` · `Meter` |
 | Controls | `Button` · `Tab` · `ModeTabs` · `Field` · `Prompt` · `StripButton` · `StripReadout` · `StripHint` · `KeyHints` · `FooterBar` · `TitleBar` · `SideHeader` |
-| Pictures | `Picture` · `Progress` · `Thumb` · `PhotoTile` · `FolderGlyph` · `Tile` · `Boxes` |
+| Pictures | `Icon` (a thing by name: a glyph in Signal, a Pixelarticon in Lantern) · `Picture` · `Progress` · `Thumb` · `PhotoTile` · `FolderGlyph` · `Tile` · `Boxes` |
 | Whole pieces | `Masthead` (launcher top) · `RegionShade` (capture) · `ToastCard` + `ToastSpec` (toasts) · `Measure` (menu widths) · `LockFace` (the lock screen) |
+
+A kit may also keep private helpers that only its own parts use; they are not
+part of the vocabulary and other kits don't need them. Lantern's: `LText` (its
+text, drawn as hard pixels), `Wood`, `Slot`, `Corners`, `Pips`, `Glyphs.js`
+(symbols Jersey lacks) and `icons/` (the Pixelarticons it names, made by
+`make_icons.py` in the build run).
 
 Two style-free helpers live at the config root, not in the kit: `Popup.qml`
 (the overlay window every menu uses: scrim, card, keyboard, list keys) and
@@ -160,7 +166,24 @@ needs a new one, and give it a look in every kit at the same time.
   `shell.qml`, a script in `scripts/sanctuary/`, a keybind. Don't invent a new way
   to open things.
 - **Outside apps: one file per style plus a symlink**, falling back to Signal's.
-  No generators. Already true for kitty, starship, niri and Mango.
+  No generators. Already true for kitty, starship and niri.
+- **Palettes are colour-only variants of Signal** (2026-10-22, Mod+Shift+C).
+  One source, `palettes/signal.json` (roles: the grey ramp, `hot`, `second`,
+  `warn`, `alarm`, `ok`, `link`, 16 ANSI). Theme.qml watches it and the state
+  file, so the switch is live. kitty / starship / niri get one generated file per
+  palette (`scripts/sanctuary/palette.py build`, committed) and `palette.sh` only
+  re-points links. New palette = a JSON entry + `build`; no QML changes.
+- **Palette effects** (2026-10-23): a palette may set `fx` (`glow` | `full`),
+  `glow` (strength) and `edge` (border gradient end). niri gets a tinted
+  shadow + gradient border; kitty (full) a longer cursor trail; the Signal kit
+  reads `Theme.glow` / `Theme.fxFull` / `Theme.flick` through its private
+  helpers `Glow` (a MultiEffect bloom, used as `layer.effect`) and `Scanlines`.
+  Glow lights only live parts (ticks, focused workspace, clock, traces, hot /
+  alarm readouts, card frames); `full` adds the toast glitch, card scanlines and
+  a rare neon flicker. Modules never touch any of it.
+- **Wallpaper overlay** (`WallFx.qml`, Ctrl+O in the wallpaper picker): off /
+  vignette / scanlines / crt / haze, on layer "bottom". Style-free like
+  `Popup.qml`: darkness plus `Theme.accent` only.
 - **Style facts in one place.** Light or dark, which kit, which base style: one
   table, not `[ "$1" = flare ]` scattered through `shell.sh`. `qs.sh`'s
   `VARIANTS` line is the start of that table; it should grow into a small
@@ -216,7 +239,7 @@ style, including ones that don't exist yet.
 - [ ] `Theme.qml`: the palette and the style word. Write its colour rules in its own `docs/styles/<word>.md`.
 - [ ] `kits/<word>/`: every part in §4, with a look for every state word in §5. A variant (like Harvest) adds only a palette.
 - [ ] Style table: base, kit, light or dark scheme, wallpaper side.
-- [ ] Outside apps: kitty, starship, niri layout, Mango look, qutebrowser palette, Vesktop theme, wallpaper(s).
+- [ ] Outside apps: kitty, starship, niri layout, qutebrowser palette, Vesktop theme, wallpaper(s).
 - [ ] Picker row.
 - [ ] **The test: no module file changed.**
 
@@ -236,5 +259,25 @@ Pitfalls met on the way, so the next kit doesn't meet them:
 - Keep fractional widths `real` (a measured text width), not `int`.
 - Copy a new kit part in before the files that use it: a hot reload can land in between.
 
-**Next: Lantern.** `kits/lantern/` with these same file names, the palettes in
-`Theme.qml`, and a `harvest:lantern` variant (`docs/styles/lantern-harvest.md`).
+**Lantern built (2026-10-16).** `kits/lantern/` has the same 56 parts (the
+55 + `Icon`) drawn the Lantern way, plus its private helpers; Theme.qml has the
+Lantern and Harvest palettes; `qs.sh` has `harvest:lantern`; the picker has the
+two rows. **No module file changed** except the picker's rows (its data). Signal
+and Flare stayed pixel-identical (vrt.py, every view).
+
+Outside apps follow the same rule: one file per style (`style-lantern.conf`,
+`layout-lantern.kdl`, `lantern24.theme.css`, `gtk/gtk4/lantern.css` …), switched
+by a link in `shell.sh`. When shell.sh needs to know "is this the pixel style?"
+it asks `qs.sh base <style>` (the VARIANTS table), never a list of words.
+
+More pitfalls, from the Lantern kit:
+- A pixel font in Qt blurs unless the Text uses `renderType: Text.NativeRendering`
+  with `antialiasing: false` (and `font.hintingPreference: Font.PreferNoHinting`).
+  Sizes matter too: Jersey 15 is even at 20px, Jersey 10 at 32px (not 30).
+- QML has no font fallback list: a symbol the font lacks (● ▸ ←) comes from a
+  smooth system font. Lantern maps them to ones Jersey has (`Glyphs.js`).
+- Modules write `text`, `width`, `elide`, paddings straight onto `Label` and
+  `Value`, so those must stay `Text`. To show something different, draw a copy
+  over a transparent original; the original keeps the size the module asked for.
+- A wider font overflows rows a module sized for mono: rows elide their own
+  descriptions (MenuRow), never trusting the card width.

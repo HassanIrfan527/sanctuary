@@ -50,6 +50,22 @@ Rectangle {
         return t === "alarm" ? Theme.sigAlarm : t === "warn" ? Theme.sigWarn : t === "live" ? Theme.sigHot : base;
     }
 
+    Rectangle {   // palette effects: a frame UNDER the card — only its bloom shows
+        id: halo
+        z: -1
+        anchors.fill: parent
+        visible: Theme.glow > 0
+        color: "transparent"
+        border.width: Math.round(1 + 2 * Theme.glow)   // a thicker hidden tube = more light to spread
+        border.color: panel.toned(panel.edgeTone, panel.toned(panel.tone, Theme.sigHot))
+        layer.enabled: visible
+        layer.effect: Glow { tint: halo.border.color; strength: 0.8 }
+    }
+    Scanlines {
+        anchors.fill: parent
+        anchors.margins: 1
+    }
+
     Ticks {
         anchors.fill: parent
         anchors.margins: -3
@@ -69,8 +85,11 @@ Rectangle {
             visible: panel.title !== ""
 
             Text {
+                id: titleText
                 x: panel.inset
                 anchors.top: parent.top
+                layer.enabled: Theme.glow > 0 && panel.titleTone !== "dim"
+                layer.effect: Glow { tint: titleText.color; strength: 0.8 }
                 text: panel.title
                 font.family: Theme.mono
                 font.pixelSize: 9

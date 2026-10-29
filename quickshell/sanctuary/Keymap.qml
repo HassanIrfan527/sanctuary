@@ -6,28 +6,15 @@ import Quickshell
 // are for reading, not parsed out of binds.kdl — so they drift unless kept in
 // step.
 //
-//   ▶ RULE: every change to niri/niri/binds.kdl OR mango/mango/binds.conf
-//     updates this file in the same edit (add, remove, rename, move a key).
-//     Both bind files say so at their top.
-//
-// One list for both compositors. A row with a third field only shows there:
-// ["SUPER G", "tabbed column", "niri"] / ["SUPER G", "pin to all tags", "mango"].
-// Rows without one are the same key doing the same job in both.
+//   ▶ RULE: every change to niri/niri/binds.kdl updates this file in the same
+//     edit (add, remove, rename, move a key). binds.kdl says so at its top.
 //
 // Families (Mod+1..9, H J K L + arrows) are one row each. Keys are written as
 // words in caps — SUPER SHIFT D — and `col` places a section in one of the
 // card's three columns (balance by eye: ~22 lines each).
 Singleton {
-    readonly property string wm: Wm.isMango ? "mango" : "niri"
-
-    // What KeySheet reads: _all with the other compositor's rows taken out.
-    readonly property var sections: _all.map(s => ({
-        col: s.col,
-        name: s.name,
-        rows: s.rows.filter(r => !r[2] || r[2] === wm)
-    })).filter(s => s.rows.length)
-
-    readonly property var _all: [
+    // What KeySheet reads.
+    readonly property var sections: [
         { col: 0, name: "LAUNCH", rows: [
             ["SUPER RETURN", "terminal"],
             ["SUPER SPACE", "launcher"],
@@ -39,15 +26,16 @@ Singleton {
         { col: 0, name: "PANELS", rows: [
             ["SUPER /", "keys · this card"],
             ["SUPER TAB", "overview"],
-            ["SUPER .", "jump · type a window's letter", "mango"],
             ["SUPER `", "column strip"],
             ["SUPER U", "RIG · recorders"],
             ["SUPER C", "COMMS · discord voice"],
+            ["SUPER S", "STUDY · VU plan + quizzes"],
             ["SUPER O", "PATCH · audio in / out"],
             ["SUPER ALT M", "mixer · wiremix"],
             ["SUPER V", "clipboard"],
             ["SUPER SHIFT W", "wallpaper"],
             ["SUPER SHIFT T", "style · signal flare"],
+            ["SUPER SHIFT C", "palette · signal colours"],
             ["SUPER SHIFT A", "hide / show the bar"]
         ] },
         { col: 0, name: "NOTIFICATIONS", rows: [
@@ -94,17 +82,11 @@ Singleton {
 
         { col: 2, name: "WINDOWS", rows: [
             ["SUPER W", "close"],
-            ["SUPER F", "maximize column", "niri"],
-            ["SUPER F", "maximize window · again to restore", "mango"],
+            ["SUPER F", "maximize column"],
             ["SUPER SHIFT F", "fullscreen"],
             ["SUPER SHIFT V", "float / tile"],
             ["SUPER ALT C", "centre column"],
-            ["SUPER G", "tabbed column", "niri"],
-            ["SUPER G", "pin to all tags", "mango"],
-            ["SUPER BACKSPACE", "last window", "mango"],
-            ["ALT TAB", "switch window · this tag", "mango"],
-            ["SUPER ALT SPACE", "cycle layout · this tag", "mango"],
-            ["SUPER CTRL SPACE", "layout picker · all 14", "mango"],
+            ["SUPER G", "tabbed column"],
             ["SUPER R", "cycle column width"],
             ["SUPER ALT H / L", "width − / +"],
             ["SUPER ALT K / J", "height − / +"]
@@ -118,8 +100,7 @@ Singleton {
         ] },
         { col: 2, name: "COLUMNS · WORKSPACES", rows: [
             ["SUPER 1-9", "focus column N"],
-            ["SUPER SHIFT 1-9", "move column to N", "niri"],
-            ["SUPER SHIFT 1-9", "send window to tag N · follow", "mango"],
+            ["SUPER SHIFT 1-9", "move column to N"],
             ["SUPER P / N", "workspace up / down"],
             ["SUPER SHIFT P / N", "column to workspace ↑ / ↓"]
         ] }

@@ -10,7 +10,7 @@
 #
 # ── The rule ──────────────────────────────────────────────────────────
 # Nothing here writes niri config or keybinds (2026-10-03). Window styling lives
-# in HAND-KEPT files, niri/niri/layout-{signal,flare}.kdl; config.kdl
+# in HAND-KEPT files, niri/niri/layout-<style>.kdl; config.kdl
 # includes `layout.kdl`, a symlink to the active one. A style switch re-points
 # that symlink (validated first) and restarts Quickshell — it never writes a
 # byte of config. The old per-mode renderer is in archive/mode-system/.
@@ -42,6 +42,12 @@ SWAYNC_THEME="$HOME/.dotfiles/swaync/swaync/themes/ascii"
 # mate before Quickshell starts, classic_up starts it once Quickshell is gone.
 POLKIT_MATE=/usr/libexec/polkit-mate-authentication-agent-1
 
+# Which styles are printed light. The scheme and the wallpaper side follow it.
+is_light() {                                 # $1 = style
+  case "$1" in flare|harvest) return 0 ;; esac
+  return 1
+}
+
 saved_style() {
   local s=signal
   [ -s "$STYLE_FILE" ] && s=$(cat "$STYLE_FILE")
@@ -66,20 +72,6 @@ point_layout() {                             # $1 = style
     return 1
   fi
   niri msg action load-config-file >/dev/null 2>&1
-}
-
-# ── Mango: the same, for its look.conf → look-<style>.conf ───────────
-# Mango re-reads its config on its own when a sourced file changes; the
-# explicit reload is for when the symlink flips but the target file didn't.
-MANGO_DIR="$HOME/.dotfiles/mango/mango"
-point_look() {                               # $1 = style
-  local want="look-$1.conf" link="$MANGO_DIR/look.conf"
-  [ -r "$MANGO_DIR/$want" ] || want="look-signal.conf"   # only Signal exists so far
-  [ "$(readlink "$link" 2>/dev/null)" = "$want" ] && return 0
-  ln -sfn "$want" "$link"
-  [ "$("$HOME/.dotfiles/scripts/sanctuary/wm.sh" name)" = mango ] &&
-    "$HOME/.dotfiles/scripts/sanctuary/wm.sh" reload
-  return 0
 }
 
 # ── terminal styling: same idea for kitty + starship ──────────────────
@@ -118,13 +110,48 @@ point_browser() {
 # adw-gtk3 / adw-gtk3-dark (Adwaita's look for GTK3). NOT "Adwaita-dark" — GTK3
 # has no theme by that name and silently draws light Adwaita (probed 2026-10-12).
 # Dracula was retired the same day (archive/gtk-dracula/).
-# Only Flare is light, as with the wallpaper.
+# Flare and Harvest are light (is_light), as with the wallpaper.
+#
+# The pixel style (kit lantern: Lantern, Harvest) brings its own, all from
+# the repo: GTK3 themes Lantern / Harvest (gtk/themes, adw-gtk3 underneath),
+# a libadwaita stylesheet (~/.config/gtk-4.0/gtk.css → gtk/gtk4/<style>.css;
+# removed again in other styles — only if it is our link), and the pixel
+# cursor (Lantern-Pixel / Harvest-Pixel, scripts/sanctuary/pixel-cursors.py).
+# Anything not installed falls back to the Adwaita / Bibata defaults.
+GTK_DIR="$HOME/.dotfiles/gtk"
+CURSOR_DEFAULT=Bibata-Modern-Classic
 point_scheme() {                             # $1 = style
-  local scheme=prefer-dark gtk=adw-gtk3-dark
-  [ "$1" = flare ] && scheme=prefer-light gtk=adw-gtk3
+  local scheme=prefer-dark gtk=adw-gtk3-dark cursor=$CURSOR_DEFAULT gtk4="" t
+  local css="$HOME/.config/gtk-4.0/gtk.css"
+  is_light "$1" && scheme=prefer-light gtk=adw-gtk3
+  if [ "$("$QS" base "$1")" = lantern ]; then
+    t=${1^}                                  # lantern → Lantern
+    [ -d "$HOME/.local/share/themes/$t" ] && gtk=$t
+    [ -d "$HOME/.local/share/icons/$t-Pixel" ] && cursor=$t-Pixel
+    [ -r "$GTK_DIR/gtk4/$1.css" ] && gtk4="$GTK_DIR/gtk4/$1.css"
+  fi
   gsettings set org.gnome.desktop.interface color-scheme "$scheme" 2>/dev/null
   gsettings set org.gnome.desktop.interface gtk-theme "$gtk" 2>/dev/null
+  gsettings set org.gnome.desktop.interface cursor-theme "$cursor" 2>/dev/null
+  if [ -n "$gtk4" ]; then
+    mkdir -p "${css%/*}" && ln -sfn "$gtk4" "$css"
+  elif [[ "$(readlink "$css" 2>/dev/null)" == "$GTK_DIR"/* ]]; then
+    rm -f "$css"
+  fi
   return 0
+}
+
+# ── Vesktop: themes/sanctuary.theme.css → this style's theme ─────────
+# signal24 (Signal, Flare) or lantern24 (Lantern, Harvest); each file follows
+# the system light/dark for its day printing. Vesktop has "sanctuary" enabled
+# (once, by hand, in place of signal24) and reloads it when the link flips.
+VESKTOP_THEMES="$HOME/.config/vesktop/themes"
+point_vesktop() {                            # $1 = style
+  local want="$HOME/.dotfiles/vesktop/$("$QS" base "$1")24.theme.css"
+  [ -r "$want" ] || want="$HOME/.dotfiles/vesktop/signal24.theme.css"
+  [ -d "$VESKTOP_THEMES" ] || return 0
+  [ "$(readlink "$VESKTOP_THEMES/sanctuary.theme.css" 2>/dev/null)" = "$want" ] && return 0
+  ln -sfn "$want" "$VESKTOP_THEMES/sanctuary.theme.css"
 }
 
 # ── wallpaper: light styles get a light wallpaper, and give yours back ─
@@ -132,12 +159,12 @@ point_scheme() {                             # $1 = style
 # wallpaper as wallpaper.dark, leaving the light side saves wallpaper.light, and
 # arriving restores what that side had (first time on the light side: the first
 # image in $LIGHT_WALLS). "Which side is it on" = is the file inside
-# $LIGHT_WALLS, so a wallpaper picked by hand (Mod+Shift+W) is respected. Only
-# Flare is light here — Paper keeps its wallpaper, as before (2026-10-12).
+# $LIGHT_WALLS, so a wallpaper picked by hand (Mod+Shift+W) is respected. The
+# light styles are is_light's: Flare and Harvest.
 LIGHT_WALLS="${SANCTUARY_WALLPAPERS:-$HOME/Pictures/Wallpapers}/light"
 point_wall() {                               # $1 = style
   local want=dark cur side=dark target
-  [ "$1" = flare ] && want=light
+  is_light "$1" && want=light
   cur=$(cat "$STATE/wallpaper" 2>/dev/null)
   case "$cur" in "$LIGHT_WALLS"/*) side=light ;; esac
   [ "$want" = "$side" ] && return 0
@@ -221,9 +248,10 @@ start_watch() {
 
 up() {                                       # $1 = style
   point_layout "$1"                          # windows first: instant, and independent of Quickshell
-  point_look "$1"                            # …on Mango too
   point_term "$1"                            # kitty + starship follow the desk
-  point_scheme "$1"                          # system light/dark + GTK3 theme — before the browser re-reads
+  "$DIR/palette.sh" point                    # Signal's colour palette (Mod+Shift+C) — or none, off Signal
+  point_scheme "$1"                          # system light/dark, GTK theme, cursor — before the browser re-reads
+  point_vesktop "$1"                         # Discord's theme
   point_browser                              # qutebrowser re-reads the style file
   point_wall "$1"                            # light style ⇄ light wallpaper
   touch "$SWITCHING"

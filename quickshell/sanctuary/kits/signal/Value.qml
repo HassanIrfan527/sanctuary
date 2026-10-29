@@ -5,6 +5,7 @@ import ".."
 //   tone   "" value | "hot" | "warn" | "alarm" | "dim" | "soft" | "second"
 //   strong bold (a state word) · size "" | "small" | "glyph"
 Text {
+    id: val
     property string tone: ""
     property bool strong: false
     property string size: ""
@@ -16,4 +17,6 @@ Text {
     color: tone === "hot" ? Theme.sigHot : tone === "warn" ? Theme.sigWarn : tone === "alarm" ? Theme.sigAlarm
          : tone === "dim" ? Theme.surface2 : tone === "soft" ? Theme.subtext0 : tone === "second" ? Theme.peach
          : Theme.sigValue
+    layer.enabled: Theme.glow > 0 && (tone === "hot" || tone === "alarm")
+    layer.effect: Glow { tint: val.color; strength: 0.8 }
 }

@@ -10,6 +10,11 @@ include "window-rules.kdl"
 // one wins, which is the only reason it can override the 2px corner radius set
 // there. Reorder these two and the radius silently stops applying.
 include "layout.kdl"
+// palette.kdl: Signal's colour palette (Mod+Shift+C), a git-ignored link that
+// scripts/sanctuary/palette.sh re-points — palettes/<word>.kdl under Signal,
+// palettes/none.kdl otherwise. Only border + overview colours; it merges
+// over layout.kdl, so it must come after it.
+include "palette.kdl"
 include "effects.kdl"
 include "binds.kdl"
 

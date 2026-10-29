@@ -1,0 +1,116 @@
+/* Harvest — GTK 3 in the pixel style (day, 2026-10-16).
+   docs/styles/lantern-harvest.md. No pixel GTK theme exists, so this is ours: Adwaita's
+   GTK 3 port (adw-gtk3) underneath, then Harvest's colours (Theme.qml lan*) and
+   the pixel style's shapes on top. Pink is YOU (selection, focus, the suggested
+   button); green / orange / red are the machine. Normal UI font (Harry's call).
+   shell.sh picks this theme (gsettings gtk-theme) while Harvest is on. */
+
+@import url("file:///usr/share/themes/adw-gtk3/gtk-3.0/gtk.css");
+
+/* ── colour ── */
+@define-color accent_color #b8286c;
+@define-color accent_bg_color #b8286c;
+@define-color accent_fg_color #fff0cc;
+@define-color destructive_color #a82418;
+@define-color destructive_bg_color #a82418;
+@define-color destructive_fg_color #fff0cc;
+@define-color success_color #3f8a2e;
+@define-color success_bg_color #3f8a2e;
+@define-color success_fg_color #fff0cc;
+@define-color warning_color #c56a1a;
+@define-color warning_bg_color #c56a1a;
+@define-color warning_fg_color #fff0cc;
+@define-color error_color #a82418;
+@define-color error_bg_color #a82418;
+@define-color error_fg_color #fff0cc;
+@define-color window_bg_color #f6e2b3;
+@define-color window_fg_color #4a2a1e;
+@define-color view_bg_color #fff0cc;
+@define-color view_fg_color #4a2a1e;
+@define-color headerbar_bg_color #7a4a2c;
+@define-color headerbar_fg_color #fff0cc;
+@define-color headerbar_border_color #3a2018;
+@define-color headerbar_backdrop_color #7a4a2c;
+@define-color headerbar_shade_color rgba(58, 32, 24, 0.20);
+@define-color sidebar_bg_color #fff0cc;
+@define-color sidebar_fg_color #4a2a1e;
+@define-color sidebar_backdrop_color #fff0cc;
+@define-color sidebar_border_color #3a2018;
+@define-color sidebar_shade_color rgba(58, 32, 24, 0.20);
+@define-color card_bg_color #fff0cc;
+@define-color card_fg_color #4a2a1e;
+@define-color card_shade_color rgba(58, 32, 24, 0.20);
+@define-color dialog_bg_color #f6e2b3;
+@define-color dialog_fg_color #4a2a1e;
+@define-color popover_bg_color #fff0cc;
+@define-color popover_fg_color #4a2a1e;
+@define-color popover_shade_color rgba(58, 32, 24, 0.20);
+@define-color thumbnail_bg_color #fff0cc;
+@define-color thumbnail_fg_color #4a2a1e;
+@define-color shade_color rgba(58, 32, 24, 0.20);
+@define-color scrollbar_outline_color rgba(58, 32, 24, 0.20);
+@define-color theme_selected_bg_color #b8286c;
+@define-color theme_selected_fg_color #fff0cc;
+@define-color theme_bg_color #f6e2b3;
+@define-color theme_fg_color #4a2a1e;
+@define-color theme_base_color #fff0cc;
+@define-color theme_text_color #4a2a1e;
+@define-color borders #3a2018;
+
+/* ── shape: the pixel style — square, framed, three materials ───────
+   Everything square. Text buttons are little wooden blocks (outline, lit top
+   edge); the suggested one is pink (yours), the destructive one red. Entries
+   are wells sunk into the paper, pink while you type in them. */
+* {
+    border-radius: 0;
+}
+button.text-button:not(.flat),
+button.suggested-action,
+button.destructive-action {
+    background-image: none;
+    background-color: #9c6236;
+    color: #fff0cc;
+    border: 2px solid #3a2018;
+    box-shadow: inset 0 2px #dba05a;
+}
+button.text-button:not(.flat):hover {
+    background-color: #b0713e;
+}
+button.text-button:not(.flat):active,
+button.text-button:not(.flat):checked {
+    background-color: #7a4a2c;
+    box-shadow: inset 0 2px #3a2018;
+}
+button.suggested-action {
+    background-color: #b8286c;
+    color: #fff0cc;
+    box-shadow: inset 0 2px #f08cb4;
+}
+button.destructive-action {
+    background-color: #a82418;
+    color: #fff0cc;
+    box-shadow: none;
+}
+entry {
+    background-color: #d9b77c;
+    border: 2px solid #d9b77c;
+    box-shadow: none;
+}
+entry:focus {
+    border-color: #b8286c;
+}
+headerbar {
+    border-bottom: 2px solid #3a2018;
+}
+selection,
+*:selected,
+row:selected {
+    background-color: #b8286c;
+    color: #fff0cc;
+}
+scrollbar slider {
+    background-color: #9c6236;
+    border: 2px solid transparent;
+    min-width: 6px;
+    min-height: 6px;
+}

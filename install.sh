@@ -38,7 +38,6 @@ LINKS=(
   "waybar                : ~/.config/waybar"
   "yazi/yazi             : ~/.config/yazi"
   "niri/niri             : ~/.config/niri"
-  "mango/mango           : ~/.config/mango"        # MangoWC — sanctuary on tags; niri stays the other session
   "quickshell            : ~/.config/quickshell"   # QS modes; lets `qs -c sanctuary` find it
   "autostart/autostart   : ~/.config/autostart"    # Hidden=true masks for /etc/xdg/autostart (blueman, kdeconnect)
 
@@ -62,6 +61,13 @@ LINKS=(
   "kotofetch/kotofetch     : ~/.config/kotofetch"
   "nautilus/scripts/Pin to launcher : ~/.local/share/nautilus/scripts/Pin to launcher"
   "vesktop/signal24.theme.css       : ~/.config/vesktop/themes/signal24.theme.css"
+
+  # ── the pixel style (Lantern / Harvest). shell.sh switches them per style;
+  #    the fonts (Jersey, Google Fonts OFL) and the cursors
+  #    (scripts/sanctuary/pixel-cursors.py) are fetched / built, not linked ──
+  "gtk/themes/Lantern                     : ~/.local/share/themes/Lantern"
+  "gtk/themes/Harvest                     : ~/.local/share/themes/Harvest"
+  "fontconfig/conf.d/60-jersey-pixel.conf : ~/.config/fontconfig/conf.d/60-jersey-pixel.conf"
 
   # ── still a real dir, not adopted. Uncomment to adopt (backs up first). ──
   # "matugen/matugen : ~/.config/matugen"
@@ -146,13 +152,18 @@ if [[ ! -e "$seed_layout" ]]; then
   say "→ seeded: niri layout.kdl -> layout-signal.kdl"
 fi
 
-# Mango's config.conf sources `look.conf`, the same kind of git-ignored
-# symlink (→ look-<style>.conf). Seed it with Signal's.
-seed_look="$DOTFILES/mango/mango/look.conf"
-if [[ ! -e "$seed_look" ]]; then
-  say ""
-  run "ln -sfn look-signal.conf '$seed_look'"
-  say "→ seeded: mango look.conf -> look-signal.conf"
+# Signal's palette links (scripts/sanctuary/palette.sh re-points them). niri's
+# config.kdl includes palette.kdl and style-signal.conf includes palette.conf,
+# so seed both with the default palette.
+seed_pal_niri="$DOTFILES/niri/niri/palette.kdl"
+if [[ ! -e "$seed_pal_niri" ]]; then
+  run "ln -sfn palettes/default.kdl '$seed_pal_niri'"
+  say "→ seeded: niri palette.kdl -> palettes/default.kdl"
+fi
+seed_pal_kitty="$DOTFILES/kitty/kitty/palette.conf"
+if [[ ! -e "$seed_pal_kitty" ]]; then
+  run "ln -sfn palettes/default.conf '$seed_pal_kitty'"
+  say "→ seeded: kitty palette.conf -> palettes/default.conf"
 fi
 
 # swaync's live config.json/style.css are git-ignored copies of a theme. The

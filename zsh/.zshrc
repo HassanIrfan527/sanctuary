@@ -96,3 +96,6 @@ eval "$(atuin init zsh)"
 export JAVA_HOME="$HOME/development/jdk-21"
 export ANDROID_HOME="$HOME/Android/Sdk"
 export PATH="$HOME/development/flutter/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+
+# Composio CLI
+export PATH="$HOME/.local/bin:$PATH"

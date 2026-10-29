@@ -36,6 +36,18 @@ Rectangle {
     border.width: 1
     border.color: Theme.sigRule
 
+    Rectangle {   // palette effects: a hot frame UNDER the strip — only its bloom shows
+        id: halo
+        z: -1
+        anchors.fill: parent
+        visible: Theme.glow > 0
+        color: "transparent"
+        border.width: Math.round(1 + 2 * Theme.glow)   // a thicker hidden tube = more light to spread
+        border.color: strip.caution ? Theme.sigAlarm : Theme.sigHot
+        layer.enabled: visible
+        layer.effect: Glow { tint: halo.border.color; strength: 0.8 }
+    }
+
     Ticks {
         anchors.fill: parent
         anchors.margins: -3

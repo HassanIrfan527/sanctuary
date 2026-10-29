@@ -10,7 +10,7 @@
 # no backslash line-continuations — the whole thing would be one unreadable line.
 set -uo pipefail
 LOCK="$HOME/.dotfiles/scripts/sanctuary/lock.sh"
-WM="$HOME/.dotfiles/scripts/sanctuary/wm.sh"   # niri or Mango, whichever is running
+WM="$HOME/.dotfiles/scripts/sanctuary/wm.sh"
 pkill -x swayidle 2>/dev/null
 pkill -f "^python3 $HOME/.dotfiles/scripts/sanctuary/awake.py" 2>/dev/null
 

@@ -4,8 +4,7 @@ import Quickshell
 import Quickshell.Io
 
 // niri state from `niri msg --json event-stream`. Only runs inside a niri
-// session ($NIRI_SOCKET set) — under Mango, Mango.qml does this job and Wm.qml
-// picks whichever is live. Everything else talks to Wm, not to this file.
+// session ($NIRI_SOCKET set). Everything else talks to Wm, not to this file.
 // Quickshell has no built-in
 // niri module, but niri's stream does the hard part: the first lines it prints
 // are the FULL state (WorkspacesChanged, WindowsChanged), and every line after
@@ -84,12 +83,6 @@ Singleton {
     function focusWindow(id) {
         Quickshell.execDetached(["niri", "msg", "action", "focus-window", "--id", String(id)]);
     }
-
-    // niri has no per-workspace layout switching: always its scroller.
-    function layoutOn(output) {
-        return "";
-    }
-    function setLayout(name) {}
 
     function toggleApp(appId, cmd) {
         for (const id in windows) {

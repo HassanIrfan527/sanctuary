@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import ".."
 
 // KIT · ToastCard — one notification on screen, and how it comes and goes.
@@ -14,7 +15,8 @@ import ".."
 //   actions   [{ text, invoke() }] — the app's buttons
 //   appear() / vanish() play the motion; vanished() when it has gone
 // Signal: a log entry — the stripe is the urgency (trace / dim / alarm); it
-// slides in from the right, 160ms ease-out.
+// slides in from the right, 160ms ease-out. With palette effects "full" it
+// glitches in instead: an RGB split that snaps shut while the card jitters.
 Item {
     id: card
 
@@ -34,7 +36,7 @@ Item {
     signal dismissed()
     signal vanished()
 
-    function appear() { enter.restart(); }
+    function appear() { Theme.fxFull ? glitch.restart() : enter.restart(); }
     function vanish() { leave.start(); }
 
     readonly property bool critical: urgency === "critical"
@@ -64,6 +66,22 @@ Item {
         color: hover.hovered ? Theme.sigCell : Theme.sigFill
         border.width: 1
         border.color: card.critical ? Theme.sigAlarm : Theme.sigRule
+
+        Rectangle {   // palette effects: a frame UNDER the card — only its bloom shows
+            id: halo
+            z: -1
+            anchors.fill: parent
+            visible: Theme.glow > 0
+            color: "transparent"
+            border.width: Math.round(1 + 2 * Theme.glow)   // a thicker hidden tube = more light to spread
+            border.color: card.stripe
+            layer.enabled: visible
+            layer.effect: Glow { tint: halo.border.color; strength: 0.8 }
+        }
+        Scanlines {
+            anchors.fill: parent
+            anchors.margins: 1
+        }
 
         Rectangle {   // urgency stripe
             x: 1
@@ -187,6 +205,63 @@ Item {
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             cursorShape: Qt.PointingHandCursor
             onClicked: mouse => mouse.button === Qt.RightButton ? card.dismissed() : card.activated()
+        }
+    }
+
+    // ── the glitch (fx "full") ──
+    // Two colour-shifted copies of the card — alarm and link, the split — slide
+    // past each other and fade while the card itself jitters into place. ~230ms.
+    ShaderEffectSource {
+        id: ghostSrc
+        sourceItem: box
+        live: glitch.running
+        hideSource: false
+        visible: false
+    }
+    MultiEffect {
+        id: ghostA
+        source: ghostSrc
+        y: box.y
+        width: box.width
+        height: box.height
+        colorization: 1
+        colorizationColor: Theme.sigAlarm
+        opacity: 0
+        visible: opacity > 0
+    }
+    MultiEffect {
+        id: ghostB
+        source: ghostSrc
+        y: box.y
+        width: box.width
+        height: box.height
+        colorization: 1
+        colorizationColor: Theme.lavender
+        opacity: 0
+        visible: opacity > 0
+    }
+    SequentialAnimation {
+        id: glitch
+        PropertyAction { target: box; property: "opacity"; value: 1 }
+        PropertyAction { target: box; property: "x"; value: 10 }
+        ParallelAnimation {
+            SequentialAnimation {   // the card: jump, overshoot, settle
+                NumberAnimation { target: box; property: "x"; to: -6; duration: 40 }
+                NumberAnimation { target: box; property: "x"; to: 4; duration: 40 }
+                PauseAnimation { duration: 30 }
+                NumberAnimation { target: box; property: "x"; to: -2; duration: 30 }
+                NumberAnimation { target: box; property: "x"; to: 0; duration: 60 }
+            }
+            SequentialAnimation {
+                NumberAnimation { target: ghostA; property: "x"; from: -9; to: 5; duration: 90 }
+                NumberAnimation { target: ghostA; property: "x"; to: 0; duration: 110 }
+            }
+            SequentialAnimation {
+                NumberAnimation { target: ghostB; property: "x"; from: 9; to: -5; duration: 90 }
+                NumberAnimation { target: ghostB; property: "x"; to: 0; duration: 110 }
+            }
+            NumberAnimation { target: ghostA; property: "opacity"; from: 0.6; to: 0; duration: 230; easing.type: Easing.InQuad }
+            NumberAnimation { target: ghostB; property: "opacity"; from: 0.6; to: 0; duration: 230; easing.type: Easing.InQuad }
         }
     }
 }

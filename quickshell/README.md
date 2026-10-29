@@ -30,6 +30,7 @@ niri startup ─► shell.sh start ─► qs.sh start <saved style>  (default: s
                      │                 └─ fails? ─► fallback: waybar + swaync (ascii)
                      └─► shell.sh watch   Quickshell dies later? ─► same fallback
 Mod+Shift+T ─► Quickshell's picker ─► shell.sh set <style>   (remembered in ~/.local/state/sanctuary/style)
+Mod+Shift+C ─► Quickshell's palette picker ─► palette.sh set <word>   (Signal colours only, live; ~/.local/state/sanctuary/palette)
            └─ in fallback: retries Quickshell instead
 ```
 
@@ -41,9 +42,7 @@ hand-kept layout file — `niri/niri/layout-signal.kdl` (square, tight, 2px gree
 border), `layout-ink.kdl` (3px light outline + hard mauve shadow),
 `layout-paper.kdl` (starts as Ink's). `layout.kdl` is a git-ignored symlink to
 the active one; a style switch re-points it (after `niri validate` passes — a
-broken file is refused and the old link kept) and reloads niri. On Mango the
-same switch re-points `mango/mango/look.conf` → `look-<style>.conf` (only Signal
-exists yet; others fall back to it). Edit those files
+broken file is refused and the old link kept) and reloads niri. Edit those files
 by hand to change how windows look in a style. The old per-mode renderer is in
 `archive/mode-system/`.
 
@@ -59,8 +58,7 @@ toast says why it happened. `shell.sh status` prints which one is up.
 | `sanctuary/Theme.qml` | Tokens for both styles. Reads `SANCTUARY_QS`. |
 | `sanctuary/Notifs.qml` | **The notification daemon** (Quickshell's `NotificationServer`), DND, history. |
 | `sanctuary/Niri.qml` | Workspaces + windows from `niri msg --json event-stream`. |
-| `sanctuary/Mango.qml` | The same for MangoWC, from `mmsg watch all-tags / all-clients / focusing-client`. Tags are dressed as niri workspaces (`id` = `<output>:<tag>`). |
-| `sanctuary/Wm.qml` | The door the shell uses: hands every call to Niri.qml or Mango.qml, whichever session is live (`$MANGO_INSTANCE_SIGNATURE` / `$NIRI_SOCKET`). Nothing else imports Niri or Mango directly. |
+| `sanctuary/Wm.qml` | The door the shell uses: hands every call to Niri.qml. Nothing else imports Niri directly. |
 | `sanctuary/Media.qml` | MPRIS now-playing, PipeWire mic. |
 | `sanctuary/Sys.qml` | CPU / mem / temp / disk, history, thresholds, exceptions. |
 | `sanctuary/Caution.qml` | Master Caution: reasons + acknowledge. |
@@ -70,6 +68,8 @@ toast says why it happened. `shell.sh status` prints which one is up.
 | `sanctuary/Toasts.qml`, `Tray.qml` | Shared: the toast column window, the system tray. |
 | `sanctuary/TrayMenu.qml` | A tray app's right-click menu, drawn in the current style (not Qt's native white QMenu). |
 | `sanctuary/Picker.qml` | Mod+Shift+T style picker. |
+| `sanctuary/Palettes.qml` | Mod+Shift+C palette picker — rows from `palettes/signal.json`; moving previews, enter keeps, esc reverts. |
+| `sanctuary/WallFx.qml` | wallpaper overlay (vignette / scanlines / crt / haze) on layer "bottom", click-through — Ctrl+O in the wallpaper picker. |
 | `sanctuary/Launcher.qml` | Mod+Space launcher (all styles): style masthead + modes APPS / `*` PINNED (apps + files) / `=` CALC / `:` DESK / `?` WEB; fsel is the fallback. |
 | `sanctuary/Patch.qml` | Mod+O PATCH: default audio output / input, per-device volume + mute (all styles); wiremix is the fallback. |
 | `sanctuary/PowerMenu.qml` | Mod+Shift+Escape power menu (all styles); fzf in kitty is the fallback. |
@@ -111,6 +111,7 @@ survives it (`keepOnReload`).
 | `Mod+Space` | launcher — type to filter · first char `*` `=` `:` `?` switches mode · `tab`/`shift-tab` mode · `enter` go · `ctrl-s` pin app (APPS) / unpin (PINNED) · `↑↓`/`ctrl-j k`/`ctrl-n p` move · `backspace` on empty → APPS · `esc` close (in fallback: fsel) |
 | `Mod+O` | PATCH (audio in / out) — `j`/`k` move · `enter`/`space` make default · `m` mute · `h`/`l` volume ±5 · `tab` OUT⇄IN · `x` full mixer · `esc`/`q` close (in fallback: wiremix) |
 | `Mod+Shift+T` | style picker — `j`/`k` move · `enter` or `1`-`3` pick · `esc` close (in fallback: retry Quickshell) |
+| `Mod+Shift+C` | palette picker (Signal colours) — `j`/`k` preview · `enter` keep · `esc` back |
 | `Mod+Shift+W` | wallpaper — type to filter · arrows/`ctrl-h j k l` move · `tab` still/live · `enter` set · `shift-enter` set and stay open · `esc` close (in fallback: yazi) |
 | `Mod+Shift+Escape` | power — `j`/`k` move · `enter` or `1`-`5` act (no confirm; opens on lock) · `esc` close (in fallback: fzf) |
 | `Mod+U` | RIG — `s` screen · `m` meeting · `p` practice; while recording: `s`/`m` stop, `d`/`p` pause · `esc` close |

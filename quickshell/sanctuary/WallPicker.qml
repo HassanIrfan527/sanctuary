@@ -25,6 +25,8 @@ import "kit"
 //
 //   type  search all folders     ← → ↑ ↓ · ctrl-h j k l  move     tab  still / live
 //   enter  open folder / set + close     shift-enter  set, stay open (try a few)
+//   ctrl-o  the overlay over the wallpaper: off / vignette / scanlines / crt / haze
+//           (WallFx.qml) — or click the OVERLAY tab
 //   backspace  up a folder — only on an empty search box, and never on key
 //              repeat: holding it to clear a word stops at the empty box
 //   esc  close     click a tile to open / set it; click outside to close
@@ -83,7 +85,7 @@ Popup {
         return up.concat(folders, files);
     }
     readonly property var picked: results[cursor] || null
-    readonly property string hints: (picked && picked.type !== "file" ? "enter open" : "enter set · shift-enter try")
+    readonly property string hints: (picked && picked.type !== "file" ? "enter open" : "enter set · shift-enter try") + " · ctrl-o overlay"
                                     + (!searching && folder !== "" ? " · ⌫ up" : "") + " · tab still/live · esc close"
     // "/ dynamic-wallpapers / dark" — where you are, for the header
     readonly property string crumb: searching ? "all folders" : "/" + (folder === "" ? "" : " " + folder.split("/").join(" / "))
@@ -215,6 +217,8 @@ Popup {
         const move = d => { if (n > 0) cursor = Math.max(0, Math.min(n - 1, cursor + d)); };
         if (k === Qt.Key_Escape)
             Ui.wallOpen = false;
+        else if (ctrl && k === Qt.Key_O)
+            Ui.cycleWallFx();
         else if (k === Qt.Key_Return || k === Qt.Key_Enter)
             apply(cursor, event.modifiers & Qt.ShiftModifier);
         else if (k === Qt.Key_Backspace && query === "" && folder !== "") {
@@ -270,6 +274,12 @@ Popup {
                     on: win.kind === modelData.k
                     onClicked: win.kind = modelData.k
                 }
+            }
+            Tab {   // the overlay over the wallpaper (WallFx.qml)
+                kind: "shelf"
+                text: "OVERLAY " + Ui.wallFx.toUpperCase()
+                on: Ui.wallFx !== "off"
+                onClicked: Ui.cycleWallFx()
             }
             Label {   // where you are
                 width: Math.min(implicitWidth, 460)

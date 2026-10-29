@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=Harvest
+Comment=Sanctuary pixel style, day (on adw-gtk3)
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=Harvest

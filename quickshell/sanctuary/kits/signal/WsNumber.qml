@@ -22,6 +22,8 @@ MouseArea {
         font.pixelSize: 11
         font.weight: ws.focused ? Font.Bold : Font.Normal
         color: ws.urgent ? Theme.sigAlarm : ws.focused ? Theme.sigHot : ws.occupied ? Theme.sigValue : Theme.surface2
+        layer.enabled: Theme.glow > 0 && (ws.focused || ws.urgent)
+        layer.effect: Glow { tint: num.color; flickers: true }
     }
     Rectangle {   // the focused cursor: a 2px underline
         anchors.bottom: parent.bottom
@@ -30,5 +32,7 @@ MouseArea {
         height: 2
         color: Theme.sigHot
         visible: ws.focused
+        layer.enabled: Theme.glow > 0 && visible
+        layer.effect: Glow { tint: Theme.sigHot; flickers: true }
     }
 }

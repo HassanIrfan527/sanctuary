@@ -16,6 +16,9 @@ Canvas {
     implicitWidth: 36
     implicitHeight: 16
 
+    layer.enabled: Theme.glow > 0
+    layer.effect: Glow { tint: spark.line; strength: 0.8 }
+
     onValuesChanged: requestPaint()
     onLineChanged: requestPaint()
 

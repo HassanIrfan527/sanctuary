@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=Lantern
+Comment=Sanctuary pixel style, night (on adw-gtk3-dark)
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=Lantern

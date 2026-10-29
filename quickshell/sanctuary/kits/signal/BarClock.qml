@@ -21,9 +21,14 @@ Row {
             font.pixelSize: 14
             font.weight: Font.Bold
             color: Theme.sigValue
+            layer.enabled: Theme.glow > 0
+            layer.effect: Glow { tint: Theme.sigHot; strength: 0.7; flickers: true }
         }
         Text {
+            id: ss
             anchors.baseline: hm.baseline
+            layer.enabled: Theme.glow > 0
+            layer.effect: Glow { tint: ss.color; flickers: true }
             text: Qt.formatDateTime(clockRoot.date, ":ss")
             font.family: Theme.mono
             font.pixelSize: 11

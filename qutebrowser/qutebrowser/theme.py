@@ -1,7 +1,8 @@
-# Signal / Flare tokens — values only, no settings.
+# Signal / Flare / Lantern / Harvest tokens — values only, no settings.
 # Every other file reads from here: `from theme import palette, font`.
 # Signal is Catppuccin Mocha, same as DESIGN-BRIEF.md §4. Flare (2026-10-12)
-# is the same names on Theme.qml's parchment palette.
+# is the same names on Theme.qml's parchment palette. Lantern / Harvest
+# (2026-10-16) are the same names on Theme.qml's lan* values.
 #
 # The desk style picks which: shell.sh writes the word to
 # ~/.local/state/sanctuary/style and runs :config-source, and config.py reloads
@@ -15,7 +16,7 @@ try:
         style = f.read().strip()
 except OSError:
     style = "signal"
-light = style == "flare"
+light = style in ("flare", "harvest")
 
 _signal = {
     # fills
@@ -86,7 +87,78 @@ _flare = {
     "lavender": "#3f56a6",
 }
 
-palette = _flare if light else _signal
+# Lantern / Harvest: same keys again, the pixel style's colour rules
+# (docs/styles/lantern-harvest.md). `green` is what Signal spends on the
+# selected tab, insert mode and progress — in Lantern that is YOU, so pink.
+# Amber (light) takes lavender's hover / caret; red, yellow stay the machine's
+# alarm and warn (orange); blue is the cyan of links and sound.
+_lantern = {
+    # fills: the night's ink
+    "crust": "#0f0c1e",
+    "mantle": "#1a1630",
+    "base": "#1a1630",
+    # structure
+    "surface0": "#2c2650",
+    "surface1": "#3a3366",
+    "surface2": "#6e6288",
+    # text
+    "overlay0": "#9d8cb0",
+    "overlay1": "#aa9cbb",
+    "overlay2": "#b8abc4",
+    "subtext0": "#d8c6a6",
+    "subtext1": "#e8d6b4",
+    "text": "#f2dcb0",
+    # accents
+    "rosewater": "#ffc2dc",
+    "flamingo": "#ffc2dc",
+    "pink": "#ff5c9d",
+    "mauve": "#c79bd8",
+    "red": "#e8423f",
+    "maroon": "#ff8a7a",
+    "peach": "#ffb347",
+    "yellow": "#f08a3c",
+    "green": "#ff5c9d",      # you: selected tab, insert mode, progress
+    "teal": "#5fd3e0",
+    "sky": "#5fd3e0",
+    "sapphire": "#5fd3e0",
+    "blue": "#5fd3e0",
+    "lavender": "#ffb347",   # amber: hover, caret
+}
+
+_harvest = {
+    # fills: paper
+    "crust": "#d9b77c",
+    "mantle": "#f6e2b3",
+    "base": "#fff0cc",
+    # structure
+    "surface0": "#e8cc94",
+    "surface1": "#d9b77c",
+    "surface2": "#b0906a",
+    # text
+    "overlay0": "#8a5a3a",
+    "overlay1": "#7a4e32",
+    "overlay2": "#6a442c",
+    "subtext0": "#5a3a26",
+    "subtext1": "#4f3222",
+    "text": "#4a2a1e",
+    # accents
+    "rosewater": "#a0405e",
+    "flamingo": "#a0405e",
+    "pink": "#b8286c",
+    "mauve": "#7a4a8a",
+    "red": "#a82418",
+    "maroon": "#8a2a1e",
+    "peach": "#a8561a",
+    "yellow": "#c56a1a",
+    "green": "#b8286c",      # you
+    "teal": "#2f6fa0",
+    "sky": "#2f6fa0",
+    "sapphire": "#2f6fa0",
+    "blue": "#2f6fa0",
+    "lavender": "#a8561a",   # amber
+}
+
+palette = {"flare": _flare, "lantern": _lantern, "harvest": _harvest}.get(style, _signal)
 
 font = {
     "family": "DM Mono",

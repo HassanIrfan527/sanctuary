@@ -10,6 +10,10 @@ Item {
     property int len: 7
     property int w: 1
 
+    // palette effects: the marks glow in their own colour
+    layer.enabled: Theme.glow > 0
+    layer.effect: Glow { tint: ticks.color }
+
     Repeater {
         model: 4
         delegate: Item {

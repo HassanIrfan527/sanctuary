@@ -114,17 +114,6 @@ PanelWindow {
                         onClicked: Wm.focusWorkspace(modelData.idx)
                     }
                 }
-
-                // Mango only: the viewed tag's layout (SCROLL, TILE, GRID …),
-                // in label weight so the numbers stay the thing you read.
-                // niri has one layout, so it says nothing there.
-                Label {
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: implicitWidth
-                    visible: text !== ""
-                    role: "tag"
-                    text: Wm.layoutOn(bar.output)
-                }
             },
 
             Cell {

@@ -2,17 +2,12 @@ pragma Singleton
 import QtQuick
 import Quickshell
 
-// "The compositor", whichever one this session runs. The shell talks only to
-// Wm; Wm hands each call to Niri.qml or Mango.qml. Both expose the same
-// functions and the same niri-shaped objects, so nothing else has to know.
-//
-// Mango's tags come through as workspaces (see Mango.qml's header).
+// "The compositor". The shell talks only to Wm; Wm hands each call to Niri.qml,
+// so nothing else has to know how niri is reached.
 Singleton {
     id: root
 
-    readonly property bool isMango: Mango.active
-    readonly property bool isNiri: !Mango.active
-    readonly property var backend: Mango.active ? Mango : Niri
+    readonly property var backend: Niri
 
     readonly property var workspaces: backend.workspaces
     readonly property var windows: backend.windows
@@ -23,8 +18,6 @@ Singleton {
     function workspacesOn(output) { return backend.workspacesOn(output); }
     function windowCount(wsId) { return backend.windowCount(wsId); }
     function columnsOf(wsId) { return backend.columnsOf(wsId); }
-    function layoutOn(output) { return backend.layoutOn(output); }
-    function setLayout(name) { backend.setLayout(name); }
 
     function focusWorkspace(idx) { backend.focusWorkspace(idx); }
     function workspaceUp() { backend.workspaceUp(); }

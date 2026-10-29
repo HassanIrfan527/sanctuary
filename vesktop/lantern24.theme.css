@@ -1,0 +1,265 @@
+/**
+ * @name lantern24
+ * @description system24 in the Sanctuary desk's pixel style: Lantern by night, Harvest by day.
+ * @author Harry
+ * @version 1.0.0
+ * @source ~/.dotfiles/vesktop/lantern24.theme.css
+*/
+
+/*
+ * The same base as signal24 (system24 does the structure and keeps up with
+ * Discord's class names); this file only sets its options and colours the
+ * Lantern way (docs/styles/lantern-harvest.md):
+ *   pink  = you          what you touch, the selected channel, mentions, unread
+ *   amber = light, time  links, idle
+ *   green / orange / red = the machine (online, warnings, mute / deafen)
+ *   cyan  = sound        streaming, voice
+ *   wood  frames the panels; ink (or paper) holds the words
+ * Type: Jersey 15 for everything (Harry, 2026-10-16), Cozette for code.
+ * Motion: none — the pixel style has none.
+ *
+ * Harvest is the light printing: shell.sh switches the system to light for
+ * it, and the @media block at the bottom follows (as signal24 does for Flare).
+ * shell.sh points themes/sanctuary.theme.css at this file or signal24.
+ */
+
+@import url('https://refact0r.github.io/system24/build/system24.css');
+
+body {
+    --font: 'Jersey 15';
+    --code-font: 'CozetteVector';
+    font-weight: 400;
+    letter-spacing: 0.02em;
+
+    --gap: 12px;
+    --divider-thickness: 2px;
+    --border-thickness: 2px;     /* frames on the 2px grid */
+    --border-hover-transition: none;
+
+    --animations: off;
+    --list-item-transition: none;
+    --dms-icon-svg-transition: none;
+
+    --top-bar-height: 24px;
+    --top-bar-button-position: titlebar;
+    --top-bar-title-position: off;
+    --subtle-top-bar-title: off;
+
+    --custom-window-controls: off;
+    --window-control-size: 14px;
+
+    --custom-dms-icon: off;
+    --dms-icon-svg-url: url('');
+    --dms-icon-svg-size: 90%;
+    --dms-icon-color-before: var(--icon-subtle);
+    --dms-icon-color-after: var(--text-1);
+    --custom-dms-background: off;
+    --dms-background-image-url: url('');
+    --dms-background-image-size: cover;
+    --dms-background-color: var(--bg-2);
+
+    --background-image: off;
+    --background-image-url: url('');
+
+    --transparency-tweaks: off;
+    --remove-bg-layer: off;
+    --panel-blur: off;
+    --blur-amount: 12px;
+    --bg-floating: var(--bg-3);
+
+    --small-user-panel: on;
+
+    --unrounding: on;
+    --round-pfp: off;
+    --remove-pfp-decor: off;
+
+    --custom-spotify-bar: on;
+    --ascii-titles: on;
+    --ascii-loader: system24;
+
+    --panel-labels: on;
+    --label-color: var(--text-5);
+    --label-font-weight: 400;
+}
+
+/* ── colour: Lantern (night) ──────────────────────────────────────── */
+:root {
+    --colors: on;
+
+    /* text: bright values, dusk labels */
+    --text-0: #1e1216;           /* on pink */
+    --text-1: #fff0cc;
+    --text-2: #f2dcb0;
+    --text-3: #e8d6b4;           /* body */
+    --text-4: #9d8cb0;           /* icons, channels */
+    --text-5: #8a7aa0;           /* timestamps, muted, labels */
+
+    /* ink, from raised to sunk — bg-4 is the deepest well */
+    --bg-1: #3a3366;
+    --bg-2: #2c2650;
+    --bg-3: #1a1630;
+    --bg-4: #0f0c1e;
+    --hover: rgb(255 240 204 / 0.04);
+    --active: rgb(255 92 157 / 0.10);
+    --active-2: rgb(255 92 157 / 0.16);
+    --message-hover: rgb(255 240 204 / 0.03);
+
+    /* what you touch is pink; links are amber (light) */
+    --accent-1: #ffb347;
+    --accent-2: #ff5c9d;
+    --accent-3: #ff5c9d;         /* accent buttons (ink text on them) */
+    --accent-4: #ffc2dc;
+    --accent-5: #e84a8a;
+    --accent-new: #e8423f;       /* mute / deafen */
+
+    /* a message that wants YOU: pink */
+    --mention: linear-gradient(to right, rgb(255 92 157 / 0.12) 40%, transparent);
+    --mention-hover: linear-gradient(to right, rgb(255 92 157 / 0.18) 40%, transparent);
+    --reply: linear-gradient(to right, rgb(255 240 204 / 0.05) 40%, transparent);
+    --reply-hover: linear-gradient(to right, rgb(255 240 204 / 0.08) 40%, transparent);
+
+    --online: #7fc45a;
+    --dnd: #e8423f;
+    --idle: #ffb347;
+    --streaming: #5fd3e0;
+    --offline: #6e6288;
+
+    /* the frames are wood */
+    --border-light: #3a2422;
+    --border: #553226;
+    --border-hover: #8f5a36;
+    --button-border: rgb(255 240 204 / 0.10);
+
+    --red-1: #ff8a7a; --red-2: #e8423f; --red-3: #d63a37; --red-4: #c4332f; --red-5: #b02c28;
+    --green-1: #b8e986; --green-2: #7fc45a; --green-3: #72b54f; --green-4: #65a645; --green-5: #58963b;
+    --blue-1: #9ff0f7; --blue-2: #5fd3e0; --blue-3: #52c2cf; --blue-4: #46b1be; --blue-5: #3aa0ad;
+    --yellow-1: #ffd68a; --yellow-2: #ffb347; --yellow-3: #f0a33a; --yellow-4: #e0932e; --yellow-5: #d08322;
+    --purple-1: #ffc2dc; --purple-2: #ff5c9d; --purple-3: #f04d8e; --purple-4: #e0407f; --purple-5: #d03370;
+}
+
+::selection {
+    background: #ff5c9d;
+    color: #1e1216;
+}
+#app-mount [contenteditable='true'],
+#app-mount textarea,
+#app-mount input {
+    caret-color: #ff5c9d;
+}
+
+/* ── words: Jersey is designed for 20px — messages and names get it ── */
+#app-mount :is(.messageContent_c19a55, .markup__75297) {
+    font-size: 20px;
+    line-height: 22px;
+}
+#app-mount :is(.username_c19a55, .name__2ea32, .title_c38106) {
+    font-size: 20px;
+}
+#app-mount :is(code, pre, .codeContainer__75297) {
+    font-size: 13px;             /* Cozette's own size */
+}
+
+/* ── readouts: timestamps are figures ── */
+#app-mount .timestamp_c19a55 {
+    font-size: 16px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-5);
+}
+
+/* ── selected: raised, with a pink edge (the launcher's row) ── */
+#app-mount .modeSelected__2ea32 .link__2ea32,
+#app-mount .interactive__972a0.interactiveSelected__972a0 {
+    background-color: var(--bg-2);
+    box-shadow: inset 4px 0 0 var(--accent-2);
+}
+
+/* ── a mention is for you: pink edge ── */
+#app-mount .message__5126c.mentioned__5126c::before {
+    background-color: var(--accent-2) !important;
+}
+
+/* ── unread: the "new" line is pink too ── */
+#app-mount .divider__908e2.isUnread__908e2 {
+    --divider-color: var(--accent-2);
+}
+#app-mount .divider__908e2.isUnread__908e2 .endCap__908e2 {
+    color: var(--text-0);
+}
+
+/* ── scrollbars: a wooden rail ── */
+#app-mount ::-webkit-scrollbar-thumb {
+    background-color: var(--border) !important;
+    border-radius: 0 !important;
+}
+#app-mount ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--border-hover) !important;
+}
+
+/* ── motion: none, whatever the system says ── */
+#app-mount *,
+#app-mount *::before,
+#app-mount *::after {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* ── Harvest: the same place on an autumn afternoon ────────────────── */
+@media (prefers-color-scheme: light) {
+    :root {
+        --text-0: #fff0cc;           /* on pink */
+        --text-1: #2a160f;
+        --text-2: #4a2a1e;
+        --text-3: #4a2a1e;
+        --text-4: #8a5a3a;
+        --text-5: #8a5a3a;
+
+        /* paper, from deep to bright — bg-4 is the deepest well */
+        --bg-1: #c9a56a;
+        --bg-2: #d9b77c;
+        --bg-3: #f6e2b3;
+        --bg-4: #fff0cc;
+        --hover: rgb(74 42 30 / 0.05);
+        --active: rgb(184 40 108 / 0.10);
+        --active-2: rgb(184 40 108 / 0.16);
+        --message-hover: rgb(74 42 30 / 0.04);
+
+        --accent-1: #a8561a;
+        --accent-2: #b8286c;
+        --accent-3: #b8286c;
+        --accent-4: #f08cb4;
+        --accent-5: #9c1f5a;
+        --accent-new: #a82418;
+
+        --mention: linear-gradient(to right, rgb(184 40 108 / 0.12) 40%, transparent);
+        --mention-hover: linear-gradient(to right, rgb(184 40 108 / 0.18) 40%, transparent);
+        --reply: linear-gradient(to right, rgb(74 42 30 / 0.06) 40%, transparent);
+        --reply-hover: linear-gradient(to right, rgb(74 42 30 / 0.09) 40%, transparent);
+
+        --online: #3f8a2e;
+        --dnd: #a82418;
+        --idle: #a8561a;
+        --streaming: #2f6fa0;
+        --offline: #b0906a;
+
+        --border-light: #b0713e;
+        --border: #9c6236;
+        --border-hover: #7a4a2c;
+        --button-border: rgb(74 42 30 / 0.12);
+
+        --red-1: #c43a2c; --red-2: #a82418; --red-3: #961f14; --red-4: #841b11; --red-5: #72170e;
+        --green-1: #4f9a3a; --green-2: #3f8a2e; --green-3: #377a28; --green-4: #2f6a22; --green-5: #275a1c;
+        --blue-1: #3a80b0; --blue-2: #2f6fa0; --blue-3: #29628e; --blue-4: #23557c; --blue-5: #1d486a;
+        --yellow-1: #c56a1a; --yellow-2: #a8561a; --yellow-3: #964c16; --yellow-4: #844212; --yellow-5: #72380e;
+        --purple-1: #c8407e; --purple-2: #b8286c; --purple-3: #a3225f; --purple-4: #8e1d52; --purple-5: #791845;
+    }
+
+    ::selection {
+        background: #b8286c;
+        color: #fff0cc;
+    }
+    #app-mount [contenteditable='true'],
+    #app-mount textarea,
+    #app-mount input {
+        caret-color: #b8286c;
+    }
+}

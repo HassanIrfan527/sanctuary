@@ -10,8 +10,8 @@
 #   labels  overlay0, caps, dimmer than their values
 #   values  text
 #   rules   surface0 (the fill)
-#   colour  only for state — green live/ok, yellow changed, red fault
-#   ┌ └     registration marks, trace green
+#   colour  only for state — hot live, ok staged, warn changed, alarm fault
+#   ┌ └     registration marks, the trace (hot)
 # No clock (the bar already has one). Its slot holds two readouts that exist
 # only when they mean something: T+ (how long the last command ran, ≥2s)
 # and FAULT (its exit code). Empty states render nothing.
@@ -20,7 +20,7 @@
 # ─────────────────────────────────────────────────────────────
 
 format = """
-[┌](fg:green) \
+[┌](fg:hot) \
 $username\
 $directory\
 $git_branch\
@@ -42,46 +42,47 @@ $python\
 $jobs\
 $cmd_duration\
 $status
-[└](fg:green) $character"""
+[└](fg:hot) $character"""
 
 command_timeout = 1000
 palette = "signal"
 
-[palettes.signal]          # Catppuccin Mocha, names as in Theme.qml
-surface0 = '#313244'
-surface2 = '#585b70'
-overlay0 = '#6c7086'
+[palettes.signal]          # roles as in palettes/signal.json — the default palette (Catppuccin Mocha).
+surface0 = '#313244'       # Under another palette (Mod+Shift+C), ~/.config/starship.toml points at
+surface2 = '#585b70'       # themes/signal/<palette>.toml instead: this file with only this table
+overlay0 = '#6c7086'       # swapped, written by scripts/sanctuary/palette.py build.
 subtext0 = '#a6adc8'
 text = '#cdd6f4'
-lavender = '#b4befe'
-green = '#a6e3a1'
-yellow = '#f9e2af'
-red = '#f38ba8'
+hot = '#a6e3a1'
+ok = '#a6e3a1'
+warn = '#f9e2af'
+alarm = '#f38ba8'
+link = '#b4befe'
 
 # ── the rule between the left readouts and the right ones ──
 [fill]
 symbol = "─"
 style = "fg:surface0"
 
-# ── line 2: the input mark. Green when the last command was fine, red when not ──
+# ── line 2: the input mark. The trace when the last command was fine, alarm when not ──
 [character]
-success_symbol = "[▸](fg:green)"
-error_symbol = "[▸](fg:red)"
-vimcmd_symbol = "[◂](fg:lavender)"
+success_symbol = "[▸](fg:hot)"
+error_symbol = "[▸](fg:alarm)"
+vimcmd_symbol = "[◂](fg:link)"
 
 # ── left: who / where / what changed ─────────────────────────
 [username]
 disabled = false
-show_always = false                    # hidden; appears only as root (red) or over SSH
+show_always = false                    # hidden; appears only as root (alarm) or over SSH
 format = "[OP](fg:overlay0) [$user]($style)  "
 style_user = "fg:text"
-style_root = "fg:red"                 # root is a state worth colour
+style_root = "fg:alarm"                 # root is a state worth colour
 
 [directory]
 format = "[DIR](fg:overlay0) [$path]($style)[$read_only]($read_only_style)  "
 style = "fg:text"
 read_only = " RO"
-read_only_style = "fg:red"
+read_only_style = "fg:alarm"
 truncation_length = 3
 truncation_symbol = "…/"
 fish_style_pwd_dir_length = 1          # ~/D/pixiecode, not ~/Development/pixiecode
@@ -94,16 +95,16 @@ style = "fg:text"
 format = "([$all_status$ahead_behind]($style) )"
 style = "fg:subtext0"
 up_to_date = ""                         # clean + synced says nothing: silence is "all is well"
-conflicted = "[=$count ](fg:red)"
-deleted = "[✘$count ](fg:red)"
-modified = "[!$count ](fg:yellow)"
-untracked = "[?$count ](fg:yellow)"
-renamed = "[»$count ](fg:yellow)"
-staged = "[+$count ](fg:green)"
+conflicted = "[=$count ](fg:alarm)"
+deleted = "[✘$count ](fg:alarm)"
+modified = "[!$count ](fg:warn)"
+untracked = "[?$count ](fg:warn)"
+renamed = "[»$count ](fg:warn)"
+staged = "[+$count ](fg:ok)"
 stashed = "[≡$count ](fg:overlay0)"
 ahead = "[⇡$count](fg:subtext0)"
 behind = "[⇣$count](fg:subtext0)"
-diverged = "[⇡$ahead_count⇣$behind_count](fg:yellow)"
+diverged = "[⇡$ahead_count⇣$behind_count](fg:warn)"
 
 # ── right: the readouts that replace the clock ───────────────
 [jobs]
@@ -120,7 +121,7 @@ style = "fg:text"
 [status]
 disabled = false
 format = "  [FAULT](fg:overlay0) [$status( $signal_name)]($style)"
-style = "fg:red"
+style = "fg:alarm"
 recognize_signal_code = true
 map_symbol = false
 pipestatus = false
@@ -129,12 +130,12 @@ pipestatus = false
 # Label = what, value = version (major.minor — the patch is noise here).
 
 [python]
-format = "  [PY](fg:overlay0) [$version]($style)( [VENV](fg:overlay0) [$virtualenv](fg:green))"
+format = "  [PY](fg:overlay0) [$version]($style)( [VENV](fg:overlay0) [$virtualenv](fg:hot))"
 version_format = "${major}.${minor}"
 style = "fg:text"
 
 [conda]
-format = "  [CONDA](fg:overlay0) [$environment](fg:green)"
+format = "  [CONDA](fg:overlay0) [$environment](fg:hot)"
 ignore_base = true
 
 [nodejs]

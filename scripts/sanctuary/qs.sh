@@ -50,11 +50,11 @@ need_qs() {
 
 # Variants: a second printing of an existing style, palette chosen inside
 # Theme.qml. `word:base` — the word is valid only if kits/<base>/ exists.
-VARIANTS=(flare:signal)
+VARIANTS=(flare:signal harvest:lantern)
 
 # The kit: quickshell/sanctuary/kit is a (git-ignored) symlink to kits/<style>/,
 # the drawing parts every module imports (DESIGN-SYSTEM.md §4). A variant draws
-# with its base's kit (flare → signal); a style with no kit draws with Signal's.
+# with its base's kit (flare → signal, harvest → lantern); a style with no kit draws with Signal's.
 kit_of() {                                   # $1 = style word → kit name
   local v
   for v in "${VARIANTS[@]}"; do
@@ -119,7 +119,8 @@ start() {
   # setsid + ignored HUP: whatever started us (niri, the picker's detached
   # process) may be gone a moment later; Quickshell must not go with it.
   trap '' HUP
-  SANCTUARY_QS="$style" setsid env -u QT_QPA_PLATFORMTHEME "$QS_BIN" -p "$QS_DIR" >"$LOG" 2>&1 </dev/null &
+  # QS_NO_RELOAD_POPUP: hot-reloads stay off-screen; errors are in `qs.sh log`.
+  SANCTUARY_QS="$style" QS_NO_RELOAD_POPUP=1 setsid env -u QT_QPA_PLATFORMTHEME "$QS_BIN" -p "$QS_DIR" >"$LOG" 2>&1 </dev/null &
   local i
   for i in $(seq 1 40); do          # ≤4s for the shell to come up and answer
     case "$(call notifs ping)" in pong*) return 0 ;; esac
@@ -138,7 +139,8 @@ case "${1:-}" in
   styles)  styles ;;
   has)     has_style "${2:?qs.sh has <style>}" ;;
   kit)     point_kit "${2:?qs.sh kit <style>}"; readlink "$QS_DIR/kit" ;;
+  base)    kit_of "${2:?qs.sh base <style>}" ;;          # the kit a style draws with (harvest → lantern)
   log)     need_qs && exec "$QS_BIN" log -p "$QS_DIR" -f ;;
-  *)       printf 'usage: qs.sh start <style>|stop|running|call <target> <fn> [args]|styles|log\n' >&2
+  *)       printf 'usage: qs.sh start <style>|stop|running|call <target> <fn> [args]|styles|has|kit|base <style>|log\n' >&2
            exit 2 ;;
 esac

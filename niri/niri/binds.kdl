@@ -49,6 +49,11 @@ binds {
     Mod+Shift+T hotkey-overlay-title="Style (Signal / Flare)" {
         spawn "/home/dweller/.dotfiles/scripts/sanctuary/shell.sh" "pick";
     }
+    // Palette picker: Signal's colours only (Default, Catppuccin Red, Dracula,
+    // Tokyo Night, Kanagawa, Rosé Pine, Embers, Outrun '84, Section 9). Live.
+    Mod+Shift+C hotkey-overlay-title="Palette (Signal colours)" {
+        spawn "/home/dweller/.dotfiles/scripts/sanctuary/palette.sh" "pick";
+    }
     Mod+Shift+A hotkey-overlay-title="Hide / show the bar" { spawn "/home/dweller/.dotfiles/scripts/sanctuary/bar.sh"; }
 
     //── Audio ──  wpctl talks to pipewire directly; the bar is the readout.
@@ -84,6 +89,11 @@ binds {
     //   M D X F inside the card; Mod+M stays the SYSTEM mic. ──
     Mod+C hotkey-overlay-title="COMMS (Discord voice)" {
         spawn "/home/dweller/.dotfiles/scripts/sanctuary/comms.sh";
+    }
+
+    //── STUDY — the VU portal (Quickshell card): today's plan, quizzes, week. ──
+    Mod+S hotkey-overlay-title="STUDY (VU portal)" {
+        spawn "/home/dweller/.dotfiles/scripts/sanctuary/qs.sh" "call" "study" "toggle";
     }
 
     Mod+U hotkey-overlay-title="RIG (recorders)" {
@@ -181,7 +191,7 @@ binds {
 
     //── Wheel ──  Mod+wheel anywhere = the bar's WS-cell wheel: workspaces,
     //   and with Shift the columns of this one (up = left; stops at the ends).
-    //   Same in Mango (binds.conf axisbind). The cooldown keeps one notch from
+    //   The cooldown keeps one notch from
     //   flying past several workspaces.
     Mod+WheelScrollUp         cooldown-ms=150 { focus-workspace-up; }
     Mod+WheelScrollDown       cooldown-ms=150 { focus-workspace-down; }

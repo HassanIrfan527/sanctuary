@@ -24,7 +24,9 @@ Popup {
     // Order = the picker's rows. `word` is what shell.sh set takes.
     readonly property var styles: [
         { word: "signal", name: "Signal", desc: "instrument strip · live traces" },
-        { word: "flare",  name: "Flare",  desc: "signal in daylight · parchment + ember" }
+        { word: "flare",  name: "Flare",  desc: "signal in daylight · parchment + ember" },
+        { word: "lantern", name: "Lantern", desc: "rainy night, warm light" },
+        { word: "harvest", name: "Harvest", desc: "autumn afternoon" }
     ]
     readonly property int current: Math.max(0, styles.findIndex(s => s.word === Theme.word))
 

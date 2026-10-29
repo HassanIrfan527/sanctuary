@@ -41,6 +41,8 @@ Item {
         color: cell.labelTone === "hot" ? Theme.sigHot : cell.labelTone === "warn" ? Theme.sigWarn
              : cell.labelTone === "alarm" ? Theme.sigAlarm : cell.labelTone === "second" ? Theme.peach
              : Theme.sigLabel
+        layer.enabled: Theme.glow > 0 && (cell.labelTone === "hot" || cell.labelTone === "alarm")
+        layer.effect: Glow { tint: lab.color; strength: 0.8 }
     }
 
     Row {
